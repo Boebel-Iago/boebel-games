@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# =========================
+# Tests Infrastructure
+# =========================
+
+infra/docker-compose.yml

@@ -1,18 +1,50 @@
-# Angular / Node
-web/node_modules/
-web/dist/
-web/.angular/
+# =========================
+# IDEs and Editors
+# =========================
 
-# Java / Spring Boot
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# =========================
+# Backend: Java / Spring Boot (api/)
+# =========================
+
 api/target/
 api/*.jar
 api/*.war
+api/hs_err_pid*
+api/.mvn/
 
-# IDEs (Arquivos da sua máquina)
-.idea/
-.vscode/
-*.eclipse/
+# =========================
+# Frontend: Angular / Node (web/)
+# =========================
 
-# Variáveis de ambiente e senhas
+web/node_modules/
+web/dist/
+web/.angular/
+web/coverage/
+web/npm-debug.log
+web/yarn-error.log
+
+# =========================
+# Secrets and Environment Variables
+# =========================
+
 .env
+.env.*
 api/src/main/resources/application-secret.properties
+
+# =========================
+# Operating System Files
+# =========================
+
+.DS_Store
+Thumbs.db

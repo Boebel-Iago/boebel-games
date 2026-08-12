@@ -1,0 +1,18 @@
+# Angular / Node
+web/node_modules/
+web/dist/
+web/.angular/
+
+# Java / Spring Boot
+api/target/
+api/*.jar
+api/*.war
+
+# IDEs (Arquivos da sua máquina)
+.idea/
+.vscode/
+*.eclipse/
+
+# Variáveis de ambiente e senhas
+.env
+api/src/main/resources/application-secret.properties

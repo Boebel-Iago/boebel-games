@@ -31,7 +31,7 @@ public class AccessTicket {
     @Builder.Default
     private Integer currentUses = 0; //Number of user online at the moment, always starts in zero
 
-    @Column(name = "local_date_time", nullable = false)
+    @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
     @Column(name = "is_active", nullable = false)

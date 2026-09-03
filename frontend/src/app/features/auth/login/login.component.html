@@ -1,25 +1,31 @@
-<div class="login-wrapper">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-card">
-        <div class="header">
-            <h2>Boebel Games</h2>
-            <p>Acesso do Professor</p>
-        </div>
-    
-        <div class="input-group">
-            <label for="email">E-mail</label>
-            <input id="email" type="email" formControlName="email" placeholder="admin@escola.com">
-        </div>
-
-        <div class="input-group">
-            <label for="password">Senha</label>
-            <input id="password" type="password" formControlName="password" placeholder="Sua senha">
-        </div>
-
-        <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-        </div>
-
-        <button type="submit" [disabled]="loginForm.invalid">Entrar no Sistema</button>
-
+<div class="flex items-center justify-center min-h-screen bg-gray-50 font-sans">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+      
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Boebel Games</h2>
+        <p class="text-sm text-gray-500 mt-1">Acesso do Professor</p>
+      </div>
+  
+      <div class="mb-5">
+        <label for="email" class="block mb-2 text-sm font-semibold text-gray-700">E-mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="admin@escola.com"
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-forest-800 focus:border-transparent transition-all">
+      </div>
+  
+      <div class="mb-6">
+        <label for="password" class="block mb-2 text-sm font-semibold text-gray-700">Senha</label>
+        <input id="password" type="password" formControlName="password" placeholder="Sua senha secreta"
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-forest-800 focus:border-transparent transition-all">
+      </div>
+  
+      <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center font-medium">
+        {{ errorMessage }}
+      </div>
+  
+      <button type="submit" [disabled]="loginForm.invalid"
+              class="w-full py-3 px-4 bg-forest-900 hover:bg-forest-800 text-white font-semibold rounded-lg shadow transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer">
+        Entrar no Sistema
+      </button>
+      
     </form>
-</div>
+  </div>

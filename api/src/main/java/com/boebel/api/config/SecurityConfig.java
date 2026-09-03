@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable postmanblock
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //force stateless http sessions
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/validate/**").permitAll()
                         .anyRequest().authenticated())

@@ -28,7 +28,7 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
       this.authService.login(email!, password!).subscribe({
         next: () => {
-          alert('Login efetuado com sucesso! Token salvo.');
+          this.router.navigate(['/admin', 'dashboard']);
         },
         error: () => {
           this.errorMessage = 'E-mail ou senha incorretos.';

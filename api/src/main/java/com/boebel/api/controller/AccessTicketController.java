@@ -6,6 +6,7 @@ import com.boebel.api.model.Teacher;
 import com.boebel.api.repository.TeacherRepository;
 import com.boebel.api.service.AccessTicketService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,23 @@ public class AccessTicketController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(ticket);
+    }
+
+    // Public endpoint for children enter in the game
+
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateStudentTicket(@RequestBody Map<String, String> payload) {
+        try {
+            String code = payload.get("code");
+            if (code == null || code.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Code not provided."));
+            }
+
+            TicketResponseDTO validatedTicket = accessTicketService.validateAndConsumeTicket(code);
+            return ResponseEntity.ok(validatedTicket);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 
     // Endpoint for delete a active ticket

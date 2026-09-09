@@ -34,4 +34,8 @@ export class TicketService {
   deleteTicket(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/tickets/${id}`, { headers: this.getHeaders() });
   }
+
+  validateTicket(code: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/tickets/validate`, { code });
+  }
 }

@@ -14,4 +14,6 @@ public interface AccessTicketRepository extends JpaRepository<AccessTicket, UUID
     boolean existsByTeacher(Teacher teacher);
 
     Optional<AccessTicket> findByTeacher(Teacher teacher);
+
+    Optional<AccessTicket> findByCode(String code);
 }

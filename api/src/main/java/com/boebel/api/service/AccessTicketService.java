@@ -81,6 +81,38 @@ public class AccessTicketService {
         accessTicketRepository.delete(ticket);
     }
 
+    public TicketResponseDTO validateAndConsumeTicket(String code) {
+        AccessTicket ticket = accessTicketRepository.findByCode(code.toUpperCase())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid ticket!"));
+
+        if (!ticket.getIsActive()) {
+            throw new IllegalArgumentException("This ticket is disable");
+        }
+
+        if (ticket.getExpirationDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("This ticket expires");
+        }
+
+        if (ticket.getCurrentUses() >= ticket.getMaxUses()) {
+            throw new IllegalArgumentException("This room is full");
+        }
+
+        // Increment the people that uses this ticket
+        ticket.setCurrentUses(ticket.getCurrentUses() + 1);
+        accessTicketRepository.save(ticket);
+
+        return new TicketResponseDTO(
+                ticket.getUuid(),
+                ticket.getCode(),
+                ticket.getGrade(),
+                ticket.getGame().getTitle(),
+                ticket.getGame().getRoute(), // CRITIC: Frontend need this to redirect to game
+                ticket.getMaxUses(),
+                ticket.getMaxUses() - ticket.getCurrentUses(),
+                null
+        );
+    }
+
     private String generateRandomCode() {
         return UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }

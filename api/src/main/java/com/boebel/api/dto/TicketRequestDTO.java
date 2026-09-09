@@ -2,5 +2,7 @@ package com.boebel.api.dto;
 
 public record TicketRequestDTO(
         Integer maxUses,
-        Integer hoursValid
+        Integer expirationHours,
+        String grade,
+        Long gameId
 ) {}

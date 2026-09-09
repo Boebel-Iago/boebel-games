@@ -1,35 +1,87 @@
 package com.boebel.api.service;
 
+import com.boebel.api.dto.TicketRequestDTO;
+import com.boebel.api.dto.TicketResponseDTO;
 import com.boebel.api.model.AccessTicket;
+import com.boebel.api.model.Game;
+import com.boebel.api.model.Teacher;
 import com.boebel.api.repository.AccessTicketRepository;
+import com.boebel.api.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
 public class AccessTicketService {
 
     private final AccessTicketRepository accessTicketRepository;
+    private final GameRepository gameRepository;
 
-    public AccessTicketService(AccessTicketRepository accessTicketRepository) {
+    public AccessTicketService(AccessTicketRepository accessTicketRepository, GameRepository gameRepository) {
         this.accessTicketRepository = accessTicketRepository;
+        this.gameRepository = gameRepository;
     }
 
-    //Generate ticket for admin control
-    public AccessTicket generateTicket(int maxUses, int hoursValid) {
+    public TicketResponseDTO generateTicket(Teacher teacher, TicketRequestDTO request) {
+        if (accessTicketRepository.existsByTeacher(teacher)) {
+            throw new IllegalStateException("Teacher already has an active ticket.");
+        }
+
+        Game game = gameRepository.findById(request.gameId())
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+
         AccessTicket accessTicket = AccessTicket.builder()
+                .teacher(teacher)
                 .code(generateRandomCode())
-                .maxUses(maxUses)
-                .expirationDate(LocalDateTime.now().plusHours(hoursValid))
+                .maxUses(request.maxUses())
+                .grade(request.grade())
+                .game(game)
+                .expirationDate(LocalDateTime.now().plusHours(request.expirationHours()))
                 .build();
-        return  accessTicketRepository.save(accessTicket);
+
+        AccessTicket savedTicket = accessTicketRepository.save(accessTicket);
+
+        return new TicketResponseDTO(
+                savedTicket.getUuid(),
+                savedTicket.getCode(),
+                savedTicket.getGrade(),
+                game.getTitle(),
+                game.getRoute(),
+                savedTicket.getMaxUses(),
+                savedTicket.getMaxUses() - savedTicket.getCurrentUses(),
+                request.expirationHours()
+        );
     }
 
-    //Generate the code for childrens in classroom uses for login in site
+    public TicketResponseDTO getActiveTicketForTeacher(Teacher teacher) {
+        AccessTicket ticket = accessTicketRepository.findByTeacher(teacher).orElse(null);
+        if (ticket == null) return null;
+
+        return new TicketResponseDTO(
+                ticket.getUuid(),
+                ticket.getCode(),
+                ticket.getGrade(),
+                ticket.getGame().getTitle(),
+                ticket.getGame().getRoute(),
+                ticket.getMaxUses(),
+                ticket.getMaxUses() - ticket.getCurrentUses(),
+                null
+        );
+    }
+
+    public void deleteTicket(UUID id, Teacher teacher) {
+        AccessTicket ticket = accessTicketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        if (!ticket.getTeacher().getUuid().equals(teacher.getUuid())) {
+            throw new SecurityException("Unauthorized to delete this ticket");
+        }
+
+        accessTicketRepository.delete(ticket);
+    }
+
     private String generateRandomCode() {
         return UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
-
 }

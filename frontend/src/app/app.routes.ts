@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { StudentLoginComponent } from './features/student-login/student-login.component';
 import { PixelArtComponent } from './features/games/pixel-art/pixel-art.component';
+import { ProfessionsComponent } from './features/games/professions/professions.component';
 
 export const routes: Routes = [
     
@@ -10,5 +11,6 @@ export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent},
     { path: 'admin/dashboard', component: DashboardComponent},
-    { path: 'games/pixel-art', component: PixelArtComponent }
+    { path: 'games/pixel-art', component: PixelArtComponent },
+    { path: 'games/professions', component: ProfessionsComponent}
 ];

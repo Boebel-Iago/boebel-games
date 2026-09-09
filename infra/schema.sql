@@ -40,3 +40,25 @@ CREATE TABLE access_tickets (
     CONSTRAINT fk_ticket_game FOREIGN KEY (game_id) REFERENCES games (id),
     CONSTRAINT fk_ticket_teacher FOREIGN KEY (teacher_uuid) REFERENCES teachers (uuid)
 );
+
+    -- Inserindo jogo de teste (Pixel Art)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Pixel Art Maker', 'Uma tela de 10x10 para criar desenhos pixelados e treinar lógica e coordenadas espaciais.', 'pixel-art');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (1, 'ELEMENTARY_1');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (1, 'ELEMENTARY_2');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (1, 'ELEMENTARY_3');
+    
+    --Adicionando novo jogo--
+    INSERT INTO games (title, description, route) 
+    VALUES ('Máquinas e Profissões', 'Associe tecnologias ao trabalho e ao lazer.', 'professions');
+
+    -- Vinculando o jogo (que provavelmente será o ID 2) à turma do 2º Ano
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (2, 'ELEMENTARY_2');
+    
+    --Adicionando novo jogo
+    INSERT INTO games (title, description, route) 
+    VALUES ('Detetive Digital', 'Avaliação prática de uso de navegadores e palavras-chave.', 'browser-search');
+
+    -- Supondo que o ID gerado seja 3
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (3, 'ELEMENTARY_3');

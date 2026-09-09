@@ -1,0 +1,118 @@
+<div class="min-h-screen bg-gray-50 flex flex-col items-center py-6 font-sans px-2">
+  
+    <!-- Header da Fase -->
+    <div class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-200 pb-4">
+      <div class="text-center md:text-left mb-4 md:mb-0">
+        <h2 class="text-3xl font-bold text-forest-900">{{ currentLevel.title }}</h2>
+        <p class="text-gray-500 font-medium">{{ currentLevel.instruction }}</p>
+      </div>
+      <div>
+        <span class="bg-forest-900 text-white px-5 py-2 rounded-full text-sm font-bold shadow">
+          Fase: {{ currentLevelIndex + 1 }} / {{ levels.length }}
+        </span>
+      </div>
+    </div>
+  
+    <div class="w-full max-w-6xl flex flex-col lg:flex-row gap-6 justify-center">
+      
+      <!-- LADO ESQUERDO: A Matriz de Código -->
+      <div class="bg-gray-900 p-4 rounded-xl shadow-lg border-4 border-gray-800 flex flex-col items-center flex-1">
+        <h3 class="text-green-400 font-mono font-bold mb-4 text-lg md:text-xl tracking-widest uppercase">>>> MATRIZ_DADOS</h3>
+        
+        <div class="flex flex-col text-green-300 font-mono text-lg md:text-2xl font-bold">
+          <!-- Letras das Colunas (A até J) -->
+          <div class="flex pl-8 md:pl-10 text-green-600/70 mb-2">
+            <div *ngFor="let col of columns" class="w-6 md:w-8 text-center">{{ col }}</div>
+          </div>
+  
+          <!-- Linhas com Números + Dados -->
+          <div class="flex">
+            <!-- Números das Linhas (1 até 10) -->
+            <div class="flex flex-col pr-2 md:pr-2 text-green-600/70">
+              <div *ngFor="let row of rows" class="h-6 md:h-8 flex items-center justify-end w-6 md:w-8">{{ row }}</div>
+            </div>
+  
+            <!-- O Código (Os 0, 1, 2, etc) -->
+            <div class="flex flex-col">
+               <div *ngFor="let rowArr of currentPatternGrid" class="flex">
+                  <div *ngFor="let char of rowArr" class="w-6 md:w-8 h-6 md:h-8 flex items-center justify-center">
+                    {{ char }}
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- LADO DIREITO: O Monitor (Área de Desenho) -->
+      <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col items-center flex-1">
+        
+        <!-- Paleta Dinâmica de Cores -->
+        <div class="flex flex-wrap justify-center gap-3 mb-6">
+          <button 
+            *ngFor="let num of getAvailableColorNumbers()"
+            (click)="selectColor(num)"
+            [style.background-color]="currentLevel.colors[num]"
+            [class.ring-4]="selectedNumber === num"
+            class="w-10 h-10 md:w-12 md:h-12 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer hover:scale-110 transition-transform flex items-center justify-center font-bold font-mono text-lg ring-forest-900 ring-offset-2"
+            [ngClass]="num === 0 ? 'text-gray-400' : 'text-white drop-shadow-md'">
+            {{ num }}
+          </button>
+        </div>
+  
+        <!-- Tabuleiro de Desenho com Coordenadas -->
+        <div class="flex flex-col mb-6">
+          <!-- Letras das Colunas (A até J) -->
+          <div class="flex pl-8 md:pl-10 text-gray-400 font-bold mb-1">
+            <div *ngFor="let col of columns" class="w-7 md:w-10 text-center">{{ col }}</div>
+          </div>
+  
+          <div class="flex">
+            <!-- Números das Linhas (1 até 10) -->
+            <div class="flex flex-col pr-1 md:pr-2 text-gray-400 font-bold">
+              <div *ngFor="let row of rows" class="h-7 md:h-10 flex items-center justify-end w-7 md:w-8">{{ row }}</div>
+            </div>
+  
+            <!-- A Grade 10x10 clicável -->
+            <div class="grid grid-cols-10 gap-0 border-4 border-gray-300 bg-gray-100 rounded-lg shadow-inner overflow-hidden">
+              <div 
+                *ngFor="let cellValue of studentGrid; let i = index"
+                (click)="paintCell(i)"
+                [style.background-color]="currentLevel.colors[cellValue]"
+                class="w-7 h-7 md:w-10 md:h-10 border border-gray-200/50 cursor-pointer hover:brightness-90 transition-colors duration-75">
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Ações do Jogo -->
+        <div class="flex gap-3 w-full max-w-sm">
+          <button 
+            *ngIf="!isLevelCompleted"
+            (click)="clearGrid()" 
+            class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition-colors border border-gray-300">
+            Limpar
+          </button>
+  
+          <button 
+            *ngIf="!isLevelCompleted"
+            (click)="checkAnswer()" 
+            class="flex-1 py-3 bg-forest-900 text-white font-bold rounded-lg hover:bg-forest-800 transition-colors shadow-md">
+            Verificar
+          </button>
+  
+          <button 
+            *ngIf="isLevelCompleted && !gameFinished"
+            (click)="nextLevel()" 
+            class="w-full py-3 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600 transition-colors shadow-lg border-b-4 border-emerald-700 text-lg animate-pulse">
+            PRÓXIMA FASE ➔
+          </button>
+  
+          <div *ngIf="gameFinished" class="w-full py-3 bg-yellow-400 text-yellow-900 text-center font-black rounded-lg shadow-lg text-lg">
+            🏆 VOCÊ VENCEU! 🏆
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>

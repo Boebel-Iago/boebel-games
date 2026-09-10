@@ -1,56 +1,158 @@
-<!-- FASE 1: O NAVEGADOR FAKE -->
-<div *ngIf="gameStage === 1 && !gameFinished" class="w-full max-w-4xl bg-white border-2 border-gray-300 rounded-xl shadow-2xl overflow-hidden flex flex-col">
-    
-    <!-- Barra Superior do Navegador (Abas) -->
-    <div class="bg-gray-200 p-2 flex gap-2 border-b border-gray-300 items-end">
-      <!-- Botões do Sistema -->
-      <div class="flex items-center gap-2 mr-2 pb-1">
-        <button (click)="checkBrowserPart('close-tab', $event)" class="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 cursor-pointer shadow-sm" title="Fechar"></button>
-        <div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div>
-        <div class="w-3 h-3 rounded-full bg-green-400 shadow-sm"></div>
+<div class="min-h-screen bg-gray-50 flex flex-col items-center py-6 font-sans px-4 relative">
+  
+    <div class="w-full max-w-5xl flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4">
+      <div>
+        <h2 class="text-3xl font-bold text-forest-900">Detetive Digital</h2>
+        <p class="text-gray-500 font-medium text-lg">
+          {{ gameStage === 1 ? 'Avaliação: Anatomia do Navegador' : 'Avaliação: Palavras-chave' }}
+        </p>
       </div>
-      
-      <!-- Aba Ativa -->
-      <div class="bg-white px-4 py-1.5 rounded-t-lg text-xs font-bold text-gray-700 shadow-sm flex items-center gap-2">
-        <span>🌍</span> Meu Site
+      <div class="text-right">
+        <span class="bg-forest-900 text-white px-4 py-2 rounded-lg font-bold shadow">
+          Módulo {{ gameStage }} de 2
+        </span>
       </div>
-
-      <!-- Nova Guia -->
-      <button (click)="checkBrowserPart('new-tab', $event)" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-black w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors shadow-sm" title="Nova Guia">
-        +
-      </button>
     </div>
-
-    <!-- Barra de Ferramentas -->
-    <div class="bg-gray-100 p-3 flex items-center gap-3 border-b-2 border-gray-300">
-      
-      <button (click)="checkBrowserPart('back')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Voltar">⬅️</button>
-      <button (click)="checkBrowserPart('forward')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Avançar">➡️</button>
-      <button (click)="checkBrowserPart('refresh')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Atualizar">🔄</button>
-      <button (click)="checkBrowserPart('home')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Página Inicial">🏠</button>
-      
-      <!-- Barra de Endereços com Botões Internos -->
-      <div (click)="checkBrowserPart('address-bar', $event)" class="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2 text-left text-gray-500 hover:border-blue-400 shadow-inner flex items-center justify-between cursor-pointer">
-        <div class="flex items-center gap-2">
-          <!-- O Cadeado -->
-          <button (click)="checkBrowserPart('lock', $event)" class="hover:bg-gray-200 p-1 rounded transition-colors text-lg" title="Site Seguro">🔒</button>
-          <span>https://www.meusite.com.br</span>
+  
+    <!-- INSTRUÇÃO ATUAL -->
+    <div *ngIf="!gameFinished" class="bg-blue-100 border-l-8 border-blue-500 p-6 rounded-xl shadow-md w-full max-w-4xl mb-8">
+      <h3 class="text-xl font-bold text-blue-900 flex items-center gap-2 mb-2">
+        <span class="text-2xl">🎯</span> Sua Missão:
+      </h3>
+      <p class="text-2xl text-blue-800 font-medium">
+        {{ gameStage === 1 ? browserTasks[currentTaskIndex].instruction : searchTasks[currentTaskIndex].situation }}
+      </p>
+    </div>
+  
+    <!-- FASE 1: O NAVEGADOR FAKE -->
+    <div *ngIf="gameStage === 1 && !gameFinished" class="w-full max-w-4xl bg-white border-2 border-gray-300 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+        
+      <!-- Barra Superior do Navegador (Abas) -->
+      <div class="bg-gray-200 p-2 flex gap-2 border-b border-gray-300 items-end">
+        <!-- Botões do Sistema -->
+        <div class="flex items-center gap-2 mr-2 pb-1">
+          <button (click)="checkBrowserPart('close-tab', $event)" class="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 cursor-pointer shadow-sm" title="Fechar"></button>
+          <div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400 shadow-sm"></div>
         </div>
         
-        <!-- Favoritos (Estrela) -->
-        <button (click)="checkBrowserPart('bookmark', $event)" class="hover:bg-yellow-100 p-1 rounded-full transition-colors text-lg" title="Favoritos">⭐</button>
+        <!-- Aba Ativa -->
+        <div class="bg-white px-4 py-1.5 rounded-t-lg text-xs font-bold text-gray-700 shadow-sm flex items-center gap-2">
+          <span>🌍</span> Meu Site
+        </div>
+
+        <!-- Nova Guia -->
+        <button (click)="checkBrowserPart('new-tab', $event)" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-black w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors shadow-sm" title="Nova Guia">
+          +
+        </button>
       </div>
 
-    </div>
+      <!-- Barra de Ferramentas -->
+      <div class="bg-gray-100 p-3 flex items-center gap-3 border-b-2 border-gray-300">
+        
+        <button (click)="checkBrowserPart('back')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Voltar">⬅️</button>
+        <button (click)="checkBrowserPart('forward')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Avançar">➡️</button>
+        <button (click)="checkBrowserPart('refresh')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Atualizar">🔄</button>
+        <button (click)="checkBrowserPart('home')" class="p-2 bg-white rounded shadow hover:bg-gray-50 hover:scale-105 transition-transform text-xl cursor-pointer" title="Página Inicial">🏠</button>
+        
+        <!-- Barra de Endereços com Botões Internos -->
+        <div (click)="checkBrowserPart('address-bar', $event)" class="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2 text-left text-gray-500 hover:border-blue-400 shadow-inner flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-2">
+            <!-- O Cadeado -->
+            <button (click)="checkBrowserPart('lock', $event)" class="hover:bg-gray-200 p-1 rounded transition-colors text-lg" title="Site Seguro">🔒</button>
+            <span>https://www.meusite.com.br</span>
+          </div>
+          
+          <!-- Favoritos (Estrela) -->
+          <button (click)="checkBrowserPart('bookmark', $event)" class="hover:bg-yellow-100 p-1 rounded-full transition-colors text-lg" title="Favoritos">⭐</button>
+        </div>
 
-    <!-- Corpo da Página com Barra de Pesquisa -->
-    <div class="bg-white p-20 flex flex-col items-center justify-center min-h-[300px]">
-      <div class="text-6xl font-black text-blue-500 mb-8 tracking-tighter drop-shadow-sm">Buscador<span class="text-yellow-500">Legal</span></div>
+      </div>
+
+      <!-- Corpo da Página com Barra de Pesquisa -->
+      <div class="bg-white p-20 flex flex-col items-center justify-center min-h-[300px]">
+        <div class="text-6xl font-black text-blue-500 mb-8 tracking-tighter drop-shadow-sm">Buscador<span class="text-yellow-500">Legal</span></div>
+        
+        <!-- Barra de Pesquisa Central -->
+        <button (click)="checkBrowserPart('search-bar')" class="w-full max-w-lg border-2 border-gray-300 rounded-full px-6 py-4 flex items-center gap-3 hover:border-blue-500 hover:shadow-lg hover:scale-105 transition-all cursor-pointer bg-gray-50">
+          <span class="text-3xl text-blue-500">🔍</span>
+          <span class="text-gray-400 font-medium text-lg">O que você quer procurar na internet?</span>
+        </button>
+      </div>
+    </div>
+  
+  
+    <!-- FASE 2: CARTÕES DE PALAVRAS-CHAVE -->
+    <div *ngIf="gameStage === 2 && !gameFinished" class="w-full max-w-4xl flex flex-col gap-6 items-center">
       
-      <!-- Barra de Pesquisa Central -->
-      <button (click)="checkBrowserPart('search-bar')" class="w-full max-w-lg border-2 border-gray-300 rounded-full px-6 py-4 flex items-center gap-3 hover:border-blue-500 hover:shadow-lg hover:scale-105 transition-all cursor-pointer bg-gray-50">
-        <span class="text-3xl text-blue-500">🔍</span>
-        <span class="text-gray-400 font-medium text-lg">O que você quer procurar na internet?</span>
+      <!-- Tela de Digitação (Onde as palavras selecionadas ficam) -->
+      <div class="w-full bg-white p-6 rounded-2xl shadow-inner border-4 border-gray-200 flex flex-wrap gap-3 min-h-[100px] items-center">
+        <span *ngIf="selectedWords.length === 0" class="text-gray-400 text-lg font-medium italic">
+          Toque nas palavras abaixo para formar sua pesquisa...
+        </span>
+        
+        <!-- Palavras selecionadas -->
+        <button 
+          *ngFor="let word of selectedWords" 
+          (click)="removeWord(word)"
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg text-xl font-bold shadow-md flex items-center gap-2 hover:bg-blue-700 hover:scale-105 transition-all">
+          {{ word }} <span>✖</span>
+        </button>
+      </div>
+  
+      <!-- Banco de Palavras Disponíveis -->
+      <div class="w-full bg-gray-100 p-6 rounded-2xl border-2 border-gray-200 flex flex-wrap justify-center gap-4">
+        <button 
+          *ngFor="let word of availableWords" 
+          (click)="selectWord(word)"
+          class="bg-white text-gray-800 border-2 border-gray-300 px-6 py-3 rounded-lg text-xl font-bold shadow hover:border-forest-900 hover:text-forest-900 hover:scale-105 transition-all">
+          {{ word }}
+        </button>
+      </div>
+  
+      <button 
+        (click)="checkKeywords()"
+        class="mt-4 px-12 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-2xl rounded-xl shadow-lg border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1 transition-all">
+        🔍 PESQUISAR
       </button>
     </div>
+  
+  
+    <!-- TELA DE VITÓRIA FINAL -->
+    <div *ngIf="gameFinished" class="bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center max-w-2xl mt-4">
+      <div class="text-9xl mb-6">💻</div>
+      <h2 class="text-4xl font-black text-forest-900 mb-4">Avaliação Concluída!</h2>
+      <p class="text-xl text-gray-600 mb-6">
+        Você provou que conhece o navegador e sabe escolher as melhores palavras-chave.
+      </p>
+      <p class="text-lg text-forest-700 font-bold bg-forest-50 p-4 rounded-lg inline-block">
+        Agora é com você: Abra o navegador real do computador e faça sua pesquisa prática!
+      </p>
+    </div>
+  
+  
+    <!-- MODAL DE FEEDBACK -->
+    <div *ngIf="showFeedbackModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+      <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center transform transition-all" 
+           [ngClass]="isCorrectGuess ? 'border-4 border-green-500' : 'border-4 border-red-500'">
+        
+        <div class="text-7xl mb-4">{{ isCorrectGuess ? '✅' : '❌' }}</div>
+        
+        <h3 class="text-3xl font-black mb-4" [ngClass]="isCorrectGuess ? 'text-green-600' : 'text-red-600'">
+          {{ isCorrectGuess ? 'Isso mesmo!' : 'Atenção!' }}
+        </h3>
+        
+        <p class="text-xl text-gray-700 font-medium mb-8 leading-relaxed">
+          {{ feedbackText }}
+        </p>
+  
+        <button 
+          (click)="nextStep()"
+          class="w-full py-4 text-white font-bold text-xl rounded-xl shadow-md transition-colors"
+          [ngClass]="isCorrectGuess ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'">
+          {{ isCorrectGuess ? 'Continuar ➔' : 'Tentar Novamente' }}
+        </button>
+      </div>
+    </div>
+  
   </div>

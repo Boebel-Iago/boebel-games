@@ -26,6 +26,8 @@ export class StudentLoginComponent {
       return;
     }
 
+
+
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -33,6 +35,7 @@ export class StudentLoginComponent {
     this.ticketService.validateTicket(this.ticketCode.trim().toUpperCase()).subscribe({
       next: (response) => {
         this.isLoading = false;
+        sessionStorage.setItem('activeGameRoute', response.gameRoute);
         // Redireciona o aluno direto para a rota do jogo! (Ex: /games/pixel-art)
         this.router.navigate([`/games/${response.gameRoute}`]);
       },

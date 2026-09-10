@@ -5,14 +5,27 @@ import { StudentLoginComponent } from './features/student-login/student-login.co
 import { PixelArtComponent } from './features/games/pixel-art/pixel-art.component';
 import { ProfessionsComponent } from './features/games/professions/professions.component';
 import { BrowserSearchComponent } from './features/games/browser-search/browser-search.component';
+import { ticketGuard } from './core/guards/ticket.guard';
 
 export const routes: Routes = [
     
-    { path: '', component: BrowserSearchComponent},
+    { 
+        path: 'games/pixel-art', 
+        component: PixelArtComponent,
+        canActivate: [ticketGuard] // Cadeado aplicado
+    },
+    { 
+        path: 'games/professions', 
+        component: ProfessionsComponent,
+        canActivate: [ticketGuard] // Cadeado aplicado
+    },
+    { 
+        path: 'games/browser-search', 
+        component: BrowserSearchComponent,
+        canActivate: [ticketGuard] // Cadeado aplicado
+    },
     { path: '', component: StudentLoginComponent },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent},
     { path: 'admin/dashboard', component: DashboardComponent},
-    { path: 'games/pixel-art', component: PixelArtComponent },
-    { path: 'games/professions', component: ProfessionsComponent}
-];
+    ];

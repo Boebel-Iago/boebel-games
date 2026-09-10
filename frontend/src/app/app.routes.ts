@@ -6,9 +6,15 @@ import { PixelArtComponent } from './features/games/pixel-art/pixel-art.componen
 import { ProfessionsComponent } from './features/games/professions/professions.component';
 import { BrowserSearchComponent } from './features/games/browser-search/browser-search.component';
 import { ticketGuard } from './core/guards/ticket.guard';
+import { FactCheckerComponent } from './features/games/fact-checker/fact-checker.component';
 
 export const routes: Routes = [
     
+    { 
+        path: 'games/fact-checker', 
+        component: FactCheckerComponent,
+        canActivate: [ticketGuard] 
+    },
     { 
         path: 'games/pixel-art', 
         component: PixelArtComponent,

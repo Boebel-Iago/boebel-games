@@ -7,9 +7,15 @@ import { ProfessionsComponent } from './features/games/professions/professions.c
 import { BrowserSearchComponent } from './features/games/browser-search/browser-search.component';
 import { ticketGuard } from './core/guards/ticket.guard';
 import { FactCheckerComponent } from './features/games/fact-checker/fact-checker.component';
+import { CreatorsVsCopiersComponent } from './features/games/creators-vs-copiers/creators-vs-copiers.component';
 
 export const routes: Routes = [
     
+    { 
+        path: 'games/creators-vs-copiers', 
+        component: CreatorsVsCopiersComponent,
+        canActivate: [ticketGuard] 
+    },
     { 
         path: 'games/fact-checker', 
         component: FactCheckerComponent,

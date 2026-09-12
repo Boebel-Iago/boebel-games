@@ -1,0 +1,13 @@
+// Ajustes visuais do Blockly no tema escuro.
+// Fica fora do encapsulamento do Angular de propósito: o Blockly injeta seu
+// próprio SVG/DOM diretamente via JS, então estilos escopados por componente
+// (.component.scss padrão) não alcançam esses elementos.
+
+.blocklyFlyoutBackground {
+    fill: #1e293b !important;
+  }
+  
+  .blocklyToolboxDiv {
+    background-color: #0f172a !important;
+    color: white !important;
+  }

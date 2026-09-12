@@ -1,0 +1,32 @@
+{
+    "id": "fase-3-risco",
+    "fase": 3,
+    "title": "Zonas de Risco",
+    "objective": "As células com ⚠️ podem pegar fogo DURANTE a sua execução, não só no início. Use o bloco condicional 'SE FOGO' pra reagir se isso acontecer.",
+    "grid": [
+      [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+      [1, 1, 0, 1, 3, 1, 1, 1, 1, 1],
+      [1, 1, 3, 1, 0, 1, 1, 1, 1, 1],
+      [1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+      [1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 3, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 3, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": ["move_down", "move_right", "if_fire", "repeat_loop"],
+    "blockLimits": [
+      { "type": "move_down", "max": 4 },
+      { "type": "move_right", "max": 4 },
+      { "type": "if_fire", "max": 2 },
+      { "type": "repeat_loop", "max": 2 }
+    ],
+    "requireConditional": true,
+    "randomFire": {
+      "enabled": true,
+      "probabilityPerRiskCell": 0.5,
+      "minStepsBeforeFirstEvent": 2
+    }
+  }

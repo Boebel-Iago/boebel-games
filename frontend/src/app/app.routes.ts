@@ -8,9 +8,21 @@ import { BrowserSearchComponent } from './features/games/browser-search/browser-
 import { ticketGuard } from './core/guards/ticket.guard';
 import { FactCheckerComponent } from './features/games/fact-checker/fact-checker.component';
 import { CreatorsVsCopiersComponent } from './features/games/creators-vs-copiers/creators-vs-copiers.component';
+import { EmergencyEscapeComponent } from './features/games/emergency-escape/emergency-escape.component';
+import { LevelRepository, LocalLevelRepositoryService } from './features/games/emergency-escape/content/level-repository.service';
+import { ProgressReporter, NoopProgressReporterService } from './features/games/emergency-escape/progress/progress-reporter.service';
 
 export const routes: Routes = [
     
+    { 
+        path: 'games/emergency-escape', 
+        component: EmergencyEscapeComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: LevelRepository, useClass: LocalLevelRepositoryService },
+            { provide: ProgressReporter, useClass: NoopProgressReporterService }
+        ] 
+    },
     { 
         path: 'games/creators-vs-copiers', 
         component: CreatorsVsCopiersComponent,

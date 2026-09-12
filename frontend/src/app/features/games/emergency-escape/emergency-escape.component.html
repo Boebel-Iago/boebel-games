@@ -1,0 +1,125 @@
+<div class="min-h-screen bg-slate-900 flex flex-col items-center py-6 font-sans px-4 relative overflow-hidden">
+
+  <div class="absolute inset-0 pointer-events-none border-[12px] border-red-600/30 animate-pulse"></div>
+
+  <div class="w-full max-w-7xl flex justify-between items-center mb-6 border-b-4 border-red-600/50 pb-4 z-10 relative">
+    <div class="flex items-center gap-4">
+      <div class="text-4xl animate-bounce">🚨</div>
+      <div>
+        <h2 class="text-3xl md:text-4xl font-black text-red-500 uppercase tracking-widest drop-shadow-md">Evacuação Digital</h2>
+        <p class="text-gray-300 font-medium text-lg mt-1" *ngIf="currentLevel">
+          Fase {{ currentLevel.fase }}: {{ currentLevel.title }}
+        </p>
+      </div>
+    </div>
+    <div class="hidden md:block" *ngIf="currentLevel">
+      <span class="bg-red-600 text-white px-6 py-3 rounded-xl text-lg font-black shadow-[0_0_15px_rgba(220,38,38,0.7)]">
+        NÍVEL {{ currentLevel.fase }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Instrução Pedagógica -->
+  <div *ngIf="!gameFinished && currentLevel" class="w-full max-w-7xl bg-slate-800 border-l-8 border-yellow-500 p-4 rounded-xl shadow-lg mb-6 z-10">
+    <p class="text-lg text-yellow-400 font-bold flex items-center gap-2">
+      <span>⚠️ OBJETIVO:</span>
+      <span class="text-white font-normal">{{ currentLevel.objective }}</span>
+    </p>
+  </div>
+
+  <div [hidden]="gameFinished" class="w-full max-w-7xl flex flex-col lg:flex-row gap-8 z-10">
+
+    <!-- LADO ESQUERDO: A Sala 10x10 -->
+    <div class="w-full lg:w-[45%] flex justify-center items-start">
+      <div class="p-1 sm:p-2 bg-[repeating-linear-gradient(45deg,#fbbf24,#fbbf24_20px,#1e293b_20px,#1e293b_40px)] rounded-2xl shadow-2xl w-full">
+        <div class="bg-gray-700 p-2 sm:p-3 rounded-xl border-4 border-gray-800 relative w-full aspect-square">
+
+          <div class="grid grid-cols-10 gap-0.5 w-full h-full">
+            <ng-container *ngFor="let row of currentGrid; let r = index">
+              <div *ngFor="let cell of row; let c = index"
+                   class="w-full h-full rounded-sm flex items-center justify-center text-sm md:text-xl shadow-inner transition-all duration-200 relative overflow-hidden"
+                   [ngClass]="{
+                     'bg-gray-200 border border-gray-300': cell === 0,
+                     'bg-amber-900 border-b-2 border-amber-950': cell === 1,
+                     'bg-emerald-500 border-b-2 border-emerald-700 animate-pulse': cell === 2,
+                     'bg-orange-200 border-2 border-dashed border-orange-500': cell === 3,
+                     'bg-red-500 border border-yellow-400 shadow-[0_0_10px_rgba(239,68,68,0.9)] animate-bounce': cell === 4
+                   }">
+
+                <span *ngIf="cell === 1" class="drop-shadow filter grayscale opacity-90">🚧</span>
+                <span *ngIf="cell === 2" class="drop-shadow">🚪</span>
+                <span *ngIf="cell === 3" class="drop-shadow opacity-70 text-xs md:text-sm">⚠️</span>
+                <span *ngIf="cell === 4" class="drop-shadow text-xl md:text-3xl">🔥</span>
+
+                <div *ngIf="playerPos.r === r && playerPos.c === c"
+                     class="absolute inset-0 flex items-center justify-center text-xl md:text-3xl z-20 transition-all duration-300 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
+                     [ngClass]="{'animate-pulse scale-110': isRunning}">
+                  🧑‍🚒
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LADO DIREITO: ÁREA DE TRABALHO BLOCKLY -->
+    <div class="w-full lg:w-[55%] flex flex-col gap-4 relative h-[600px] lg:h-auto">
+
+      <!-- PAINEL DE INVENTÁRIO (só quando a fase tem blockLimits) -->
+      <div *ngIf="inventory.length > 0" class="w-full bg-slate-900 border-2 border-slate-700 rounded-xl p-3 flex flex-wrap gap-4 items-center justify-center shadow-lg">
+        <span class="text-slate-400 font-bold text-sm uppercase">Restam:</span>
+
+        <div *ngFor="let item of inventory"
+             class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border-2 transition-colors"
+             [ngClass]="item.max - item.used <= 0 ? 'border-red-500 opacity-60' : 'border-emerald-500'">
+          <span class="text-xl md:text-2xl">{{ item.label }}</span>
+          <span class="text-white font-black text-xl w-6 text-center"
+                [ngClass]="{'text-red-400': item.max - item.used <= 0}">
+            {{ item.max - item.used }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Área do Google Blockly -->
+      <div #blocklyDiv class="w-full flex-1 rounded-xl shadow-2xl border-4 border-slate-700 overflow-hidden bg-slate-800 min-h-[300px]"></div>
+
+      <button
+        (click)="executeAlgorithm()"
+        [disabled]="isRunning"
+        class="w-full bg-red-600 hover:bg-red-700 text-white font-black text-2xl py-4 rounded-xl shadow-[0_6px_0_#991b1b] active:shadow-none active:translate-y-[6px] transition-all disabled:opacity-50 uppercase mt-auto">
+        {{ isRunning ? 'Executando...' : '▶ Iniciar Sequência' }}
+      </button>
+
+    </div>
+  </div>
+
+  <!-- TELA DE VITÓRIA FINAL -->
+  <div *ngIf="gameFinished" class="bg-slate-800 p-12 rounded-3xl shadow-[0_0_30px_rgba(16,185,129,0.5)] border-4 border-emerald-500 text-center max-w-2xl mt-4 z-10">
+    <div class="text-9xl mb-6">🏆</div>
+    <h2 class="text-4xl font-black text-emerald-400 mb-4">Mestre dos Algoritmos!</h2>
+    <p class="text-xl text-gray-300 mb-6 leading-relaxed">
+      Você aprendeu na prática que Programação não é só decorar comandos, mas usar <b>Lógica Condicional</b> e planejamento pra resolver problemas com o menor número de passos possível. Parabéns!
+    </p>
+  </div>
+
+  <!-- MODAL DE FEEDBACK -->
+  <div *ngIf="showFeedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex justify-center items-center p-4 z-50">
+    <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center transform transition-all border-4"
+         [ngClass]="isSuccess ? 'border-emerald-500' : 'border-red-600'">
+      <div class="text-7xl mb-4">{{ isSuccess ? '✅' : '💥' }}</div>
+      <h3 class="text-3xl font-black mb-4 uppercase" [ngClass]="isSuccess ? 'text-emerald-400' : 'text-red-500'">
+        {{ isSuccess ? 'Sucesso!' : 'Falha Crítica!' }}
+      </h3>
+      <p class="text-xl text-gray-300 font-medium mb-8">
+        {{ feedbackText }}
+      </p>
+      <button
+        (click)="nextStep()"
+        class="w-full py-4 text-white font-black text-xl rounded-xl shadow-lg border-b-4 transition-all active:border-b-0 active:translate-y-1 uppercase"
+        [ngClass]="isSuccess ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-800' : 'bg-red-600 hover:bg-red-500 border-red-800'">
+        {{ isSuccess ? 'Continuar' : 'Revisar Código' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,3 +1,6 @@
+// styles.scss
+@use 'app/features/games/emergency-escape/blockly/blockly-dark-theme.scss';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

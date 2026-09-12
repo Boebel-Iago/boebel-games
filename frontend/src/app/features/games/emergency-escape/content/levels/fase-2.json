@@ -1,0 +1,24 @@
+{
+    "id": "fase-2-reduzida",
+    "fase": 2,
+    "title": "Rotas Múltiplas",
+    "objective": "Agora você só tem blocos de BAIXO e DIREITA — e um limite de quantidade. Existe mais de um caminho até a porta: escolha um e não deixe blocos sobrando!",
+    "grid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+      [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": ["move_down", "move_right"],
+    "blockLimits": [
+      { "type": "move_down", "max": 9 },
+      { "type": "move_right", "max": 9 }
+    ]
+  }

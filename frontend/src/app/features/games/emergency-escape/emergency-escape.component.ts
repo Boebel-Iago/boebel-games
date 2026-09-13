@@ -14,7 +14,7 @@ import { GameEngine } from './engine/game-engine';
 import { BlocklyAdapterService } from './blockly/blockly-adapter.service';
 import { BLOCK_LABELS } from './blockly/custom-blocks';
 import { LevelRepository } from './content/level-repository.service';
-import { LevelConfig, BlockType, CellType } from './content/level.model';
+import { LevelConfig, BlockType, CellType, NarrativeLine } from './content/level.model';
 import { ProgressReporter } from './progress/progress-reporter.service';
 
 interface InventoryItem {
@@ -44,6 +44,10 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
   currentGrid: CellType[][] = [];
   playerPos = { r: 0, c: 0 };
   inventory: InventoryItem[] = [];
+
+  /** 'briefing' = tela narrada antes da fase; 'playing' = jogo liberado. */
+  screen: 'briefing' | 'playing' = 'briefing';
+  briefingIndex = 0;
 
   isRunning = false;
   showFeedbackModal = false;
@@ -83,6 +87,8 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     this.levels.getLevel(fase).subscribe(level => {
       this.currentLevel = level;
       this.attempts = 0;
+      this.screen = 'briefing';
+      this.briefingIndex = 0;
 
       this.engine.loadLevel(level);
       this.currentGrid = this.engine.getGrid();
@@ -97,8 +103,29 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     });
   }
 
+  get currentBriefingLine(): NarrativeLine | null {
+    return this.currentLevel?.briefing[this.briefingIndex] ?? null;
+  }
+
+  get isLastBriefingLine(): boolean {
+    return !!this.currentLevel && this.briefingIndex === this.currentLevel.briefing.length - 1;
+  }
+
+  nextBriefingLine(): void {
+    if (!this.currentLevel) return;
+    if (this.isLastBriefingLine) {
+      this.screen = 'playing';
+    } else {
+      this.briefingIndex++;
+    }
+  }
+
+  skipBriefing(): void {
+    this.screen = 'playing';
+  }
+
   executeAlgorithm(): void {
-    if (!this.currentLevel || !this.workspace || this.isRunning) return;
+    if (!this.currentLevel || !this.workspace || this.isRunning || this.screen === 'briefing') return;
 
     const { program, error } = this.blockly.extractProgram(this.workspace);
     if (error) {

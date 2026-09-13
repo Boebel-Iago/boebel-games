@@ -1,20 +1,25 @@
 {
-    "id": "fase-1-livre",
-    "fase": 1,
-    "title": "Caminho Livre",
-    "objective": "Arraste e encaixe os blocos para chegar à porta. Não existe uma única resposta certa — use o caminho que você quiser!",
-    "grid": [
-      [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-      [0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-      [1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [1, 1, 1, 1, 1, 1, 1, 0, 0, 2]
-    ],
-    "startPosition": { "r": 0, "c": 0 },
-    "availableBlocks": ["move_up", "move_down", "move_left", "move_right"]
-  }
+  "id": "fase-1-livre",
+  "fase": 1,
+  "title": "Caminho Livre",
+  "objective": "Arraste e encaixe os blocos para chegar à porta. Não existe uma única resposta certa — use o caminho que você quiser!",
+  "briefing": [
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Alarme de incêndio! Preciso sair da sala com segurança, e só você pode me ajudar." },
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Você vai montar um algoritmo: uma sequência de comandos que me diz exatamente o que fazer, passo a passo." },
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Não existe um único jeito certo de chegar até a porta. Escolha o caminho que você quiser!" }
+  ],
+  "grid": [
+    [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 2]
+  ],
+  "startPosition": { "r": 0, "c": 0 },
+  "availableBlocks": ["move_up", "move_down", "move_left", "move_right"]
+}

@@ -23,12 +23,22 @@ export interface RandomFireConfig {
   minStepsBeforeFirstEvent?: number;
 }
 
+export interface NarrativeLine {
+  /** Nome do personagem-guia (ex: "Capitão Alerta"). */
+  speaker: string;
+  /** Emoji usado como avatar na tela de briefing. */
+  avatar: string;
+  text: string;
+}
+
 export interface LevelConfig {
   id: string;
   fase: 1 | 2 | 3;
   title: string;
   /** Texto mostrado no painel amarelo de instrução (⚠️ OBJETIVO). */
   objective: string;
+  /** Falas mostradas em sequência ANTES da fase liberar o jogo. */
+  briefing: NarrativeLine[];
   grid: CellType[][];
   startPosition: { r: number; c: number };
   /** Quais blocos aparecem na toolbox do Blockly nesta fase. */

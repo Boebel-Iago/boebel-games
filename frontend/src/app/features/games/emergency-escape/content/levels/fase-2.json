@@ -1,24 +1,29 @@
 {
-    "id": "fase-2-reduzida",
-    "fase": 2,
-    "title": "Rotas Múltiplas",
-    "objective": "Agora você só tem blocos de BAIXO e DIREITA — e um limite de quantidade. Existe mais de um caminho até a porta: escolha um e não deixe blocos sobrando!",
-    "grid": [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
-      [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-      [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
-    ],
-    "startPosition": { "r": 0, "c": 0 },
-    "availableBlocks": ["move_down", "move_right"],
-    "blockLimits": [
-      { "type": "move_down", "max": 9 },
-      { "type": "move_right", "max": 9 }
-    ]
-  }
+  "id": "fase-2-reduzida",
+  "fase": 2,
+  "title": "Rotas Múltiplas",
+  "objective": "Agora você só tem blocos de BAIXO e DIREITA — e um limite de quantidade. Existe mais de um caminho até a porta: escolha um e não deixe blocos sobrando!",
+  "briefing": [
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Muito bem na primeira sala! Agora ficou mais desafiador." },
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Dessa vez eu só entendo comandos de BAIXO e DIREITA — e você tem uma quantidade limitada deles." },
+    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Pense antes de arrastar: existe mais de uma rota até a porta, mas só uma vai caber no seu limite de blocos." }
+  ],
+  "grid": [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+  ],
+  "startPosition": { "r": 0, "c": 0 },
+  "availableBlocks": ["move_down", "move_right"],
+  "blockLimits": [
+    { "type": "move_down", "max": 9 },
+    { "type": "move_right", "max": 9 }
+  ]
+}

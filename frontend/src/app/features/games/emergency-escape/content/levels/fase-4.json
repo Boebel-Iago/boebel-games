@@ -1,0 +1,158 @@
+{
+    "id": "fase-4",
+    "fase": 4,
+    "title": "Planeje o Caminho",
+    "objective": "O caminho ficou mais longo, e os blocos continuam contados. Organize a sequência com cuidado.",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Essa sala é maior. Confie no planejamento antes de arrastar qualquer bloco."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Lembre-se: só BAIXO e DIREITA, na quantidade certa."
+      }
+    ],
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_down",
+      "move_right"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_down",
+        "max": 4
+      },
+      {
+        "type": "move_right",
+        "max": 5
+      }
+    ]
+  }

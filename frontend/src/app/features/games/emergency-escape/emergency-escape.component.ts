@@ -15,6 +15,7 @@ import { BlocklyAdapterService } from './blockly/blockly-adapter.service';
 import { BLOCK_LABELS } from './blockly/custom-blocks';
 import { LevelRepository } from './content/level-repository.service';
 import { LevelConfig, BlockType, CellType, NarrativeLine } from './content/level.model';
+import { TOTAL_LEVELS } from './content/tiers';
 import { ProgressReporter } from './progress/progress-reporter.service';
 
 interface InventoryItem {
@@ -24,11 +25,10 @@ interface InventoryItem {
   used: number;
 }
 
-const LEVEL_COMPLETE_MESSAGES: Record<1 | 2 | 3, string> = {
-  1: 'Algoritmo completo! Você chegou até a porta.',
-  2: 'Ótimo planejamento de rota — e sem desperdiçar blocos!',
-  3: 'Lógica condicional na medida certa para sobreviver ao imprevisto. Mestre dos Algoritmos!'
-};
+const LEVEL_COMPLETE_MESSAGE = (level: LevelConfig): string =>
+  level.fase === TOTAL_LEVELS
+    ? 'Você venceu o desafio final! Mestre dos Algoritmos!'
+    : `Fase ${level.fase} concluída: ${level.title}!`;
 
 @Component({
   selector: 'app-emergency-escape',
@@ -83,7 +83,7 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     }
   }
 
-  loadStage(fase: 1 | 2 | 3): void {
+  loadStage(fase: number): void {
     this.levels.getLevel(fase).subscribe(level => {
       this.currentLevel = level;
       this.attempts = 0;
@@ -150,8 +150,8 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     this.showFeedbackModal = false;
 
     if (this.isSuccess) {
-      if (this.currentLevel && this.currentLevel.fase < 3) {
-        this.loadStage((this.currentLevel.fase + 1) as 1 | 2 | 3);
+      if (this.currentLevel && this.currentLevel.fase < TOTAL_LEVELS) {
+        this.loadStage(this.currentLevel.fase + 1);
       } else {
         this.gameFinished = true;
       }
@@ -217,7 +217,7 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
   private levelComplete(): void {
     this.isRunning = false;
     this.isSuccess = true;
-    this.feedbackText = LEVEL_COMPLETE_MESSAGES[this.currentLevel!.fase];
+    this.feedbackText = LEVEL_COMPLETE_MESSAGE(this.currentLevel!);
     this.showFeedbackModal = true;
     this.reportProgress('success');
   }

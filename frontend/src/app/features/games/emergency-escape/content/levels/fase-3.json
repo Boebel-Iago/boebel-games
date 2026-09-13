@@ -1,37 +1,163 @@
 {
-  "id": "fase-3-risco",
+  "id": "fase-3",
   "fase": 3,
-  "title": "Zonas de Risco",
-  "objective": "As células com ⚠️ podem pegar fogo DURANTE a sua execução, não só no início. Use o bloco condicional 'SE FOGO' pra reagir se isso acontecer.",
+  "title": "Blocos Contados",
+  "objective": "Agora você só tem blocos de BAIXO e DIREITA — e a quantidade exata que vai precisar. Não pode sobrar nem faltar!",
   "briefing": [
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Última sala, e é a mais perigosa. Reparou nas células marcadas com ⚠️?" },
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Elas podem pegar fogo ENQUANTO estamos andando — não só no começo. O cenário muda no meio do caminho." },
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Use o bloco condicional 'SE FOGO ENTÃO APAGAR' pra me proteger se isso acontecer. Sem ele, corremos risco de verdade." }
+    {
+      "speaker": "Capitão Alerta",
+      "avatar": "🧑‍🚒",
+      "text": "Muito bem nas salas livres! Agora ficou mais desafiador."
+    },
+    {
+      "speaker": "Capitão Alerta",
+      "avatar": "🧑‍🚒",
+      "text": "Dessa vez eu só entendo comandos de BAIXO e DIREITA — e você tem uma quantidade exata deles."
+    },
+    {
+      "speaker": "Capitão Alerta",
+      "avatar": "🧑‍🚒",
+      "text": "Pense antes de arrastar: se errar a ordem, pode não sobrar bloco pra corrigir."
+    }
   ],
   "grid": [
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-    [1, 1, 0, 1, 3, 1, 1, 1, 1, 1],
-    [1, 1, 3, 1, 0, 1, 1, 1, 1, 1],
-    [1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 3, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 3, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
   ],
-  "startPosition": { "r": 0, "c": 0 },
-  "availableBlocks": ["move_down", "move_right", "if_fire", "repeat_loop"],
+  "startPosition": {
+    "r": 0,
+    "c": 0
+  },
+  "availableBlocks": [
+    "move_down",
+    "move_right"
+  ],
   "blockLimits": [
-    { "type": "move_down", "max": 4 },
-    { "type": "move_right", "max": 4 },
-    { "type": "if_fire", "max": 2 },
-    { "type": "repeat_loop", "max": 2 }
-  ],
-  "requireConditional": true,
-  "randomFire": {
-    "enabled": true,
-    "probabilityPerRiskCell": 0.5,
-    "minStepsBeforeFirstEvent": 2
-  }
+    {
+      "type": "move_down",
+      "max": 3
+    },
+    {
+      "type": "move_right",
+      "max": 3
+    }
+  ]
 }

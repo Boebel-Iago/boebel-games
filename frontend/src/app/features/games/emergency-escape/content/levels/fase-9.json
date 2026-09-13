@@ -1,0 +1,174 @@
+{
+    "id": "fase-9",
+    "fase": 9,
+    "title": "Primeira Zona de Risco",
+    "objective": "As células com ⚠️ podem pegar fogo DURANTE a execução. Use o bloco 'SE FOGO' perto da célula marcada com ⚠️.",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Última etapa antes do desafio final. Reparou nas células marcadas com ⚠️?"
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Elas podem pegar fogo ENQUANTO estamos andando — não só no começo."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Use o bloco 'SE FOGO ENTÃO APAGAR' pra me proteger se isso acontecer."
+      }
+    ],
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        2,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_down",
+      "move_right",
+      "if_fire"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_down",
+        "max": 3
+      },
+      {
+        "type": "move_right",
+        "max": 6
+      },
+      {
+        "type": "if_fire",
+        "max": 1
+      }
+    ],
+    "requireConditional": true,
+    "randomFire": {
+      "enabled": true,
+      "probabilityPerRiskCell": 0.4,
+      "minStepsBeforeFirstEvent": 2
+    }
+  }

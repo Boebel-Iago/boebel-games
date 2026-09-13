@@ -1,0 +1,174 @@
+{
+    "id": "fase-11",
+    "fase": 11,
+    "title": "Repetição com Risco",
+    "objective": "As células com ⚠️ podem pegar fogo DURANTE a execução. O padrão se repete, e cada repetição passa por uma zona de risco. Encaixe o condicional DENTRO do loop.",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Você já sabe repetir blocos e já sabe usar o condicional. Hora de juntar os dois."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Coloque o 'SE FOGO' DENTRO do bloco REPETIR, senão ele só protege uma vez, não em todas as repetições."
+      }
+    ],
+    "grid": [
+      [
+        0,
+        0,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0,
+        0,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        3,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_down",
+      "move_right",
+      "if_fire",
+      "repeat_loop"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_down",
+        "max": 3
+      },
+      {
+        "type": "move_right",
+        "max": 6
+      },
+      {
+        "type": "if_fire",
+        "max": 1
+      },
+      {
+        "type": "repeat_loop",
+        "max": 1
+      }
+    ],
+    "requireConditional": true,
+    "randomFire": {
+      "enabled": true,
+      "probabilityPerRiskCell": 0.5,
+      "minStepsBeforeFirstEvent": 2
+    }
+  }

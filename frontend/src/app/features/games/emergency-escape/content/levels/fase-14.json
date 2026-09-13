@@ -1,0 +1,176 @@
+{
+    "id": "fase-14",
+    "fase": 14,
+    "title": "Sala Aberta",
+    "objective": "Labirinto aberto, com zonas de risco espalhadas. Agora o caminho não é só baixo/direita — use as 4 direções e proteja-se do fogo.",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Essa sala é diferente: o caminho não é reto, pode ir pra qualquer direção."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "As zonas de risco estão espalhadas. Planeje um algoritmo mais livre, mas continue usando o condicional."
+      }
+    ],
+    "grid": [
+      [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_up",
+      "move_down",
+      "move_left",
+      "move_right",
+      "if_fire",
+      "repeat_loop"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_down",
+        "max": 11
+      },
+      {
+        "type": "move_right",
+        "max": 11
+      },
+      {
+        "type": "if_fire",
+        "max": 2
+      },
+      {
+        "type": "repeat_loop",
+        "max": 2
+      }
+    ],
+    "requireConditional": true,
+    "randomFire": {
+      "enabled": true,
+      "probabilityPerRiskCell": 0.55,
+      "minStepsBeforeFirstEvent": 2
+    }
+  }

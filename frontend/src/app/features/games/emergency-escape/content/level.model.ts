@@ -33,7 +33,8 @@ export interface NarrativeLine {
 
 export interface LevelConfig {
   id: string;
-  fase: 1 | 2 | 3;
+  /** Número da fase, de 1 a TOTAL_LEVELS (ver content/tiers.ts). */
+  fase: number;
   title: string;
   /** Texto mostrado no painel amarelo de instrução (⚠️ OBJETIVO). */
   objective: string;

@@ -1,0 +1,168 @@
+{
+    "id": "fase-7",
+    "fase": 7,
+    "title": "Loop Dentro de Loop",
+    "objective": "Você só tem UM bloco de cada direção. Vai precisar de um REPETIR dentro de outro REPETIR!",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Agora o desafio é maior: só te dei um bloco de cada direção."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Monte um REPETIR pequeno (pro pedacinho que anda pro lado) e coloque ele dentro de um REPETIR maior (pro padrão inteiro)."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Essa é a ideia de 'repetição aninhada': um loop guardado dentro de outro."
+      }
+    ],
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_down",
+      "move_right",
+      "repeat_loop"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_right",
+        "max": 1
+      },
+      {
+        "type": "move_down",
+        "max": 1
+      },
+      {
+        "type": "repeat_loop",
+        "max": 2
+      }
+    ]
+  }

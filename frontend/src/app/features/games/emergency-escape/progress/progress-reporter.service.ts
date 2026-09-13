@@ -4,7 +4,7 @@ export type LevelResult = 'success' | 'failure';
 
 export interface ProgressEvent {
   levelId: string;
-  fase: 1 | 2 | 3;
+  fase: number;
   result: LevelResult;
   attempts: number;
   timestamp: string; // ISO 8601

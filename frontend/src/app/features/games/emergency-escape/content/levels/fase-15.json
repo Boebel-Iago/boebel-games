@@ -1,0 +1,176 @@
+{
+    "id": "fase-15",
+    "fase": 15,
+    "title": "O Grande Escape",
+    "objective": "Labirinto aberto, com zonas de risco espalhadas. A prova final: labirinto aberto, várias zonas de risco, blocos contados.",
+    "briefing": [
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Última sala. Você já sabe repetir, decidir com condicionais e planejar rotas."
+      },
+      {
+        "speaker": "Capitão Alerta",
+        "avatar": "🧑‍🚒",
+        "text": "Junte tudo isso agora. Se você conseguir sair daqui, é Mestre dos Algoritmos!"
+      }
+    ],
+    "grid": [
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        3,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        0,
+        2
+      ]
+    ],
+    "startPosition": {
+      "r": 0,
+      "c": 0
+    },
+    "availableBlocks": [
+      "move_up",
+      "move_down",
+      "move_left",
+      "move_right",
+      "if_fire",
+      "repeat_loop"
+    ],
+    "blockLimits": [
+      {
+        "type": "move_down",
+        "max": 11
+      },
+      {
+        "type": "move_right",
+        "max": 11
+      },
+      {
+        "type": "if_fire",
+        "max": 2
+      },
+      {
+        "type": "repeat_loop",
+        "max": 2
+      }
+    ],
+    "requireConditional": true,
+    "randomFire": {
+      "enabled": true,
+      "probabilityPerRiskCell": 0.6,
+      "minStepsBeforeFirstEvent": 2
+    }
+  }

@@ -1,29 +1,150 @@
 {
-  "id": "fase-2-reduzida",
+  "id": "fase-2",
   "fase": 2,
-  "title": "Rotas Múltiplas",
-  "objective": "Agora você só tem blocos de BAIXO e DIREITA — e um limite de quantidade. Existe mais de um caminho até a porta: escolha um e não deixe blocos sobrando!",
+  "title": "Outra Rota",
+  "objective": "Sala nova, mesmo jeito de jogar: sem limite de blocos. Explore e monte o caminho até a porta.",
   "briefing": [
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Muito bem na primeira sala! Agora ficou mais desafiador." },
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Dessa vez eu só entendo comandos de BAIXO e DIREITA — e você tem uma quantidade limitada deles." },
-    { "speaker": "Capitão Alerta", "avatar": "🧑‍🚒", "text": "Pense antes de arrastar: existe mais de uma rota até a porta, mas só uma vai caber no seu limite de blocos." }
+    {
+      "speaker": "Capitão Alerta",
+      "avatar": "🧑‍🚒",
+      "text": "Ótimo trabalho na sala anterior! Essa sala tem um layout diferente."
+    },
+    {
+      "speaker": "Capitão Alerta",
+      "avatar": "🧑‍🚒",
+      "text": "Ainda sem limite de blocos — use quantos precisar pra chegar até mim."
+    }
   ],
   "grid": [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-    [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      2
+    ]
   ],
-  "startPosition": { "r": 0, "c": 0 },
-  "availableBlocks": ["move_down", "move_right"],
-  "blockLimits": [
-    { "type": "move_down", "max": 9 },
-    { "type": "move_right", "max": 9 }
+  "startPosition": {
+    "r": 0,
+    "c": 0
+  },
+  "availableBlocks": [
+    "move_up",
+    "move_down",
+    "move_left",
+    "move_right"
   ]
 }

@@ -5,11 +5,11 @@ spring:
   application:
     name: boebel-games-api
 
-  # Database connection configuration
+  # Configuração Híbrida: Puxa do Docker, mas funciona localmente!
   datasource:
-    url: jdbc:postgresql://localhost:5432/boebelgames
-    username: postgres
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/boebelgames}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
 
   # JPA-Hibernate Configuration
@@ -29,5 +29,3 @@ app:
   security:
     token:
       secret: ${JWT_SECRET}
-
-

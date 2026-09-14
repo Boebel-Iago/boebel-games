@@ -53,6 +53,7 @@ export class ClassifyActivityComponent implements OnChanges {
       // Não bloqueia: deixa tentar de novo, só avisa visualmente.
       this.wrongItemId = item.id;
       this.selectedItemId = null;
+      this.completed.emit(false); // Reporta erro para o orquestrador contabilizar
     }
   }
 }

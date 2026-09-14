@@ -7,11 +7,12 @@ import { Router } from '@angular/router';
 import { Client } from '@stomp/stompjs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SafeUrlPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -34,9 +35,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   activeTicket: any = null;
   errorMessage: string = '';
 
-  // NEW: Monitoring state
+  // Monitoring state
   sessions: StudentSession[] = [];
   private stompClient: Client | null = null;
+
+  // Tabs: 'monitor' | 'demo'
+  activeTab: 'monitor' | 'demo' = 'monitor';
+
+  // Demo mode
+  isDemoFullscreen = false;
 
   get playingCount(): number {
     return this.sessions.filter(s => !s.completed).length;
@@ -48,6 +55,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get totalMistakesCount(): number {
     return this.sessions.reduce((sum, s) => sum + s.totalMistakes, 0);
+  }
+
+  get demoUrl(): string {
+    if (!this.activeTicket) return '';
+    return `/games/${this.activeTicket.gameRoute}?demo=1`;
   }
 
   ngOnInit() {
@@ -161,6 +173,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ============ PDF Export ============
+  // O PDF é gerado no navegador e baixado como arquivo.
+  // Na EC2, o professor acessa o dashboard pelo navegador do computador dele,
+  // então o arquivo é salvo na pasta Downloads padrão do navegador (ex: ~/Downloads/).
+  // Não é salvo no servidor — é gerado e baixado direto no dispositivo do professor.
   exportPdf() {
     const doc = new jsPDF();
 
@@ -204,9 +221,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     doc.text(`Alunos Finalizados: ${this.completedCount}`, 14, finalY + 24);
     doc.text(`Total de Erros da Turma: ${this.totalMistakesCount}`, 14, finalY + 31);
 
-    // Save
+    // Save — downloads to the browser's default Downloads folder
     const fileName = `relatorio-${this.activeTicket.code}-${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(fileName);
+  }
+
+  // ============ Demo Mode ============
+  openDemoFullscreen() {
+    this.isDemoFullscreen = true;
+  }
+
+  closeDemoFullscreen() {
+    this.isDemoFullscreen = false;
+  }
+
+  openDemoNewWindow() {
+    window.open(this.demoUrl, '_blank', 'width=1280,height=720');
   }
 
   formatGrade(code: string): string {

@@ -4,6 +4,12 @@ import { CanActivateFn, Router } from '@angular/router';
 export const ticketGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   
+  // Se for modo demonstração do professor (tem JWT salvo), libera sem ingresso
+  const token = localStorage.getItem('token');
+  if (token && state.url.includes('demo=1')) {
+    return true;
+  }
+
   // Pega a rota que foi liberada pelo backend no momento do login
   const allowedRoute = sessionStorage.getItem('activeGameRoute');
   

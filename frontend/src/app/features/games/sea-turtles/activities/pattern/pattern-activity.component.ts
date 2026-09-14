@@ -41,6 +41,7 @@ export class PatternActivityComponent implements OnChanges {
       setTimeout(() => this.advance(), 500);
     } else {
       this.wrongOptionId = option.id;
+      this.completed.emit(false); // Reporta erro para o orquestrador contabilizar
     }
   }
 

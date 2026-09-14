@@ -88,25 +88,53 @@ public class AccessTicketController {
     }
 
     // MODIFIED: Reuse existing session if student re-enters with same name + code
+    // Now properly validates ticket (active, not expired, max uses) via service
     @PostMapping("/validate")
     public ResponseEntity<?> validateTicketAndJoin(@RequestBody JoinGameRequestDTO request) {
 
         AccessTicket ticket = accessTicketRepository.findByCode(request.ticketCode())
-                .orElseThrow(() -> new RuntimeException("Ticket inválido ou não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Código inválido ou não encontrado!"));
 
         // Check if session already exists for this student + ticket (allows resume)
         StudentSession session = studentSessionRepository
                 .findByStudentNameAndTicketCode(request.studentName(), ticket.getCode())
                 .orElse(null);
 
-        if (session == null) {
-            // Create new session only if one doesn't exist
-            session = new StudentSession();
-            session.setStudentName(request.studentName());
-            session.setTicketCode(ticket.getCode());
-            session.setGameRoute(ticket.getGame().getRoute());
-            session = studentSessionRepository.save(session);
+        if (session != null) {
+            // Returning student — reuse existing session without consuming a slot
+            broadcastSessions(ticket.getCode());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("sessionId", session.getId());
+            response.put("gameRoute", session.getGameRoute());
+            response.put("currentStage", session.getCurrentStage());
+            return ResponseEntity.ok(response);
         }
+
+        // New student — validate ticket constraints (active, expiration, maxUses)
+        if (!ticket.getIsActive()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Este ingresso foi desativado!"));
+        }
+        if (ticket.getExpirationDate().isBefore(java.time.LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Este ingresso expirou!"));
+        }
+        if (ticket.getCurrentUses() >= ticket.getMaxUses()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "A sala está cheia! Número máximo de alunos atingido."));
+        }
+
+        // Consume a slot
+        ticket.setCurrentUses(ticket.getCurrentUses() + 1);
+        accessTicketRepository.save(ticket);
+
+        // Create new session
+        session = new StudentSession();
+        session.setStudentName(request.studentName());
+        session.setTicketCode(ticket.getCode());
+        session.setGameRoute(ticket.getGame().getRoute());
+        session = studentSessionRepository.save(session);
 
         // Broadcast updated sessions via WebSocket
         broadcastSessions(ticket.getCode());

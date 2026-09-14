@@ -13,7 +13,7 @@
       <!-- Formulário de Criação -->
       <form *ngIf="!activeTicket" [formGroup]="ticketForm" (ngSubmit)="onGenerateTicket()" class="space-y-4 max-w-lg mx-auto">
         <div>
-          <label class="block mb-1 text-sm font-semibold">Turma (Grade)</label>
+          <label class="block mb-1 text-sm font-semibold">Turma</label>
           <select formControlName="grade" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
             <option value="" disabled>Selecione a turma...</option>
             <option *ngFor="let g of availableGrades" [value]="g.code">{{ g.name }}</option>
@@ -35,12 +35,12 @@
         </div>
 
         <div>
-          <label class="block mb-1 text-sm font-semibold">Max Uses (Alunos)</label>
+          <label class="block mb-1 text-sm font-semibold">Máximo de Alunos</label>
           <input type="number" formControlName="maxUses" class="w-full px-4 py-2 border rounded-lg">
         </div>
 
         <div>
-          <label class="block mb-1 text-sm font-semibold">Expiration (Hours)</label>
+          <label class="block mb-1 text-sm font-semibold">Expiração (Horas)</label>
           <input type="number" formControlName="expirationHours" class="w-full px-4 py-2 border rounded-lg">
         </div>
 
@@ -54,7 +54,7 @@
       <div *ngIf="activeTicket" class="bg-emerald-50 border border-emerald-200 p-6 rounded-xl max-w-lg mx-auto">
         <span class="text-xs uppercase font-bold text-emerald-700">Ingresso Ativo ({{ activeTicket.gameTitle }})</span>
         <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ activeTicket.code }}</code>
-        <p class="text-xs text-center mt-2">Turma: {{ activeTicket.grade }} | Usos Restantes: {{ activeTicket.remainingUses }}</p>
+        <p class="text-xs text-center mt-2">Turma: {{ formatGrade(activeTicket.grade) }} | Vagas: {{ activeTicket.remainingUses }}/{{ activeTicket.maxUses }}</p>
         <button (click)="onDeleteTicket(activeTicket.id)" class="w-full py-2 bg-red-600 text-white rounded-lg mt-4 hover:bg-red-700">
           Excluir Ingresso
         </button>
@@ -65,71 +65,144 @@
       </div>
     </div>
 
-    <!-- Seção 2: Painel de Monitoramento (visível apenas quando há ingresso ativo) -->
+    <!-- Seção 2: Abas (Monitoramento / Demonstração) — só com ingresso ativo -->
     <div *ngIf="activeTicket" class="space-y-6">
 
-      <!-- Cards de Resumo -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
-          <p class="text-sm text-gray-500 mb-1">🟢 Alunos Jogando</p>
-          <p class="text-3xl font-bold text-gray-800">{{ playingCount }}</p>
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200">
+        <button (click)="activeTab = 'monitor'"
+                class="px-6 py-3 text-sm font-bold transition-colors"
+                [ngClass]="activeTab === 'monitor'
+                  ? 'text-forest-900 border-b-2 border-forest-900'
+                  : 'text-gray-400 hover:text-gray-600'">
+          📊 Monitoramento
+        </button>
+        <button (click)="activeTab = 'demo'"
+                class="px-6 py-3 text-sm font-bold transition-colors"
+                [ngClass]="activeTab === 'demo'
+                  ? 'text-forest-900 border-b-2 border-forest-900'
+                  : 'text-gray-400 hover:text-gray-600'">
+          📽️ Demonstração
+        </button>
+      </div>
+
+      <!-- ==================== TAB: MONITORAMENTO ==================== -->
+      <div *ngIf="activeTab === 'monitor'" class="space-y-6">
+
+        <!-- Cards de Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
+            <p class="text-sm text-gray-500 mb-1">🟢 Alunos Jogando</p>
+            <p class="text-3xl font-bold text-gray-800">{{ playingCount }}</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
+            <p class="text-sm text-gray-500 mb-1">✅ Finalizaram</p>
+            <p class="text-3xl font-bold text-gray-800">{{ completedCount }}</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
+            <p class="text-sm text-gray-500 mb-1">❌ Total de Erros</p>
+            <p class="text-3xl font-bold text-gray-800">{{ totalMistakesCount }}</p>
+          </div>
         </div>
-        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
-          <p class="text-sm text-gray-500 mb-1">✅ Finalizaram</p>
-          <p class="text-3xl font-bold text-gray-800">{{ completedCount }}</p>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
-          <p class="text-sm text-gray-500 mb-1">❌ Total de Erros</p>
-          <p class="text-3xl font-bold text-gray-800">{{ totalMistakesCount }}</p>
+
+        <!-- Tabela de Alunos -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="px-6 py-4 border-b flex justify-between items-center">
+            <h3 class="text-lg font-bold">Alunos na Sala</h3>
+            <button (click)="exportPdf()"
+                    [disabled]="sessions.length === 0"
+                    class="bg-forest-900 hover:bg-forest-800 text-white px-4 py-2 rounded-lg text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
+              📄 Exportar PDF
+            </button>
+          </div>
+
+          <div *ngIf="sessions.length === 0" class="p-12 text-center text-gray-400">
+            <p class="text-4xl mb-3">🎮</p>
+            <p class="text-lg">Nenhum aluno entrou na sala ainda.</p>
+            <p class="text-sm">Compartilhe o código <strong>{{ activeTicket.code }}</strong> com a turma!</p>
+          </div>
+
+          <table *ngIf="sessions.length > 0" class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fase</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Erros</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Início</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr *ngFor="let s of sessions" class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 font-medium text-gray-900">{{ s.studentName }}</td>
+                <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
+                <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
+                <td class="px-6 py-4">
+                  <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    ✅ Finalizado
+                  </span>
+                  <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    🟢 Jogando
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ s.startedAt | date:'HH:mm' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Tabela de Alunos -->
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="px-6 py-4 border-b flex justify-between items-center">
-          <h3 class="text-lg font-bold">Alunos na Sala</h3>
-          <button (click)="exportPdf()" 
-                  [disabled]="sessions.length === 0"
-                  class="bg-forest-900 hover:bg-forest-800 text-white px-4 py-2 rounded-lg text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
-            📄 Exportar PDF
-          </button>
-        </div>
+      <!-- ==================== TAB: DEMONSTRAÇÃO ==================== -->
+      <div *ngIf="activeTab === 'demo'" class="space-y-6">
 
-        <div *ngIf="sessions.length === 0" class="p-12 text-center text-gray-400">
-          <p class="text-4xl mb-3">🎮</p>
-          <p class="text-lg">Nenhum aluno entrou na sala ainda.</p>
-          <p class="text-sm">Compartilhe o código <strong>{{ activeTicket.code }}</strong> com a turma!</p>
-        </div>
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+          <div class="text-center mb-6">
+            <h3 class="text-xl font-bold mb-2">📽️ Demonstração do Jogo</h3>
+            <p class="text-gray-500 text-sm">
+              Use esta aba para projetar o jogo na tela da sala de aula.
+              O jogo roda aqui dentro sem precisar de código de ingresso.
+            </p>
+          </div>
 
-        <table *ngIf="sessions.length > 0" class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fase</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Erros</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Início</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr *ngFor="let s of sessions" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 font-medium text-gray-900">{{ s.studentName }}</td>
-              <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
-              <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
-              <td class="px-6 py-4">
-                <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  ✅ Finalizado
-                </span>
-                <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  🟢 Jogando
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-500">{{ s.startedAt | date:'HH:mm' }}</td>
-            </tr>
-          </tbody>
-        </table>
+          <!-- Botões de ação -->
+          <div class="flex justify-center gap-4 mb-6">
+            <button (click)="openDemoFullscreen()"
+                    class="bg-forest-900 hover:bg-forest-800 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+              🖥️ Abrir Aqui (Tela Cheia)
+            </button>
+            <button (click)="openDemoNewWindow()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+              🪟 Abrir em Nova Janela
+            </button>
+          </div>
+
+          <!-- Preview inline do jogo -->
+          <div class="border-4 border-gray-200 rounded-xl overflow-hidden bg-gray-100" style="height: 600px;">
+            <iframe [src]="demoUrl | safeUrl"
+                    class="w-full h-full border-0"
+                    title="Demonstração do Jogo">
+            </iframe>
+          </div>
+
+          <p class="text-center text-xs text-gray-400 mt-3">
+            💡 Dica: Use "Abrir em Nova Janela" e pressione <kbd class="px-1.5 py-0.5 bg-gray-200 rounded text-gray-600">F11</kbd> para tela cheia no projetor.
+          </p>
+        </div>
       </div>
+
     </div>
 
   </main>
+</div>
+
+<!-- Modal Fullscreen do Jogo (Demo) -->
+<div *ngIf="isDemoFullscreen" class="fixed inset-0 z-50 bg-black">
+  <button (click)="closeDemoFullscreen()"
+          class="fixed top-4 right-4 z-[60] bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+    ✕ Fechar
+  </button>
+  <iframe [src]="demoUrl | safeUrl"
+          class="w-full h-full border-0"
+          title="Demonstração do Jogo">
+  </iframe>
 </div>

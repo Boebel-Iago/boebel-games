@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-slate-900 flex flex-col items-center py-6 font-sans px-4">
+
+  <div class="w-full max-w-4xl flex justify-between items-center mb-6 border-b-4 border-teal-600/50 pb-4" *ngIf="currentPhase">
+    <div class="flex items-center gap-4">
+      <div class="text-4xl">🐢</div>
+      <div>
+        <h2 class="text-3xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md">Das Areias ao Mar</h2>
+        <p class="text-gray-300 font-medium text-lg mt-1">Fase {{ currentPhase.fase }}: {{ currentPhase.title }}</p>
+      </div>
+    </div>
+    <span class="hidden md:inline bg-teal-600 text-white px-6 py-3 rounded-xl text-lg font-black shadow-[0_0_15px_rgba(13,148,136,0.6)]">
+      NÍVEL {{ currentPhase.fase }}
+    </span>
+  </div>
+
+  <div *ngIf="screen === 'playing' && !gameFinished && currentPhase"
+       class="w-full max-w-4xl bg-slate-800 border-l-8 border-yellow-500 p-4 rounded-xl shadow-lg mb-6">
+    <p class="text-lg text-yellow-400 font-bold flex items-center gap-2">
+      <span>⚠️ OBJETIVO:</span>
+      <span class="text-white font-normal">{{ currentPhase.objective }}</span>
+    </p>
+  </div>
+
+  <div class="relative w-full max-w-4xl" *ngIf="!gameFinished && currentPhase">
+
+    <!-- BRIEFING NARRADO -->
+    <div *ngIf="screen === 'briefing'"
+         class="absolute inset-0 z-30 bg-slate-900/97 rounded-2xl flex justify-center items-center p-4">
+      <div class="w-full max-w-lg bg-slate-800 border-4 border-yellow-500/60 rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 text-center">
+        <div class="text-7xl">{{ currentBriefingLine?.avatar }}</div>
+        <div>
+          <p class="text-yellow-400 font-black uppercase tracking-wide text-sm mb-2">{{ currentBriefingLine?.speaker }}</p>
+          <p class="text-white text-xl font-medium leading-relaxed">{{ currentBriefingLine?.text }}</p>
+        </div>
+        <div class="flex gap-2">
+          <span *ngFor="let line of currentPhase.briefing; let i = index"
+                class="w-2.5 h-2.5 rounded-full transition-colors"
+                [ngClass]="i === briefingIndex ? 'bg-yellow-400' : 'bg-slate-600'"></span>
+        </div>
+        <div class="flex gap-4 w-full max-w-sm">
+          <button (click)="skipBriefing()"
+                  class="flex-1 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold uppercase text-sm transition-colors">
+            Pular
+          </button>
+          <button (click)="nextBriefingLine()"
+                  class="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-black uppercase transition-colors">
+            {{ isLastBriefingLine ? 'Vamos lá!' : 'Avançar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÁREA DA MECÂNICA -->
+    <div class="w-full bg-slate-800/50 border-4 border-slate-700 rounded-2xl p-6 min-h-[400px]" [ngSwitch]="currentPhase.activityType">
+      <app-classify-activity
+        *ngSwitchCase="'classify'"
+        [phase]="classifyPhase"
+        (completed)="onActivityCompleted($event)">
+      </app-classify-activity>
+
+      <app-pattern-activity
+        *ngSwitchCase="'pattern'"
+        [phase]="patternPhase"
+        (completed)="onActivityCompleted($event)">
+      </app-pattern-activity>
+
+      <p *ngSwitchDefault class="text-white text-center py-16">
+        Mecânica "{{ currentPhase.activityType }}" ainda não implementada.
+      </p>
+    </div>
+  </div>
+
+  <!-- TELA FINAL -->
+  <div *ngIf="gameFinished" class="bg-slate-800 p-12 rounded-3xl shadow-[0_0_30px_rgba(13,148,136,0.5)] border-4 border-teal-500 text-center max-w-2xl mt-4">
+    <div class="text-8xl mb-6">🐢🌊</div>
+    <h2 class="text-4xl font-black text-teal-400 mb-4">Guardião das Tartarugas!</h2>
+    <p class="text-xl text-gray-300 leading-relaxed">
+      Você ajudou a proteger as tartarugas marinhas e aprendeu a organizar, seguir sequências e criar algoritmos no caminho!
+    </p>
+  </div>
+
+  <!-- MODAL DE FEEDBACK -->
+  <div *ngIf="showFeedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex justify-center items-center p-4 z-50">
+    <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-4"
+         [ngClass]="isSuccess ? 'border-emerald-500' : 'border-red-600'">
+      <div class="text-7xl mb-4">{{ isSuccess ? '✅' : '💥' }}</div>
+      <h3 class="text-3xl font-black mb-4 uppercase" [ngClass]="isSuccess ? 'text-emerald-400' : 'text-red-500'">
+        {{ isSuccess ? 'Sucesso!' : 'Quase lá!' }}
+      </h3>
+      <p class="text-xl text-gray-300 font-medium mb-8">{{ feedbackText }}</p>
+      <button (click)="nextStep()"
+              class="w-full py-4 text-white font-black text-xl rounded-xl shadow-lg border-b-4 transition-all active:border-b-0 active:translate-y-1 uppercase"
+              [ngClass]="isSuccess ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-800' : 'bg-red-600 hover:bg-red-500 border-red-800'">
+        {{ isSuccess ? 'Continuar' : 'Tentar de Novo' }}
+      </button>
+    </div>
+  </div>
+</div>

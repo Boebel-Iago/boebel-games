@@ -1,0 +1,35 @@
+<div class="flex flex-col items-center gap-8 w-full py-4">
+
+    <p class="text-slate-400 text-sm font-bold uppercase tracking-wide">
+      Rodada {{ roundIndex + 1 }} de {{ phase.rounds.length }}
+    </p>
+  
+    <p class="text-white text-xl font-medium text-center max-w-xl">{{ currentRound.prompt }}</p>
+  
+    <!-- Contexto visual (sequência ou item único) -->
+    <div class="flex flex-wrap justify-center gap-3 bg-slate-900/60 rounded-2xl px-6 py-5 border-2 border-slate-700">
+      <span *ngFor="let symbol of currentRound.contextSequence"
+            class="text-5xl"
+            [ngClass]="{'text-yellow-400 animate-pulse': symbol === '❓'}">
+        {{ symbol }}
+      </span>
+    </div>
+  
+    <!-- Opções -->
+    <div class="flex flex-wrap justify-center gap-4">
+      <button *ngFor="let option of currentRound.options"
+              (click)="selectOption(option)"
+              class="flex flex-col items-center gap-1 bg-slate-800 border-4 rounded-2xl p-4 w-28 transition-transform"
+              [ngClass]="{
+                'border-emerald-500 scale-110': justCorrect && option.isCorrect,
+                'border-red-500': wrongOptionId === option.id,
+                'border-slate-700 hover:border-yellow-400 hover:scale-105': wrongOptionId !== option.id && !(justCorrect && option.isCorrect)
+              }">
+        <span class="text-4xl">{{ option.emoji }}</span>
+        <span *ngIf="option.label" class="text-white text-xs font-bold">{{ option.label }}</span>
+      </button>
+    </div>
+  
+    <p *ngIf="wrongOptionId" class="text-red-400 font-bold">Tenta de novo!</p>
+    <p *ngIf="justCorrect" class="text-emerald-400 font-black text-xl">Isso aí! 🎉</p>
+  </div>

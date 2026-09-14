@@ -1,9 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { TicketService } from '../../../core/services/ticket.service';
+import { TicketService, StudentSession } from '../../../core/services/ticket.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { Client } from '@stomp/stompjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,11 +15,12 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private ticketService = inject(TicketService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private ngZone = inject(NgZone);
 
   ticketForm = this.fb.group({
     grade: ['', Validators.required],
@@ -29,6 +33,22 @@ export class DashboardComponent implements OnInit {
   availableGames: any[] = [];
   activeTicket: any = null;
   errorMessage: string = '';
+
+  // NEW: Monitoring state
+  sessions: StudentSession[] = [];
+  private stompClient: Client | null = null;
+
+  get playingCount(): number {
+    return this.sessions.filter(s => !s.completed).length;
+  }
+
+  get completedCount(): number {
+    return this.sessions.filter(s => s.completed).length;
+  }
+
+  get totalMistakesCount(): number {
+    return this.sessions.reduce((sum, s) => sum + s.totalMistakes, 0);
+  }
 
   ngOnInit() {
     this.loadActiveTicket();
@@ -44,11 +64,55 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.disconnectWebSocket();
+  }
+
   loadActiveTicket() {
     this.ticketService.getActiveTicket().subscribe({
-      next: (ticket) => { this.activeTicket = ticket; },
+      next: (ticket) => {
+        this.activeTicket = ticket;
+        if (ticket) {
+          this.loadSessions();
+          this.connectWebSocket(ticket.code);
+        }
+      },
       error: () => { this.activeTicket = null; }
     });
+  }
+
+  loadSessions() {
+    this.ticketService.getSessionsByTicket().subscribe({
+      next: (sessions) => { this.sessions = sessions; },
+      error: () => { this.sessions = []; }
+    });
+  }
+
+  connectWebSocket(ticketCode: string) {
+    this.disconnectWebSocket();
+
+    this.stompClient = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      reconnectDelay: 5000,
+      onConnect: () => {
+        this.stompClient!.subscribe(`/topic/sessions/${ticketCode}`, (message) => {
+          this.ngZone.run(() => {
+            this.sessions = JSON.parse(message.body);
+          });
+        });
+      },
+      onStompError: (frame) => {
+        console.error('WebSocket STOMP error:', frame);
+      }
+    });
+    this.stompClient.activate();
+  }
+
+  disconnectWebSocket() {
+    if (this.stompClient) {
+      this.stompClient.deactivate();
+      this.stompClient = null;
+    }
   }
 
   loadGrades() {
@@ -72,6 +136,7 @@ export class DashboardComponent implements OnInit {
         next: (response) => {
           this.activeTicket = response;
           this.errorMessage = '';
+          this.connectWebSocket(response.code);
         },
         error: (err) => {
           this.errorMessage = err.error?.error || 'Erro ao gerar o ingresso.';
@@ -81,17 +146,90 @@ export class DashboardComponent implements OnInit {
   }
 
   onDeleteTicket(id: string) {
+    if (this.sessions.length > 0 && !confirm('Atenção! Ao excluir o ingresso, todas as sessões dos alunos serão apagadas do banco de dados. Já exportou o relatório em PDF?')) {
+      return;
+    }
+
     this.ticketService.deleteTicket(id).subscribe({
       next: () => {
         this.activeTicket = null;
+        this.sessions = [];
+        this.disconnectWebSocket();
         this.ticketForm.reset({ maxUses: 1, expirationHours: 24, grade: '', gameId: null });
       },
       error: () => { this.errorMessage = 'Erro ao excluir o ingresso.'; }
     });
   }
 
+  exportPdf() {
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Relatório - Boebel Games', 14, 20);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Jogo: ${this.activeTicket.gameTitle}`, 14, 32);
+    doc.text(`Turma: ${this.formatGrade(this.activeTicket.grade)}`, 14, 39);
+    doc.text(`Código do Ingresso: ${this.activeTicket.code}`, 14, 46);
+    doc.text(`Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}`, 14, 53);
+
+    // Table
+    autoTable(doc, {
+      startY: 63,
+      head: [['Nome do Aluno', 'Fase Atual', 'Total de Erros', 'Status', 'Hora de Início']],
+      body: this.sessions.map(s => [
+        s.studentName,
+        s.currentStage.toString(),
+        s.totalMistakes.toString(),
+        s.completed ? 'Finalizado' : 'Jogando',
+        new Date(s.startedAt).toLocaleString('pt-BR')
+      ]),
+      styles: { fontSize: 10, cellPadding: 4 },
+      headStyles: { fillColor: [15, 46, 33] },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    });
+
+    // Summary below table
+    const finalY = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Resumo da Sessão', 14, finalY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Total de Alunos: ${this.sessions.length}`, 14, finalY + 10);
+    doc.text(`Alunos Jogando: ${this.playingCount}`, 14, finalY + 17);
+    doc.text(`Alunos Finalizados: ${this.completedCount}`, 14, finalY + 24);
+    doc.text(`Total de Erros da Turma: ${this.totalMistakesCount}`, 14, finalY + 31);
+
+    // Save
+    const fileName = `relatorio-${this.activeTicket.code}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(fileName);
+  }
+
+  formatGrade(code: string): string {
+    const grades: Record<string, string> = {
+      'ELEMENTARY_1': '1º Ano (Fundamental I)',
+      'ELEMENTARY_2': '2º Ano (Fundamental I)',
+      'ELEMENTARY_3': '3º Ano (Fundamental I)',
+      'ELEMENTARY_4': '4º Ano (Fundamental I)',
+      'ELEMENTARY_5': '5º Ano (Fundamental I)',
+      'ELEMENTARY_6': '6º Ano (Fundamental II)',
+      'ELEMENTARY_7': '7º Ano (Fundamental II)',
+      'ELEMENTARY_8': '8º Ano (Fundamental II)',
+      'ELEMENTARY_9': '9º Ano (Fundamental II)',
+      'HIGH_SCHOOL_1': '1º Ano (Ensino Médio)',
+      'HIGH_SCHOOL_2': '2º Ano (Ensino Médio)',
+      'HIGH_SCHOOL_3': '3º Ano (Ensino Médio)'
+    };
+    return grades[code] || code;
+  }
+
   logout() {
     this.authService.logout();
+    this.disconnectWebSocket();
     this.router.navigate(['/login']);
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 
 interface Tool {
   name: string;
@@ -213,8 +214,36 @@ scenarios: Scenario[] = [
   isCorrectGuess: boolean = false;
   gameFinished: boolean = false;
 
+  constructor(private progressReporter: ProgressReporter) {}
+
   ngOnInit() {
+    this.restoreProgress();
     this.loadProfession();
+  }
+
+  private restoreProgress() {
+    const saved = sessionStorage.getItem('currentStage');
+    if (saved) {
+      const stage = parseInt(saved, 10);
+      if (!isNaN(stage) && stage > 0) {
+        const phase1Total = this.professions.length;
+        if (stage >= phase1Total + this.scenarios.length) {
+          this.gameFinished = true;
+        } else if (stage >= phase1Total) {
+          this.gameStage = 2;
+          this.currentIndex = stage - phase1Total;
+        } else {
+          this.gameStage = 1;
+          this.currentIndex = stage;
+        }
+      }
+    }
+  }
+
+  private getAbsoluteStage(): number {
+    return this.gameStage === 1
+      ? this.currentIndex
+      : this.professions.length + this.currentIndex;
   }
 
   loadProfession() {
@@ -256,18 +285,40 @@ scenarios: Scenario[] = [
 
   nextStep() {
     this.showFeedbackModal = false;
-    
-    if (this.isCorrectGuess) {
-      this.currentIndex++;
-      
-      if (this.gameStage === 1 && this.currentIndex >= this.professions.length) {
-        this.gameStage = 2;
-        this.currentIndex = 0;
-      } else if (this.gameStage === 2 && this.currentIndex >= this.scenarios.length) {
-        this.gameFinished = true;
-      } else if (this.gameStage === 1) {
-        this.loadProfession();
-      }
+
+    if (!this.isCorrectGuess) {
+      this.progressReporter.report({
+        levelId: `professions-${this.getAbsoluteStage()}`,
+        fase: this.getAbsoluteStage(),
+        result: 'failure',
+        attempts: 0,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
+      return;
     }
+
+    this.currentIndex++;
+    const phase1Total = this.professions.length;
+    let isFinished = false;
+
+    if (this.gameStage === 1 && this.currentIndex >= phase1Total) {
+      this.gameStage = 2;
+      this.currentIndex = 0;
+    } else if (this.gameStage === 2 && this.currentIndex >= this.scenarios.length) {
+      this.gameFinished = true;
+      isFinished = true;
+    } else if (this.gameStage === 1) {
+      this.loadProfession();
+    }
+
+    this.progressReporter.report({
+      levelId: `professions-${this.getAbsoluteStage()}`,
+      fase: this.getAbsoluteStage(),
+      result: 'success',
+      attempts: 0,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isFinished
+    });
   }
 }

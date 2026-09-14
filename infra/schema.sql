@@ -62,3 +62,23 @@ CREATE TABLE access_tickets (
 
     -- Supondo que o ID gerado seja 3
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (3, 'ELEMENTARY_3');
+    
+    -- Nova tabela pra sessão dos estudantes.
+    
+    CREATE TABLE student_sessions (
+    id UUID PRIMARY KEY,
+    student_name VARCHAR(255) NOT NULL,
+    ticket_code VARCHAR(255) NOT NULL,
+    game_route VARCHAR(255) NOT NULL,
+    current_stage INT DEFAULT 0 NOT NULL,
+    total_mistakes INT DEFAULT 0 NOT NULL,
+    completed BOOLEAN DEFAULT FALSE NOT NULL,
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO games (title, description, route) 
+VALUES ('Tartarugas Marinhas', 'Aprenda a classificar e reconhecer padrões com as tartarugas marinhas.', 'sea-turtles');
+
+-- Considerando que este seja o jogo de ID 7 (ajuste o número verificando qual foi gerado no insert acima)
+INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_1');
+INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_2');

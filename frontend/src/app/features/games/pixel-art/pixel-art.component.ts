@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 
 interface Level {
   id: number;
@@ -93,8 +94,21 @@ export class PixelArtComponent implements OnInit {
   isLevelCompleted: boolean = false;
   gameFinished: boolean = false;
 
+  constructor(private progressReporter: ProgressReporter) {}
+
   ngOnInit() {
-    this.loadLevel(0);
+    const saved = sessionStorage.getItem('currentStage');
+    let startLevel = 0;
+    if (saved) {
+      const stage = parseInt(saved, 10);
+      if (!isNaN(stage) && stage > 0 && stage < this.levels.length) {
+        startLevel = stage;
+      } else if (!isNaN(stage) && stage >= this.levels.length) {
+        this.gameFinished = true;
+        return;
+      }
+    }
+    this.loadLevel(startLevel);
   }
 
   loadLevel(index: number) {
@@ -130,10 +144,27 @@ export class PixelArtComponent implements OnInit {
     const isCorrect = JSON.stringify(this.studentGrid) === JSON.stringify(this.targetGrid);
     if (isCorrect) {
       this.isLevelCompleted = true;
-      if (this.currentLevelIndex === this.levels.length - 1) {
+      const isLast = this.currentLevelIndex === this.levels.length - 1;
+      if (isLast) {
         this.gameFinished = true;
       }
+      this.progressReporter.report({
+        levelId: `pixel-art-${this.currentLevelIndex}`,
+        fase: this.currentLevelIndex,
+        result: 'success',
+        attempts: 0,
+        timestamp: new Date().toISOString(),
+        isLastLevel: isLast
+      });
     } else {
+      this.progressReporter.report({
+        levelId: `pixel-art-${this.currentLevelIndex}`,
+        fase: this.currentLevelIndex,
+        result: 'failure',
+        attempts: 0,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
       alert("Ops! Tem algo diferente. Verifique linha por linha, preste atenção nas letras e números!");
     }
   }

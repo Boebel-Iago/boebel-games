@@ -10,17 +10,32 @@ import { FactCheckerComponent } from './features/games/fact-checker/fact-checker
 import { CreatorsVsCopiersComponent } from './features/games/creators-vs-copiers/creators-vs-copiers.component';
 import { EmergencyEscapeComponent } from './features/games/emergency-escape/emergency-escape.component';
 import { LevelRepository, LocalLevelRepositoryService } from './features/games/emergency-escape/content/level-repository.service';
-import { ProgressReporter, NoopProgressReporterService } from './features/games/emergency-escape/progress/progress-reporter.service';
+import { ProgressReporter } from './features/games/emergency-escape/progress/progress-reporter.service';
+import { ApiProgressReporterService } from './features/games/emergency-escape/progress/api-progress-reporter.service';
+import { SeaTurtlesComponent } from './features/games/sea-turtles/sea-turtles.component';
+import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/sea-turtles/content/phase-repository.service';
 
 export const routes: Routes = [
     
+    { 
+        path: 'games/sea-turtles', 
+        component: SeaTurtlesComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            // O serviço de telemetria que você já usa no outro jogo
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            
+            // Supondo que você criou um LocalPhaseRepositoryService seguindo a mesma lógica do LevelRepository
+            { provide: PhaseRepository, useClass: LocalPhaseRepositoryService } 
+        ]
+    },
     { 
         path: 'games/emergency-escape', 
         component: EmergencyEscapeComponent,
         canActivate: [ticketGuard],
         providers: [
             { provide: LevelRepository, useClass: LocalLevelRepositoryService },
-            { provide: ProgressReporter, useClass: NoopProgressReporterService }
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
         ] 
     },
     { 

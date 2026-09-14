@@ -3,19 +3,30 @@
   <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center border border-gray-200">
     
     <h1 class="text-3xl font-bold text-forest-900 mb-2">Boebel Games</h1>
-    <p class="text-gray-500 mb-8 text-sm">Digite o código de acesso fornecido pelo professor</p>
+    <p class="text-gray-500 mb-8 text-sm">Digite seu nome e o código de acesso fornecido pelo professor</p>
 
-    <!-- Campo de Código (Mantive a letra grande e espaçada para facilitar a leitura) -->
-    <div class="mb-6">
-      <input
-        type="text"
-        [(ngModel)]="ticketCode"
-        (keyup.enter)="onEnterGame()"
-        maxlength="6"
-        class="w-full text-center text-4xl font-bold tracking-[0.2em] uppercase border border-gray-300 rounded-lg py-4 focus:border-forest-900 focus:ring-1 focus:ring-forest-900 focus:outline-none transition-colors text-gray-800 placeholder-gray-300"
-        placeholder="CÓDIGO"
-      />
-    </div>
+    <!-- Dentro do seu formulário de login -->
+  <div class="mb-4">
+    <label class="block text-gray-700 font-bold mb-2">Seu Nome:</label>
+    <input 
+      type="text" 
+      [(ngModel)]="studentName" 
+      name="studentName"
+      placeholder="Digite seu nome (Ex: João)"
+      class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all text-xl"
+      required>
+  </div>
+
+  <div class="mb-6">
+    <label class="block text-gray-700 font-bold mb-2">Código da Turma:</label>
+    <input 
+      type="text" 
+      [(ngModel)]="ticketCode" 
+      name="ticketCode"
+      placeholder="Ex: A7X9"
+      class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-forest-500 focus:ring-4 focus:ring-forest-200 transition-all text-xl uppercase font-mono"
+      required>
+  </div>
 
     <!-- Mensagem de Erro (Usando o mesmo padrão de erro do dashboard) -->
     <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm text-center">
@@ -30,10 +41,5 @@
       {{ isLoading ? 'Validando...' : 'Acessar Jogo' }}
     </button>
 
-  </div>
-
-  <!-- Link discreto para o login do professor -->
-  <div class="mt-8 text-gray-500 text-sm">
-    Área do Professor? <a routerLink="/login" class="text-forest-900 font-semibold hover:underline">Acesse aqui</a>
   </div>
 </div>

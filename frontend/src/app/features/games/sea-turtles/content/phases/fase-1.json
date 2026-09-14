@@ -1,0 +1,25 @@
+{
+    "id": "fase-1-lixo-natureza",
+    "fase": 1,
+    "activityType": "classify",
+    "skillCodes": ["EF01CO01"],
+    "title": "Praia Limpa",
+    "objective": "Toque em cada item e depois toque no balde certo: LIXO ou NATUREZA.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Oi! Eu cuido das tartarugas marinhas e preciso da sua ajuda." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "A praia está cheia de coisas. Algumas são da natureza, outras são lixo que machuca os animais." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Toque em cada item e coloque no balde certo!" }
+    ],
+    "buckets": [
+      { "id": "lixo", "label": "Lixo", "emoji": "🗑️" },
+      { "id": "natureza", "label": "Natureza", "emoji": "🌿" }
+    ],
+    "items": [
+      { "id": "garrafa", "label": "Garrafa PET", "emoji": "🍾", "correctBucket": "lixo" },
+      { "id": "concha", "label": "Concha", "emoji": "🐚", "correctBucket": "natureza" },
+      { "id": "sacola", "label": "Sacola Plástica", "emoji": "🛍️", "correctBucket": "lixo" },
+      { "id": "alga", "label": "Alga Marinha", "emoji": "🌱", "correctBucket": "natureza" },
+      { "id": "lata", "label": "Lata", "emoji": "🥫", "correctBucket": "lixo" },
+      { "id": "estrela", "label": "Estrela do Mar", "emoji": "⭐", "correctBucket": "natureza" }
+    ]
+  }

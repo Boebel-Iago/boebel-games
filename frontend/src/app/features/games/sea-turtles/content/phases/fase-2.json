@@ -1,0 +1,27 @@
+{
+    "id": "fase-2-areia-mar",
+    "fase": 2,
+    "activityType": "classify",
+    "skillCodes": ["EF01CO01"],
+    "title": "Areia ou Mar?",
+    "objective": "Agora organize por outro critério: o que fica na AREIA e o que fica no MAR.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Muito bem na praia limpa! Agora vamos organizar de um jeito diferente." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "As mesmas coisas podem ser organizadas de formas diferentes, dependendo do que a gente observa." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Dessa vez: o que fica na AREIA e o que fica no MAR?" }
+    ],
+    "buckets": [
+      { "id": "areia", "label": "Areia", "emoji": "🏖️" },
+      { "id": "mar", "label": "Mar", "emoji": "🌊" }
+    ],
+    "items": [
+      { "id": "ninho", "label": "Ninho de Tartaruga", "emoji": "🥚", "correctBucket": "areia" },
+      { "id": "peixe", "label": "Peixe", "emoji": "🐠", "correctBucket": "mar" },
+      { "id": "caranguejo", "label": "Caranguejo", "emoji": "🦀", "correctBucket": "areia" },
+      { "id": "polvo", "label": "Polvo", "emoji": "🐙", "correctBucket": "mar" },
+      { "id": "guardasol", "label": "Guarda-sol", "emoji": "⛱️", "correctBucket": "areia" },
+      { "id": "golfinho", "label": "Golfinho", "emoji": "🐬", "correctBucket": "mar" },
+      { "id": "pegada", "label": "Pegada de Tartaruga", "emoji": "👣", "correctBucket": "areia" },
+      { "id": "tubarao", "label": "Tubarão", "emoji": "🦈", "correctBucket": "mar" }
+    ]
+  }

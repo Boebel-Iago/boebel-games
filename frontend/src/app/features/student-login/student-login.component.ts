@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TicketService } from '../../core/services/ticket.service';
+import { TicketService, JoinGamePayload, JoinGameResponse } from '../../core/services/ticket.service';
 
 @Component({
   selector: 'app-student-login',
@@ -12,37 +12,47 @@ import { TicketService } from '../../core/services/ticket.service';
   styleUrl: './student-login.component.scss'
 })
 export class StudentLoginComponent {
+  studentName: string = '';
   ticketCode: string = '';
-  errorMessage: string = '';
   isLoading: boolean = false;
+  errorMessage: string = '';
 
-  private ticketService = inject(TicketService);
-  private router = inject(Router);
+  constructor(
+    private ticketService: TicketService, 
+    private router: Router
+  ) {}
 
   onEnterGame() {
-    // Validação básica do tamanho
-    if (!this.ticketCode || this.ticketCode.trim().length < 6) {
-      this.errorMessage = 'O código precisa ter 6 letras ou números.';
+    if (!this.studentName.trim() || !this.ticketCode.trim()) {
+      this.errorMessage = "Preencha seu nome e o código do jogo!";
       return;
     }
-
-
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Envia o código maiúsculo para o backend
-    this.ticketService.validateTicket(this.ticketCode.trim().toUpperCase()).subscribe({
-      next: (response) => {
+    const payload: JoinGamePayload = {
+      studentName: this.studentName.trim(),
+      ticketCode: this.ticketCode.trim().toUpperCase()
+    };
+
+    this.ticketService.validateTicket(payload).subscribe({
+      next: (response: JoinGameResponse) => {
         this.isLoading = false;
+        
+        // Salva a ROTA para o Guarda liberar a porta
         sessionStorage.setItem('activeGameRoute', response.gameRoute);
-        // Redireciona o aluno direto para a rota do jogo! (Ex: /games/pixel-art)
+        
+        // Salva o ID da sessão, nome e a fase atual
+        sessionStorage.setItem('sessionId', response.sessionId);
+        sessionStorage.setItem('studentName', this.studentName);
+        sessionStorage.setItem('currentStage', response.currentStage.toString());
+        
         this.router.navigate([`/games/${response.gameRoute}`]);
       },
       error: (err) => {
         this.isLoading = false;
-        // Pega a mensagem de erro que mandamos do Spring Boot (Ex: "Este ingresso já expirou")
-        this.errorMessage = err.error?.error || 'Erro ao entrar. Tente novamente.';
+        this.errorMessage = "Código incorreto ou expirado. Chame o professor!";
       }
     });
   }

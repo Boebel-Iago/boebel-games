@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 
 interface BrowserTask {
   id: string;
@@ -112,8 +113,36 @@ export class BrowserSearchComponent implements OnInit {
   isCorrectGuess: boolean = false;
   gameFinished: boolean = false;
 
+  constructor(private progressReporter: ProgressReporter) {}
+
   ngOnInit() {
+    this.restoreProgress();
     this.loadStage();
+  }
+
+  private restoreProgress() {
+    const saved = sessionStorage.getItem('currentStage');
+    if (saved) {
+      const stage = parseInt(saved, 10);
+      if (!isNaN(stage) && stage > 0) {
+        const phase1Total = this.browserTasks.length; // 10
+        if (stage >= phase1Total + this.searchTasks.length) {
+          this.gameFinished = true;
+        } else if (stage >= phase1Total) {
+          this.gameStage = 2;
+          this.currentTaskIndex = stage - phase1Total;
+        } else {
+          this.gameStage = 1;
+          this.currentTaskIndex = stage;
+        }
+      }
+    }
+  }
+
+  private getAbsoluteStage(): number {
+    return this.gameStage === 1
+      ? this.currentTaskIndex
+      : this.browserTasks.length + this.currentTaskIndex;
   }
 
   loadStage() {
@@ -169,19 +198,41 @@ export class BrowserSearchComponent implements OnInit {
 
   nextStep() {
     this.showFeedbackModal = false;
-    
-    if (this.isCorrectGuess) {
-      this.currentTaskIndex++;
-      
-      if (this.gameStage === 1 && this.currentTaskIndex >= this.browserTasks.length) {
-        this.gameStage = 2;
-        this.currentTaskIndex = 0;
-        this.loadStage();
-      } else if (this.gameStage === 2 && this.currentTaskIndex >= this.searchTasks.length) {
-        this.gameFinished = true;
-      } else {
-        this.loadStage();
-      }
+
+    if (!this.isCorrectGuess) {
+      this.progressReporter.report({
+        levelId: `browser-search-${this.getAbsoluteStage()}`,
+        fase: this.getAbsoluteStage(),
+        result: 'failure',
+        attempts: 0,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
+      return;
     }
+
+    this.currentTaskIndex++;
+    const phase1Total = this.browserTasks.length;
+    let isFinished = false;
+
+    if (this.gameStage === 1 && this.currentTaskIndex >= phase1Total) {
+      this.gameStage = 2;
+      this.currentTaskIndex = 0;
+      this.loadStage();
+    } else if (this.gameStage === 2 && this.currentTaskIndex >= this.searchTasks.length) {
+      this.gameFinished = true;
+      isFinished = true;
+    } else {
+      this.loadStage();
+    }
+
+    this.progressReporter.report({
+      levelId: `browser-search-${this.getAbsoluteStage()}`,
+      fase: this.getAbsoluteStage(),
+      result: 'success',
+      attempts: 0,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isFinished
+    });
   }
 }

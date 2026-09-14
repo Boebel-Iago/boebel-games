@@ -9,13 +9,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { WorkspaceSvg } from 'blockly';
+import { Router } from '@angular/router';
 
 import { GameEngine } from './engine/game-engine';
 import { BlocklyAdapterService } from './blockly/blockly-adapter.service';
 import { BLOCK_LABELS } from './blockly/custom-blocks';
 import { LevelRepository } from './content/level-repository.service';
 import { LevelConfig, BlockType, CellType, NarrativeLine } from './content/level.model';
-import { TOTAL_LEVELS } from './content/tiers';
+import { TOTAL_LEVELS } from './content/tiers'; 
 import { ProgressReporter } from './progress/progress-reporter.service';
 
 interface InventoryItem {
@@ -25,8 +26,8 @@ interface InventoryItem {
   used: number;
 }
 
-const LEVEL_COMPLETE_MESSAGE = (level: LevelConfig): string =>
-  level.fase === TOTAL_LEVELS
+const LEVEL_COMPLETE_MESSAGE = (level: LevelConfig, isLast: boolean): string =>
+  isLast
     ? 'Você venceu o desafio final! Mestre dos Algoritmos!'
     : `Fase ${level.fase} concluída: ${level.title}!`;
 
@@ -64,16 +65,34 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     private blockly: BlocklyAdapterService,
     private levels: LevelRepository,
     private progress: ProgressReporter,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // A injeção do Blockly precisa do #blocklyDiv já renderizado,
-    // então o carregamento real da fase acontece em ngAfterViewInit.
+    const sessionId = sessionStorage.getItem('sessionId');
+    // CORREÇÃO: Não usamos redirecionamento aqui para não quebrar a visualização em dev
+    if (!sessionId) {
+      console.warn("Modo Dev: Jogando sem sessão no banco de dados.");
+    }
   }
 
   ngAfterViewInit(): void {
-    this.loadStage(1);
+    // CORREÇÃO: O Timeout dá tempo ao Angular para renderizar a div do Blockly
+    setTimeout(() => {
+      const savedStage = sessionStorage.getItem('currentStage');
+      let startStage = 1;
+
+      // CORREÇÃO: Validação rígida para evitar o erro NaN (Not a Number)
+      if (savedStage && savedStage !== 'undefined' && savedStage !== 'null') {
+        const parsed = parseInt(savedStage, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+          startStage = parsed;
+        }
+      }
+      
+      this.loadStage(startStage);
+    }, 50);
   }
 
   ngOnDestroy(): void {
@@ -84,22 +103,34 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   loadStage(fase: number): void {
-    this.levels.getLevel(fase).subscribe(level => {
-      this.currentLevel = level;
-      this.attempts = 0;
-      this.screen = 'briefing';
-      this.briefingIndex = 0;
+    this.levels.getLevel(fase).subscribe({
+      next: (level) => {
+        if (!level) {
+          console.error(`Fase ${fase} não encontrada! Retornando para Fase 1.`);
+          if (fase !== 1) this.loadStage(1);
+          return;
+        }
+        
+        this.currentLevel = level;
+        this.attempts = 0;
+        this.screen = 'briefing';
+        this.briefingIndex = 0;
 
-      this.engine.loadLevel(level);
-      this.currentGrid = this.engine.getGrid();
-      this.playerPos = this.engine.getPlayerPosition();
+        this.engine.loadLevel(level);
+        this.currentGrid = this.engine.getGrid();
+        this.playerPos = this.engine.getPlayerPosition();
 
-      if (this.workspace) {
-        this.blockly.dispose(this.workspace);
+        if (this.workspace) {
+          this.blockly.dispose(this.workspace);
+        }
+        
+        this.workspace = this.blockly.inject(this.blocklyDiv.nativeElement, level);
+        this.workspace.addChangeListener(() => this.updateInventory());
+        this.updateInventory();
+      },
+      error: (err) => {
+        console.error("Erro crítico ao carregar fase:", err);
       }
-      this.workspace = this.blockly.inject(this.blocklyDiv.nativeElement, level);
-      this.workspace.addChangeListener(() => this.updateInventory());
-      this.updateInventory();
     });
   }
 
@@ -158,7 +189,6 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
       return;
     }
 
-    // Falhou: deixa tentar de novo a mesma fase.
     if (this.currentLevel) {
       this.engine.loadLevel(this.currentLevel);
       this.currentGrid = this.engine.getGrid();
@@ -191,7 +221,7 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
         break;
       case 'caught_fire':
         this.stopInterval();
-        this.gameOver('🔥 EMERGÊNCIA! Você pisou no fogo! Use o bloco "SE FOGO" antes de entrar na zona de risco.');
+        this.gameOver('🔥 EMERGÊNCIA! Você pisou no fogo! Use o bloco "SE FOGO".');
         break;
       case 'reached_goal':
         this.stopInterval();
@@ -199,7 +229,7 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
         break;
       case 'moved':
       case 'extinguished':
-        break; // segue rodando; currentGrid já é a mesma referência mutada pelo engine
+        break; 
     }
 
     this.cdr.detectChanges();
@@ -211,25 +241,35 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     this.feedbackText = message;
     this.showFeedbackModal = true;
     this.attempts++;
+    
+    // Serviço genérico cuida de contar o erro!
     this.reportProgress('failure');
   }
 
   private levelComplete(): void {
     this.isRunning = false;
     this.isSuccess = true;
-    this.feedbackText = LEVEL_COMPLETE_MESSAGE(this.currentLevel!);
+    
+    const isLast = this.currentLevel!.fase >= TOTAL_LEVELS;
+    this.feedbackText = LEVEL_COMPLETE_MESSAGE(this.currentLevel!, isLast);
     this.showFeedbackModal = true;
+    
+    // Serviço genérico cuida de enviar o POST pro banco
     this.reportProgress('success');
   }
 
   private reportProgress(result: 'success' | 'failure'): void {
     if (!this.currentLevel) return;
+    
+    const isLast = this.currentLevel.fase >= TOTAL_LEVELS;
+
     this.progress.report({
       levelId: this.currentLevel.id,
       fase: this.currentLevel.fase,
       result,
       attempts: this.attempts,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      isLastLevel: isLast 
     });
   }
 

@@ -1,0 +1,45 @@
+{
+    "id": "fase-3-padroes",
+    "fase": 3,
+    "activityType": "pattern",
+    "skillCodes": ["EF01CO01"],
+    "title": "Encontre o Padrão",
+    "objective": "Olhe a sequência e descubra o que vem no lugar do ❓.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Você já sabe organizar! Agora vamos treinar outra coisa: encontrar padrões." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Um padrão é quando alguma coisa se repete sempre do mesmo jeito." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Olhe a sequência e descubra o que continua o padrão!" }
+    ],
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "O que vem depois?",
+        "contextSequence": ["🥚", "🐢", "🥚", "🐢", "🥚", "❓"],
+        "options": [
+          { "id": "a", "emoji": "🐢", "isCorrect": true },
+          { "id": "b", "emoji": "🐚", "isCorrect": false },
+          { "id": "c", "emoji": "🌊", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r2",
+        "prompt": "Essas são pegadas de tartaruga na areia. O que continua o padrão?",
+        "contextSequence": ["👣", "👣", "🌊", "👣", "👣", "🌊", "👣", "👣", "❓"],
+        "options": [
+          { "id": "a", "emoji": "🐢", "isCorrect": false },
+          { "id": "b", "emoji": "🌊", "isCorrect": true },
+          { "id": "c", "emoji": "☀️", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r3",
+        "prompt": "O que falta nesse padrão?",
+        "contextSequence": ["🐚", "🌿", "🐚", "🌿", "❓", "🌿"],
+        "options": [
+          { "id": "a", "emoji": "🐚", "isCorrect": true },
+          { "id": "b", "emoji": "🥚", "isCorrect": false },
+          { "id": "c", "emoji": "🦀", "isCorrect": false }
+        ]
+      }
+    ]
+  }

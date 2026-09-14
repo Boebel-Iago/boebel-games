@@ -1,36 +1,44 @@
 package com.boebel.api.controller;
 
+import com.boebel.api.dto.JoinGameRequestDTO;
+import com.boebel.api.dto.ProgressUpdateRequestDTO;
+import com.boebel.api.dto.StudentSessionDTO;
 import com.boebel.api.dto.TicketRequestDTO;
 import com.boebel.api.dto.TicketResponseDTO;
+import com.boebel.api.model.AccessTicket;
+import com.boebel.api.model.StudentSession;
 import com.boebel.api.model.Teacher;
+import com.boebel.api.repository.AccessTicketRepository;
+import com.boebel.api.repository.StudentSessionRepository;
 import com.boebel.api.repository.TeacherRepository;
 import com.boebel.api.service.AccessTicketService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tickets")
+@RequiredArgsConstructor
 public class AccessTicketController {
 
     private final AccessTicketService accessTicketService;
     private final TeacherRepository teacherRepository;
-
-    public AccessTicketController(AccessTicketService accessTicketService, TeacherRepository teacherRepository) {
-        this.accessTicketService = accessTicketService;
-        this.teacherRepository = teacherRepository;
-    }
+    private final StudentSessionRepository studentSessionRepository;
+    private final AccessTicketRepository accessTicketRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     // Endpoint to generate a new code
     @PostMapping
     public ResponseEntity<?> createTicket(@RequestBody TicketRequestDTO ticketRequestDTO, Principal principal) {
         try {
-            //Get email from JWT and extract the Teacher
             String email = principal.getName();
             Teacher teacher = teacherRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -43,7 +51,7 @@ public class AccessTicketController {
         }
     }
 
-    // Endpoint for get activate ticker for a Teacher (chamado no ngOnInit do Angular)
+    // Endpoint for get active ticket for a Teacher
     @GetMapping("/active")
     public ResponseEntity<TicketResponseDTO> getActiveTicket(Principal principal) {
         String email = principal.getName();
@@ -58,31 +66,111 @@ public class AccessTicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    // Public endpoint for children enter in the game
+    // NEW: Get all sessions for the teacher's active ticket
+    @GetMapping("/sessions")
+    public ResponseEntity<List<StudentSessionDTO>> getSessionsByTicket(Principal principal) {
+        String email = principal.getName();
+        Teacher teacher = teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
-    @PostMapping("/validate")
-    public ResponseEntity<?> validateStudentTicket(@RequestBody Map<String, String> payload) {
-        try {
-            String code = payload.get("code");
-            if (code == null || code.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Code not provided."));
-            }
-
-            TicketResponseDTO validatedTicket = accessTicketService.validateAndConsumeTicket(code);
-            return ResponseEntity.ok(validatedTicket);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        AccessTicket ticket = accessTicketRepository.findByTeacher(teacher).orElse(null);
+        if (ticket == null) {
+            return ResponseEntity.ok(List.of());
         }
+
+        List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticket.getCode())
+                .stream()
+                .map(s -> new StudentSessionDTO(s.getId(), s.getStudentName(), s.getGameRoute(),
+                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt()))
+                .toList();
+
+        return ResponseEntity.ok(sessions);
     }
 
-    // Endpoint for delete a active ticket
+    // MODIFIED: Reuse existing session if student re-enters with same name + code
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateTicketAndJoin(@RequestBody JoinGameRequestDTO request) {
+
+        AccessTicket ticket = accessTicketRepository.findByCode(request.ticketCode())
+                .orElseThrow(() -> new RuntimeException("Ticket inválido ou não encontrado!"));
+
+        // Check if session already exists for this student + ticket (allows resume)
+        StudentSession session = studentSessionRepository
+                .findByStudentNameAndTicketCode(request.studentName(), ticket.getCode())
+                .orElse(null);
+
+        if (session == null) {
+            // Create new session only if one doesn't exist
+            session = new StudentSession();
+            session.setStudentName(request.studentName());
+            session.setTicketCode(ticket.getCode());
+            session.setGameRoute(ticket.getGame().getRoute());
+            session = studentSessionRepository.save(session);
+        }
+
+        // Broadcast updated sessions via WebSocket
+        broadcastSessions(ticket.getCode());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessionId", session.getId());
+        response.put("gameRoute", session.getGameRoute());
+        response.put("currentStage", session.getCurrentStage());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // MODIFIED: Also delete all sessions when ticket is deleted
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTicket(@PathVariable UUID id, Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
+        // Get the ticket before deleting to clean up sessions
+        AccessTicket ticket = accessTicketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        // Delete all student sessions associated with this ticket
+        studentSessionRepository.deleteByTicketCode(ticket.getCode());
+
         accessTicketService.deleteTicket(id, teacher);
         return ResponseEntity.noContent().build();
+    }
+
+    // MODIFIED: Broadcast via WebSocket after updating progress
+    @PutMapping("/sessions/{sessionId}/progress")
+    public ResponseEntity<?> updateProgress(
+            @PathVariable UUID sessionId,
+            @RequestBody ProgressUpdateRequestDTO request) {
+
+        StudentSession session = studentSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Sessão não encontrada!"));
+
+        session.setCurrentStage(request.nextStage());
+        session.setTotalMistakes(session.getTotalMistakes() + request.mistakesInThisLevel());
+
+        if (request.gameFinished()) {
+            session.setCompleted(true);
+        }
+
+        studentSessionRepository.save(session);
+
+        // Broadcast updated sessions via WebSocket
+        broadcastSessions(session.getTicketCode());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Broadcasts the full list of sessions for a given ticket code to all
+     * connected WebSocket clients subscribed to that topic.
+     */
+    private void broadcastSessions(String ticketCode) {
+        List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticketCode)
+                .stream()
+                .map(s -> new StudentSessionDTO(s.getId(), s.getStudentName(), s.getGameRoute(),
+                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt()))
+                .toList();
+        messagingTemplate.convertAndSend("/topic/sessions/" + ticketCode, sessions);
     }
 }

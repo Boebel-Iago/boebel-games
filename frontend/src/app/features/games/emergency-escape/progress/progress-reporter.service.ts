@@ -8,6 +8,7 @@ export interface ProgressEvent {
   result: LevelResult;
   attempts: number;
   timestamp: string; // ISO 8601
+  isLastLevel?: boolean;
 }
 
 /**

@@ -3,6 +3,17 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+export interface JoinGamePayload {
+  ticketCode: string;
+  studentName: string;
+}
+
+export interface JoinGameResponse {
+  sessionId: string;
+  gameRoute: string;
+  currentStage: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TicketService {
   private http = inject(HttpClient);
@@ -35,7 +46,24 @@ export class TicketService {
     return this.http.delete<any>(`${this.apiUrl}/tickets/${id}`, { headers: this.getHeaders() });
   }
 
-  validateTicket(code: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/tickets/validate`, { code });
+  // NOVO: Método de validação atualizado para receber Nome e Código
+  validateTicket(payload: JoinGamePayload): Observable<JoinGameResponse> {
+    // Note que não usa getHeaders(), pois o aluno não tem token de professor
+    return this.http.post<JoinGameResponse>(`${this.apiUrl}/tickets/validate`, payload);
   }
+
+  // NOVO: Buscar sessões dos alunos vinculadas ao ingresso ativo do professor
+  getSessionsByTicket(): Observable<StudentSession[]> {
+    return this.http.get<StudentSession[]>(`${this.apiUrl}/tickets/sessions`, { headers: this.getHeaders() });
+  }
+}
+
+export interface StudentSession {
+  id: string;
+  studentName: string;
+  gameRoute: string;
+  currentStage: number;
+  totalMistakes: number;
+  completed: boolean;
+  startedAt: string;
 }

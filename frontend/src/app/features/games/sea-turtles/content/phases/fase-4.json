@@ -1,0 +1,59 @@
+{
+    "id": "fase-4-informacao",
+    "fase": 4,
+    "activityType": "pattern",
+    "skillCodes": ["EF01CO04"],
+    "title": "O Que é Informação?",
+    "objective": "Cada imagem: ela passa uma mensagem pra alguém, ou não?",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Informação é tudo que passa uma mensagem — pode ser uma placa, um som, até uma pegada na areia." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Algumas coisas só existem, sem avisar nada pra ninguém. Vamos descobrir a diferença?" }
+    ],
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "O semáforo passa uma informação?",
+        "contextSequence": ["🚦"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r2",
+        "prompt": "Uma pedra parada, sozinha na areia, passa uma informação?",
+        "contextSequence": ["🪨"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      },
+      {
+        "id": "r3",
+        "prompt": "Uma pegada de tartaruga na areia passa uma informação?",
+        "contextSequence": ["👣"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r4",
+        "prompt": "Uma placa de perigo passa uma informação?",
+        "contextSequence": ["⚠️"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r5",
+        "prompt": "Uma árvore parada, sem nenhuma placa nela, passa uma informação?",
+        "contextSequence": ["🌳"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      }
+    ]
+  }

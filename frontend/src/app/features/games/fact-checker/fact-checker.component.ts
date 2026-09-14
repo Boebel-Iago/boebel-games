@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 
 interface NewsPartTask {
   id: string; // 'url', 'headline', 'author', 'date', 'image', 'body'
@@ -125,7 +126,36 @@ export class FactCheckerComponent implements OnInit {
   isCorrectGuess: boolean = false;
   gameFinished: boolean = false;
 
-  ngOnInit() {}
+  constructor(private progressReporter: ProgressReporter) {}
+
+  ngOnInit() {
+    this.restoreProgress();
+  }
+
+  private restoreProgress() {
+    const saved = sessionStorage.getItem('currentStage');
+    if (saved) {
+      const stage = parseInt(saved, 10);
+      if (!isNaN(stage) && stage > 0) {
+        const phase1Total = this.newsTasks.length;
+        if (stage >= phase1Total + this.factCheckTasks.length) {
+          this.gameFinished = true;
+        } else if (stage >= phase1Total) {
+          this.gameStage = 2;
+          this.currentTaskIndex = stage - phase1Total;
+        } else {
+          this.gameStage = 1;
+          this.currentTaskIndex = stage;
+        }
+      }
+    }
+  }
+
+  private getAbsoluteStage(): number {
+    return this.gameStage === 1
+      ? this.currentTaskIndex
+      : this.newsTasks.length + this.currentTaskIndex;
+  }
 
   // --- LÓGICA FASE 1 (PARTES DA NOTÍCIA) ---
   checkNewsPart(partId: string) {
@@ -165,17 +195,39 @@ export class FactCheckerComponent implements OnInit {
   // --- NAVEGAÇÃO GERAL ---
   nextStep() {
     this.showFeedbackModal = false;
-    
-    if (this.isCorrectGuess) {
-      this.currentTaskIndex++;
-      this.hasSearched = false;
-      
-      if (this.gameStage === 1 && this.currentTaskIndex >= this.newsTasks.length) {
-        this.gameStage = 2;
-        this.currentTaskIndex = 0;
-      } else if (this.gameStage === 2 && this.currentTaskIndex >= this.factCheckTasks.length) {
-        this.gameFinished = true;
-      }
+
+    if (!this.isCorrectGuess) {
+      this.progressReporter.report({
+        levelId: `fact-checker-${this.getAbsoluteStage()}`,
+        fase: this.getAbsoluteStage(),
+        result: 'failure',
+        attempts: 0,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
+      return;
     }
+
+    this.currentTaskIndex++;
+    this.hasSearched = false;
+    const phase1Total = this.newsTasks.length;
+    let isFinished = false;
+
+    if (this.gameStage === 1 && this.currentTaskIndex >= phase1Total) {
+      this.gameStage = 2;
+      this.currentTaskIndex = 0;
+    } else if (this.gameStage === 2 && this.currentTaskIndex >= this.factCheckTasks.length) {
+      this.gameFinished = true;
+      isFinished = true;
+    }
+
+    this.progressReporter.report({
+      levelId: `fact-checker-${this.getAbsoluteStage()}`,
+      fase: this.getAbsoluteStage(),
+      result: 'success',
+      attempts: 0,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isFinished
+    });
   }
 }

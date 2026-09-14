@@ -4,12 +4,14 @@
     <button (click)="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer">Sair</button>
   </header>
 
-  <main class="flex justify-center items-center py-12 px-4">
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
-      <h3 class="text-xl font-bold text-center mb-2">Gerenciador de Ingressos</h3>
-      
+  <main class="max-w-6xl mx-auto py-8 px-4 space-y-8">
+
+    <!-- Seção 1: Gerenciador de Ingressos -->
+    <div class="bg-white p-8 rounded-xl shadow-lg">
+      <h3 class="text-xl font-bold text-center mb-4">Gerenciador de Ingressos</h3>
+
       <!-- Formulário de Criação -->
-      <form *ngIf="!activeTicket" [formGroup]="ticketForm" (ngSubmit)="onGenerateTicket()" class="space-y-4">
+      <form *ngIf="!activeTicket" [formGroup]="ticketForm" (ngSubmit)="onGenerateTicket()" class="space-y-4 max-w-lg mx-auto">
         <div>
           <label class="block mb-1 text-sm font-semibold">Turma (Grade)</label>
           <select formControlName="grade" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
@@ -21,7 +23,7 @@
         <div *ngIf="availableGames.length > 0">
           <label class="block mb-1 text-sm font-semibold">Jogo Disponível</label>
           <div class="space-y-2">
-            <div *ngFor="let game of availableGames" 
+            <div *ngFor="let game of availableGames"
                  (click)="ticketForm.patchValue({gameId: game.id})"
                  [class.border-forest-800]="ticketForm.value.gameId === game.id"
                  [class.bg-forest-50]="ticketForm.value.gameId === game.id"
@@ -49,18 +51,85 @@
       </form>
 
       <!-- Card de Ingresso Ativo -->
-      <div *ngIf="activeTicket" class="bg-emerald-50 border border-emerald-200 p-6 rounded-xl mt-4">
+      <div *ngIf="activeTicket" class="bg-emerald-50 border border-emerald-200 p-6 rounded-xl max-w-lg mx-auto">
         <span class="text-xs uppercase font-bold text-emerald-700">Ingresso Ativo ({{ activeTicket.gameTitle }})</span>
         <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ activeTicket.code }}</code>
         <p class="text-xs text-center mt-2">Turma: {{ activeTicket.grade }} | Usos Restantes: {{ activeTicket.remainingUses }}</p>
-        <button (click)="onDeleteTicket(activeTicket.id)" class="w-full py-2 bg-red-600 text-white rounded-lg mt-4">
+        <button (click)="onDeleteTicket(activeTicket.id)" class="w-full py-2 bg-red-600 text-white rounded-lg mt-4 hover:bg-red-700">
           Excluir Ingresso
         </button>
       </div>
 
-      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg mt-4 text-center">
+      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg mt-4 text-center max-w-lg mx-auto">
         {{ errorMessage }}
       </div>
     </div>
+
+    <!-- Seção 2: Painel de Monitoramento (visível apenas quando há ingresso ativo) -->
+    <div *ngIf="activeTicket" class="space-y-6">
+
+      <!-- Cards de Resumo -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
+          <p class="text-sm text-gray-500 mb-1">🟢 Alunos Jogando</p>
+          <p class="text-3xl font-bold text-gray-800">{{ playingCount }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
+          <p class="text-sm text-gray-500 mb-1">✅ Finalizaram</p>
+          <p class="text-3xl font-bold text-gray-800">{{ completedCount }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
+          <p class="text-sm text-gray-500 mb-1">❌ Total de Erros</p>
+          <p class="text-3xl font-bold text-gray-800">{{ totalMistakesCount }}</p>
+        </div>
+      </div>
+
+      <!-- Tabela de Alunos -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="px-6 py-4 border-b flex justify-between items-center">
+          <h3 class="text-lg font-bold">Alunos na Sala</h3>
+          <button (click)="exportPdf()" 
+                  [disabled]="sessions.length === 0"
+                  class="bg-forest-900 hover:bg-forest-800 text-white px-4 py-2 rounded-lg text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
+            📄 Exportar PDF
+          </button>
+        </div>
+
+        <div *ngIf="sessions.length === 0" class="p-12 text-center text-gray-400">
+          <p class="text-4xl mb-3">🎮</p>
+          <p class="text-lg">Nenhum aluno entrou na sala ainda.</p>
+          <p class="text-sm">Compartilhe o código <strong>{{ activeTicket.code }}</strong> com a turma!</p>
+        </div>
+
+        <table *ngIf="sessions.length > 0" class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fase</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Erros</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Início</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let s of sessions" class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-900">{{ s.studentName }}</td>
+              <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
+              <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
+              <td class="px-6 py-4">
+                <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  ✅ Finalizado
+                </span>
+                <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  🟢 Jogando
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">{{ s.startedAt | date:'HH:mm' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>

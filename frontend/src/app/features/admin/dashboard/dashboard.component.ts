@@ -8,6 +8,7 @@ import { Client } from '@stomp/stompjs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -103,8 +104,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   connectWebSocket(ticketCode: string) {
     this.disconnectWebSocket();
 
+    const wsBase = environment.apiBaseUrl
+      ? environment.apiBaseUrl.replace(/^http/, 'ws')
+      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+
     this.stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: `${wsBase}/ws`,
       reconnectDelay: 5000,
       onConnect: () => {
         this.stompClient!.subscribe(`/topic/sessions/${ticketCode}`, (message) => {
@@ -155,6 +160,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  onExtendTicket(id: string, hours: number) {
+    this.ticketService.extendTicket(id, hours).subscribe({
+      next: (updated) => {
+        this.activeTicket = updated;
+        this.errorMessage = '';
+      },
+      error: () => { this.errorMessage = 'Erro ao estender o ingresso.'; }
+    });
+  }
+
+  onToggleTicketStatus(id: string) {
+    this.ticketService.toggleTicketStatus(id).subscribe({
+      next: (updated) => {
+        this.activeTicket = updated;
+        this.errorMessage = '';
+      },
+      error: () => { this.errorMessage = 'Erro ao alterar status do ingresso.'; }
+    });
+  }
+
+  getTimeRemaining(): string {
+    if (!this.activeTicket?.expirationDate) return '';
+    const exp = new Date(this.activeTicket.expirationDate);
+    const now = new Date();
+    const diff = exp.getTime() - now.getTime();
+    if (diff <= 0) return 'Expirado';
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0) return `${hours}h ${minutes}min restantes`;
+    return `${minutes}min restantes`;
   }
 
   onDeleteTicket(id: string) {

@@ -10,5 +10,7 @@ public record TicketResponseDTO(
         String gameRoute,
         Integer maxUses,
         Integer remainingUses,
-        Integer expirationHours
+        Integer expirationHours,
+        String expirationDate,
+        Boolean isActive
 ) {}

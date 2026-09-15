@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 export interface JoinGamePayload {
   ticketCode: string;
@@ -18,7 +19,7 @@ export interface JoinGameResponse {
 export class TicketService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = `${environment.apiBaseUrl}/api`;
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders()
@@ -55,6 +56,16 @@ export class TicketService {
   // NOVO: Buscar sessões dos alunos vinculadas ao ingresso ativo do professor
   getSessionsByTicket(): Observable<StudentSession[]> {
     return this.http.get<StudentSession[]>(`${this.apiUrl}/tickets/sessions`, { headers: this.getHeaders() });
+  }
+
+  // NOVO: Estender tempo do ingresso
+  extendTicket(id: string, additionalHours: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/tickets/${id}/extend`, { additionalHours }, { headers: this.getHeaders() });
+  }
+
+  // NOVO: Pausar/Reativar ingresso
+  toggleTicketStatus(id: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/tickets/${id}/toggle-status`, {}, { headers: this.getHeaders() });
   }
 }
 

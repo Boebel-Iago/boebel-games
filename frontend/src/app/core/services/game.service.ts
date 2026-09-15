@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 // Interface que define o pacote de dados que vai pro Java (com nomes iguais ao seu Record Java)
 export interface ProgressUpdatePayload {
@@ -16,7 +17,7 @@ export class GameService {
   private http = inject(HttpClient);
   
   // URL mapeada exatamente igual ao @RequestMapping + @PutMapping do Spring Boot
-  private apiUrl = 'http://localhost:8080/api/tickets/sessions'; 
+  private apiUrl = `${environment.apiBaseUrl}/api/tickets/sessions`; 
 
   /**
    * Envia o progresso e a quantidade de falhas da fase atual para o Spring Boot.

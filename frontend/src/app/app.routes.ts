@@ -14,9 +14,38 @@ import { ProgressReporter } from './features/games/emergency-escape/progress/pro
 import { ApiProgressReporterService } from './features/games/emergency-escape/progress/api-progress-reporter.service';
 import { SeaTurtlesComponent } from './features/games/sea-turtles/sea-turtles.component';
 import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/sea-turtles/content/phase-repository.service';
+import { FreeGamesComponent } from './features/public/free-games/free-games.component';
 
 export const routes: Routes = [
     
+    // ==========================================
+    // JOGOS FREE (DEMONSTRAÇÃO / PÚBLICO)
+    // Sem TicketGuard, Não salvam no Banco de Dados
+    // ==========================================
+    { 
+        path: 'free', 
+        component: FreeGamesComponent 
+    },
+    { 
+        path: 'free/sea-turtles', 
+        component: SeaTurtlesComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            { provide: PhaseRepository, useClass: LocalPhaseRepositoryService } 
+        ]
+    },
+    { 
+        path: 'free/emergency-escape', 
+        component: EmergencyEscapeComponent,
+        providers: [
+            { provide: LevelRepository, useClass: LocalLevelRepositoryService },
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ] 
+    },
+
+    // ==========================================
+    // JOGOS PROTEGIDOS (COM INGRESSO E BANCO)
+    // ==========================================
     { 
         path: 'games/sea-turtles', 
         component: SeaTurtlesComponent,

@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-gray-50 font-sans flex flex-col">
+  <!-- Header Public -->
+  <header class="bg-forest-900 text-white px-8 py-4 flex justify-between items-center shadow-md">
+    <h1 class="text-xl font-bold flex items-center gap-2">
+      🎮 Boebel Games <span class="bg-emerald-500 text-xs px-2 py-1 rounded-full uppercase tracking-wider ml-2">Modo Livre</span>
+    </h1>
+    <a routerLink="/" class="text-sm hover:underline font-medium">Sou Aluno (Entrar em Turma)</a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-5xl mx-auto py-12 px-4 w-full">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Aprenda Computação Brincando</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Experimente nossos jogos educacionais gratuitos baseados na BNCC Computação. 
+        Nenhuma conta ou código de turma é necessário!
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div *ngFor="let game of games" 
+           class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all flex flex-col transform hover:-translate-y-1">
+        
+        <div [class]="'h-40 flex items-center justify-center text-6xl ' + game.color">
+          {{ game.icon }}
+        </div>
+        
+        <div class="p-6 flex flex-col flex-grow">
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ game.title }}</h3>
+          <p class="text-gray-600 flex-grow mb-6 leading-relaxed">{{ game.description }}</p>
+          
+          <a [routerLink]="game.route" 
+             class="block text-center w-full py-4 px-4 bg-forest-900 hover:bg-forest-800 text-white font-bold rounded-xl transition-colors shadow-md">
+            Jogar Agora ➡️
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+  
+  <footer class="bg-gray-800 text-white text-center py-6 mt-8">
+    <p class="text-sm">Boebel Games © 2026 - Educação Digital para o Brasil</p>
+  </footer>
+</div>

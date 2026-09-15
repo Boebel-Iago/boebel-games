@@ -9,6 +9,10 @@ services:
       POSTGRES_DB: boebelgames
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Adicione esta linha abaixo mapeando o seu arquivo SQL para a pasta de inicialização do Postgres:
+      - ./infra/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      # Se você tiver um arquivo com os INSERTS dos jogos, pode mapear também:
+      # - ./api/src/main/resources/data.sql:/docker-entrypoint-initdb.d/2-data.sql
 
   backend:
     build: ./api

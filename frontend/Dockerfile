@@ -12,7 +12,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copia o build do Angular (ATENÇÃO: ajuste 'boebel-games' para o nome exato da pasta que o seu Angular gera dentro de dist/)
-COPY --from=build /app/dist/boebel-games/browser /usr/share/nginx/html
+COPY --from=build /app/dist/frontend /usr/share/nginx/html
 
 # Configuração para evitar erro 404 nas rotas do Angular
 RUN echo 'server { \

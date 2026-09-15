@@ -39,23 +39,21 @@ export class TicketService {
     return this.http.post<any>(`${this.apiUrl}/tickets`, data, { headers: this.getHeaders() });
   }
 
-  getActiveTicket(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/tickets/active`, { headers: this.getHeaders() });
+  getActiveTickets(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/tickets/active`, { headers: this.getHeaders() });
   }
 
   deleteTicket(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/tickets/${id}`, { headers: this.getHeaders() });
   }
 
-  // NOVO: Método de validação atualizado para receber Nome e Código
   validateTicket(payload: JoinGamePayload): Observable<JoinGameResponse> {
-    // Note que não usa getHeaders(), pois o aluno não tem token de professor
     return this.http.post<JoinGameResponse>(`${this.apiUrl}/tickets/validate`, payload);
   }
 
-  // NOVO: Buscar sessões dos alunos vinculadas ao ingresso ativo do professor
-  getSessionsByTicket(): Observable<StudentSession[]> {
-    return this.http.get<StudentSession[]>(`${this.apiUrl}/tickets/sessions`, { headers: this.getHeaders() });
+  // MODIFIED: Buscar sessões de um ticket específico
+  getSessionsByTicket(ticketCode: string): Observable<StudentSession[]> {
+    return this.http.get<StudentSession[]>(`${this.apiUrl}/tickets/${ticketCode}/sessions`, { headers: this.getHeaders() });
   }
 
   // NOVO: Estender tempo do ingresso

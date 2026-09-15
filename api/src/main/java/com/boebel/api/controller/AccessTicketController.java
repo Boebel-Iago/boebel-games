@@ -52,30 +52,30 @@ public class AccessTicketController {
     }
 
     // Endpoint for get active ticket for a Teacher
+    // MODIFIED: Get all active tickets for teacher
     @GetMapping("/active")
-    public ResponseEntity<TicketResponseDTO> getActiveTicket(Principal principal) {
+    public ResponseEntity<List<TicketResponseDTO>> getActiveTickets(Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
-        TicketResponseDTO ticket = accessTicketService.getActiveTicketForTeacher(teacher);
-
-        if (ticket == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(ticket);
+        List<TicketResponseDTO> tickets = accessTicketService.getActiveTicketsForTeacher(teacher);
+        return ResponseEntity.ok(tickets);
     }
 
-    // NEW: Get all sessions for the teacher's active ticket
-    @GetMapping("/sessions")
-    public ResponseEntity<List<StudentSessionDTO>> getSessionsByTicket(Principal principal) {
+    // MODIFIED: Get sessions for a specific ticket code
+    @GetMapping("/{ticketCode}/sessions")
+    public ResponseEntity<List<StudentSessionDTO>> getSessionsByTicket(@PathVariable String ticketCode, Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
-        AccessTicket ticket = accessTicketRepository.findByTeacher(teacher).orElse(null);
-        if (ticket == null) {
-            return ResponseEntity.ok(List.of());
+        // Verify if teacher owns this ticket
+        AccessTicket ticket = accessTicketRepository.findByCode(ticketCode)
+                .orElseThrow(() -> new RuntimeException("Ingresso não encontrado"));
+                
+        if (!ticket.getTeacher().getUuid().equals(teacher.getUuid())) {
+             throw new SecurityException("Sem permissão para ver estas sessões.");
         }
 
         List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticket.getCode())

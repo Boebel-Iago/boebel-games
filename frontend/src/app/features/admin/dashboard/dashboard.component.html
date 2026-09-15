@@ -6,134 +6,173 @@
 
   <main class="max-w-6xl mx-auto py-8 px-4 space-y-8">
 
-    <!-- Seção 1: Gerenciador de Ingressos -->
-    <div class="bg-white p-8 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold text-center mb-4">Gerenciador de Ingressos</h3>
+    <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg mt-4 text-center mx-auto shadow-sm">
+      {{ errorMessage }}
+    </div>
 
+    <!-- ==================== TELA 1: LISTA DE INGRESSOS ==================== -->
+    <div *ngIf="!selectedTicket" class="space-y-8">
+      
       <!-- Formulário de Criação -->
-      <form *ngIf="!activeTicket" [formGroup]="ticketForm" (ngSubmit)="onGenerateTicket()" class="space-y-4 max-w-lg mx-auto">
-        <div>
-          <label class="block mb-1 text-sm font-semibold">Turma</label>
-          <select formControlName="grade" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-            <option value="" disabled>Selecione a turma...</option>
-            <option *ngFor="let g of availableGrades" [value]="g.code">{{ g.name }}</option>
-          </select>
+      <div class="bg-white p-8 rounded-xl shadow-lg">
+        <h3 class="text-xl font-bold text-center mb-4">Gerenciador de Ingressos</h3>
+        
+        <div *ngIf="tickets.length >= 20" class="bg-yellow-50 text-yellow-800 p-4 rounded-lg text-center mb-4">
+          Você atingiu o limite máximo de 20 ingressos ativos. Para criar um novo, exclua algum antigo.
         </div>
 
-        <div *ngIf="availableGames.length > 0">
-          <label class="block mb-1 text-sm font-semibold">Jogo Disponível</label>
-          <div class="space-y-2">
-            <div *ngFor="let game of availableGames"
-                 (click)="ticketForm.patchValue({gameId: game.id})"
-                 [class.border-forest-800]="ticketForm.value.gameId === game.id"
-                 [class.bg-forest-50]="ticketForm.value.gameId === game.id"
-                 class="p-3 border border-gray-200 rounded-lg cursor-pointer">
-              <h4 class="font-bold text-sm">{{ game.title }}</h4>
-              <p class="text-xs">{{ game.description }}</p>
+        <form *ngIf="tickets.length < 20" [formGroup]="ticketForm" (ngSubmit)="onGenerateTicket()" class="space-y-4 max-w-lg mx-auto">
+          <div>
+            <label class="block mb-1 text-sm font-semibold">Turma</label>
+            <select formControlName="grade" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              <option value="" disabled>Selecione a turma...</option>
+              <option *ngFor="let g of availableGrades" [value]="g.code">{{ g.name }}</option>
+            </select>
+          </div>
+
+          <div *ngIf="availableGames.length > 0">
+            <label class="block mb-1 text-sm font-semibold">Jogo Disponível</label>
+            <div class="space-y-2">
+              <div *ngFor="let game of availableGames"
+                   (click)="ticketForm.patchValue({gameId: game.id})"
+                   [class.border-forest-800]="ticketForm.value.gameId === game.id"
+                   [class.bg-forest-50]="ticketForm.value.gameId === game.id"
+                   class="p-3 border border-gray-200 rounded-lg cursor-pointer">
+                <h4 class="font-bold text-sm">{{ game.title }}</h4>
+                <p class="text-xs">{{ game.description }}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div>
-          <label class="block mb-1 text-sm font-semibold">Máximo de Alunos</label>
-          <input type="number" formControlName="maxUses" class="w-full px-4 py-2 border rounded-lg">
-        </div>
+          <div>
+            <label class="block mb-1 text-sm font-semibold">Máximo de Alunos</label>
+            <input type="number" formControlName="maxUses" class="w-full px-4 py-2 border rounded-lg">
+          </div>
 
-        <div>
-          <label class="block mb-1 text-sm font-semibold">Expiração (Horas)</label>
-          <input type="number" formControlName="expirationHours" class="w-full px-4 py-2 border rounded-lg">
-        </div>
+          <div>
+            <label class="block mb-1 text-sm font-semibold">Expiração (Horas)</label>
+            <input type="number" formControlName="expirationHours" class="w-full px-4 py-2 border rounded-lg">
+          </div>
 
-        <button type="submit" [disabled]="ticketForm.invalid"
-                class="w-full py-3 bg-forest-900 text-white rounded-lg disabled:bg-gray-300">
-          Gerar Ingresso
-        </button>
-      </form>
+          <button type="submit" [disabled]="ticketForm.invalid"
+                  class="w-full py-3 bg-forest-900 hover:bg-forest-800 transition-colors text-white rounded-lg disabled:bg-gray-300">
+            Criar Ingresso
+          </button>
+        </form>
+      </div>
 
-      <!-- Card de Ingresso Ativo -->
-      <div *ngIf="activeTicket" 
-           class="border p-6 rounded-xl max-w-lg mx-auto transition-colors"
-           [ngClass]="activeTicket.isActive ? 'bg-emerald-50 border-emerald-200' : 'bg-yellow-50 border-yellow-300'">
+      <!-- Lista de Ingressos Ativos -->
+      <div>
+        <h3 class="text-xl font-bold mb-4">Suas Turmas Ativas ({{tickets.length}}/20)</h3>
         
-        <!-- Header com Badge e Botão de Pausa -->
+        <div *ngIf="tickets.length === 0" class="text-center text-gray-500 py-8 bg-white rounded-xl shadow border border-dashed">
+          Você não tem turmas ativas. Crie um ingresso acima para começar!
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let ticket of tickets" 
+               class="p-5 rounded-xl shadow-sm border transition-all hover:shadow-md"
+               [ngClass]="ticket.isActive ? 'bg-white border-emerald-200' : 'bg-gray-50 border-yellow-300 opacity-80'">
+            
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <span class="text-xs uppercase font-bold" [ngClass]="ticket.isActive ? 'text-emerald-700' : 'text-yellow-700'">
+                  {{ ticket.isActive ? 'Ativo' : 'Pausado' }}
+                </span>
+                <h4 class="font-bold text-lg text-gray-900">{{ ticket.gameTitle }}</h4>
+              </div>
+              <code class="font-bold bg-gray-100 px-2 py-1 border rounded text-sm">{{ ticket.code }}</code>
+            </div>
+            
+            <div class="text-sm text-gray-600 mb-4">
+              <p>Turma: {{ formatGrade(ticket.grade) }}</p>
+              <p>Alunos: {{ ticket.maxUses - ticket.remainingUses }}/{{ ticket.maxUses }}</p>
+              <p class="mt-1 font-medium" [ngClass]="getTimeRemaining(ticket) === 'Expirado' ? 'text-red-600' : 'text-gray-500'">
+                ⏱️ {{ getTimeRemaining(ticket) }}
+              </p>
+            </div>
+
+            <button (click)="openTicketMonitor(ticket)" 
+                    class="w-full py-2 bg-forest-900 text-white rounded-lg text-sm font-bold hover:bg-forest-800 transition-colors">
+              Gerenciar Sala ➡️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== TELA 2: SALA ESPECÍFICA (MONITORAMENTO) ==================== -->
+    <div *ngIf="selectedTicket" class="space-y-6">
+      
+      <button (click)="closeTicketMonitor()" class="flex items-center text-forest-900 font-bold hover:underline mb-2">
+        ⬅️ Voltar para a lista de turmas
+      </button>
+
+      <!-- Card do Ingresso Selecionado -->
+      <div class="border p-6 rounded-xl max-w-lg mx-auto transition-colors"
+           [ngClass]="selectedTicket.isActive ? 'bg-emerald-50 border-emerald-200' : 'bg-yellow-50 border-yellow-300'">
+        
         <div class="flex justify-between items-center mb-2">
           <span class="text-xs uppercase font-bold" 
-                [ngClass]="activeTicket.isActive ? 'text-emerald-700' : 'text-yellow-700'">
-            Ingresso {{ activeTicket.isActive ? 'Ativo' : 'Pausado' }} ({{ activeTicket.gameTitle }})
+                [ngClass]="selectedTicket.isActive ? 'text-emerald-700' : 'text-yellow-700'">
+            Ingresso {{ selectedTicket.isActive ? 'Ativo' : 'Pausado' }} ({{ selectedTicket.gameTitle }})
           </span>
-          <button (click)="onToggleTicketStatus(activeTicket.id)"
+          <button (click)="onToggleTicketStatus(selectedTicket.id)"
                   class="text-xs px-3 py-1 rounded-full font-bold transition-colors shadow-sm"
-                  [ngClass]="activeTicket.isActive ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'">
-            {{ activeTicket.isActive ? '⏸️ Pausar Sala' : '▶️ Reativar' }}
+                  [ngClass]="selectedTicket.isActive ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'">
+            {{ selectedTicket.isActive ? '⏸️ Pausar Sala' : '▶️ Reativar' }}
           </button>
         </div>
 
-        <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ activeTicket.code }}</code>
+        <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ selectedTicket.code }}</code>
         
-        <p class="text-xs text-center mt-2" [ngClass]="activeTicket.isActive ? 'text-gray-700' : 'text-yellow-800'">
-          Turma: {{ formatGrade(activeTicket.grade) }} | Vagas: {{ activeTicket.remainingUses }}/{{ activeTicket.maxUses }}
+        <p class="text-xs text-center mt-2" [ngClass]="selectedTicket.isActive ? 'text-gray-700' : 'text-yellow-800'">
+          Turma: {{ formatGrade(selectedTicket.grade) }} | Vagas: {{ selectedTicket.remainingUses }}/{{ selectedTicket.maxUses }}
         </p>
         
-        <!-- Alerta quando pausado -->
-        <div *ngIf="!activeTicket.isActive" class="bg-yellow-100 text-yellow-800 p-2 text-xs rounded mt-2 text-center">
+        <div *ngIf="!selectedTicket.isActive" class="bg-yellow-100 text-yellow-800 p-2 text-xs rounded mt-2 text-center">
           Os alunos estão bloqueados de entrar na sala até você reativar.
         </div>
 
-        <p class="text-xs text-center mt-1 font-medium" [ngClass]="getTimeRemaining() === 'Expirado' ? 'text-red-600' : 'text-gray-600'">
-          ⏱️ {{ getTimeRemaining() }}
+        <p class="text-xs text-center mt-1 font-medium" [ngClass]="getTimeRemaining(selectedTicket) === 'Expirado' ? 'text-red-600' : 'text-gray-600'">
+          ⏱️ {{ getTimeRemaining(selectedTicket) }}
         </p>
 
         <!-- Botões de Estender Tempo -->
         <div class="flex gap-2 mt-4">
-          <button (click)="onExtendTicket(activeTicket.id, 1)"
-                  class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
+          <button (click)="onExtendTicket(selectedTicket.id, 1)" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
             +1h
           </button>
-          <button (click)="onExtendTicket(activeTicket.id, 2)"
-                  class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
+          <button (click)="onExtendTicket(selectedTicket.id, 2)" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
             +2h
           </button>
-          <button (click)="onExtendTicket(activeTicket.id, 24)"
-                  class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">
-            📅 +24h (Próxima Aula)
+          <button (click)="onExtendTicket(selectedTicket.id, 24)" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">
+            📅 +24h (Aula)
           </button>
         </div>
 
-        <button (click)="onDeleteTicket(activeTicket.id)" class="w-full py-2 bg-red-600 text-white rounded-lg mt-3 hover:bg-red-700 text-sm">
-          Excluir Ingresso
+        <button (click)="onDeleteTicket(selectedTicket.id)" class="w-full py-2 bg-red-600 text-white rounded-lg mt-3 hover:bg-red-700 text-sm">
+          Encerrar e Excluir Ingresso
         </button>
       </div>
 
-      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg mt-4 text-center max-w-lg mx-auto">
-        {{ errorMessage }}
-      </div>
-    </div>
-
-    <!-- Seção 2: Abas (Monitoramento / Demonstração) — só com ingresso ativo -->
-    <div *ngIf="activeTicket" class="space-y-6">
-
-      <!-- Tabs -->
+      <!-- Tabs de Monitoramento/Demonstração -->
       <div class="flex border-b border-gray-200">
         <button (click)="activeTab = 'monitor'"
                 class="px-6 py-3 text-sm font-bold transition-colors"
-                [ngClass]="activeTab === 'monitor'
-                  ? 'text-forest-900 border-b-2 border-forest-900'
-                  : 'text-gray-400 hover:text-gray-600'">
+                [ngClass]="activeTab === 'monitor' ? 'text-forest-900 border-b-2 border-forest-900' : 'text-gray-400 hover:text-gray-600'">
           📊 Monitoramento
         </button>
         <button (click)="activeTab = 'demo'"
                 class="px-6 py-3 text-sm font-bold transition-colors"
-                [ngClass]="activeTab === 'demo'
-                  ? 'text-forest-900 border-b-2 border-forest-900'
-                  : 'text-gray-400 hover:text-gray-600'">
+                [ngClass]="activeTab === 'demo' ? 'text-forest-900 border-b-2 border-forest-900' : 'text-gray-400 hover:text-gray-600'">
           📽️ Demonstração
         </button>
       </div>
 
-      <!-- ==================== TAB: MONITORAMENTO ==================== -->
+      <!-- TAB: MONITORAMENTO -->
       <div *ngIf="activeTab === 'monitor'" class="space-y-6">
-
-        <!-- Cards de Resumo -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
             <p class="text-sm text-gray-500 mb-1">🟢 Alunos Jogando</p>
@@ -149,7 +188,6 @@
           </div>
         </div>
 
-        <!-- Tabela de Alunos -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
           <div class="px-6 py-4 border-b flex justify-between items-center">
             <h3 class="text-lg font-bold">Alunos na Sala</h3>
@@ -163,7 +201,7 @@
           <div *ngIf="sessions.length === 0" class="p-12 text-center text-gray-400">
             <p class="text-4xl mb-3">🎮</p>
             <p class="text-lg">Nenhum aluno entrou na sala ainda.</p>
-            <p class="text-sm">Compartilhe o código <strong>{{ activeTicket.code }}</strong> com a turma!</p>
+            <p class="text-sm">Compartilhe o código <strong>{{ selectedTicket.code }}</strong> com a turma!</p>
           </div>
 
           <table *ngIf="sessions.length > 0" class="w-full">
@@ -182,12 +220,8 @@
                 <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
                 <td class="px-6 py-4">
-                  <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    ✅ Finalizado
-                  </span>
-                  <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    🟢 Jogando
-                  </span>
+                  <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">✅ Finalizado</span>
+                  <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">🟢 Jogando</span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500">{{ s.startedAt | date:'HH:mm' }}</td>
               </tr>
@@ -196,41 +230,24 @@
         </div>
       </div>
 
-      <!-- ==================== TAB: DEMONSTRAÇÃO ==================== -->
+      <!-- TAB: DEMONSTRAÇÃO -->
       <div *ngIf="activeTab === 'demo'" class="space-y-6">
-
         <div class="bg-white p-8 rounded-xl shadow-lg">
           <div class="text-center mb-6">
             <h3 class="text-xl font-bold mb-2">📽️ Demonstração do Jogo</h3>
-            <p class="text-gray-500 text-sm">
-              Use esta aba para projetar o jogo na tela da sala de aula.
-              O jogo roda aqui dentro sem precisar de código de ingresso.
-            </p>
+            <p class="text-gray-500 text-sm">Use esta aba para projetar o jogo na tela da sala de aula.</p>
           </div>
-
-          <!-- Botões de ação -->
           <div class="flex justify-center gap-4 mb-6">
-            <button (click)="openDemoFullscreen()"
-                    class="bg-forest-900 hover:bg-forest-800 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+            <button (click)="openDemoFullscreen()" class="bg-forest-900 hover:bg-forest-800 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
               🖥️ Abrir Aqui (Tela Cheia)
             </button>
-            <button (click)="openDemoNewWindow()"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+            <button (click)="openDemoNewWindow()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
               🪟 Abrir em Nova Janela
             </button>
           </div>
-
-          <!-- Preview inline do jogo -->
           <div class="border-4 border-gray-200 rounded-xl overflow-hidden bg-gray-100" style="height: 600px;">
-            <iframe [src]="demoUrl | safeUrl"
-                    class="w-full h-full border-0"
-                    title="Demonstração do Jogo">
-            </iframe>
+            <iframe [src]="demoUrl | safeUrl" class="w-full h-full border-0" title="Demonstração do Jogo"></iframe>
           </div>
-
-          <p class="text-center text-xs text-gray-400 mt-3">
-            💡 Dica: Use "Abrir em Nova Janela" e pressione <kbd class="px-1.5 py-0.5 bg-gray-200 rounded text-gray-600">F11</kbd> para tela cheia no projetor.
-          </p>
         </div>
       </div>
 
@@ -239,14 +256,10 @@
   </main>
 </div>
 
-<!-- Modal Fullscreen do Jogo (Demo) -->
+<!-- Modal Fullscreen -->
 <div *ngIf="isDemoFullscreen" class="fixed inset-0 z-50 bg-black">
-  <button (click)="closeDemoFullscreen()"
-          class="fixed top-4 right-4 z-[60] bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+  <button (click)="closeDemoFullscreen()" class="fixed top-4 right-4 z-[60] bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
     ✕ Fechar
   </button>
-  <iframe [src]="demoUrl | safeUrl"
-          class="w-full h-full border-0"
-          title="Demonstração do Jogo">
-  </iframe>
+  <iframe [src]="demoUrl | safeUrl" class="w-full h-full border-0" title="Demonstração do Jogo"></iframe>
 </div>

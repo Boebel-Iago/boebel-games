@@ -33,7 +33,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   availableGrades: any[] = [];
   availableGames: any[] = [];
-  activeTicket: any = null;
+  
+  // Lista de ingressos (master) e ingresso selecionado (detail)
+  tickets: any[] = [];
+  selectedTicket: any = null;
+  
   errorMessage: string = '';
 
   // Monitoring state
@@ -59,12 +63,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   get demoUrl(): string {
-    if (!this.activeTicket) return '';
-    return `/games/${this.activeTicket.gameRoute}?demo=1`;
+    if (!this.selectedTicket) return '';
+    return `/games/${this.selectedTicket.gameRoute}?demo=1`;
   }
 
   ngOnInit() {
-    this.loadActiveTicket();
+    this.loadTickets();
     this.loadGrades();
 
     this.ticketForm.get('grade')?.valueChanges.subscribe(grade => {
@@ -81,21 +85,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.disconnectWebSocket();
   }
 
-  loadActiveTicket() {
-    this.ticketService.getActiveTicket().subscribe({
-      next: (ticket) => {
-        this.activeTicket = ticket;
-        if (ticket) {
-          this.loadSessions();
-          this.connectWebSocket(ticket.code);
+  loadTickets() {
+    this.ticketService.getActiveTickets().subscribe({
+      next: (tickets) => {
+        this.tickets = tickets || [];
+        
+        // Se houver um ingresso selecionado e a lista atualizar, atualizar os dados dele
+        if (this.selectedTicket) {
+          const updated = this.tickets.find(t => t.id === this.selectedTicket.id);
+          if (updated) {
+            this.selectedTicket = updated;
+          } else {
+            // Se o ingresso foi deletado/expirou no backend, voltar para a lista
+            this.closeTicketMonitor();
+          }
         }
       },
-      error: () => { this.activeTicket = null; }
+      error: () => { this.tickets = []; }
     });
   }
 
+  // ==== Navegação Master-Detail ====
+  openTicketMonitor(ticket: any) {
+    this.selectedTicket = ticket;
+    this.activeTab = 'monitor';
+    this.loadSessions();
+    this.connectWebSocket(ticket.code);
+  }
+
+  closeTicketMonitor() {
+    this.selectedTicket = null;
+    this.sessions = [];
+    this.disconnectWebSocket();
+    this.loadTickets(); // Recarrega a lista para pegar possíveis status atualizados
+  }
+
+  // ==== Restante da Lógica ====
   loadSessions() {
-    this.ticketService.getSessionsByTicket().subscribe({
+    if (!this.selectedTicket) return;
+    this.ticketService.getSessionsByTicket(this.selectedTicket.code).subscribe({
       next: (sessions) => { this.sessions = sessions; },
       error: () => { this.sessions = []; }
     });
@@ -151,12 +179,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.ticketService.generateTicket(payload).subscribe({
         next: (response) => {
-          this.activeTicket = response;
           this.errorMessage = '';
-          this.connectWebSocket(response.code);
+          this.ticketForm.reset({ maxUses: 1, expirationHours: 24, grade: '', gameId: null });
+          this.loadTickets(); // Atualiza a lista
         },
         error: (err) => {
-          this.errorMessage = err.error?.error || 'Erro ao gerar o ingresso.';
+          this.errorMessage = err.error?.error || err.error?.message || 'Erro ao gerar o ingresso.';
         }
       });
     }
@@ -165,8 +193,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onExtendTicket(id: string, hours: number) {
     this.ticketService.extendTicket(id, hours).subscribe({
       next: (updated) => {
-        this.activeTicket = updated;
+        this.selectedTicket = updated;
         this.errorMessage = '';
+        this.loadTickets(); // Atualiza no background
       },
       error: () => { this.errorMessage = 'Erro ao estender o ingresso.'; }
     });
@@ -175,16 +204,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onToggleTicketStatus(id: string) {
     this.ticketService.toggleTicketStatus(id).subscribe({
       next: (updated) => {
-        this.activeTicket = updated;
+        this.selectedTicket = updated;
         this.errorMessage = '';
+        this.loadTickets(); // Atualiza no background
       },
       error: () => { this.errorMessage = 'Erro ao alterar status do ingresso.'; }
     });
   }
 
-  getTimeRemaining(): string {
-    if (!this.activeTicket?.expirationDate) return '';
-    const exp = new Date(this.activeTicket.expirationDate);
+  getTimeRemaining(ticket: any): string {
+    if (!ticket?.expirationDate) return '';
+    const exp = new Date(ticket.expirationDate);
     const now = new Date();
     const diff = exp.getTime() - now.getTime();
     if (diff <= 0) return 'Expirado';
@@ -201,36 +231,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.ticketService.deleteTicket(id).subscribe({
       next: () => {
-        this.activeTicket = null;
-        this.sessions = [];
-        this.disconnectWebSocket();
-        this.ticketForm.reset({ maxUses: 1, expirationHours: 24, grade: '', gameId: null });
+        this.closeTicketMonitor();
       },
       error: () => { this.errorMessage = 'Erro ao excluir o ingresso.'; }
     });
   }
 
-  // ============ PDF Export ============
-  // O PDF é gerado no navegador e baixado como arquivo.
-  // Na EC2, o professor acessa o dashboard pelo navegador do computador dele,
-  // então o arquivo é salvo na pasta Downloads padrão do navegador (ex: ~/Downloads/).
-  // Não é salvo no servidor — é gerado e baixado direto no dispositivo do professor.
   exportPdf() {
     const doc = new jsPDF();
 
-    // Header
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Relatório - Boebel Games', 14, 20);
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Jogo: ${this.activeTicket.gameTitle}`, 14, 32);
-    doc.text(`Turma: ${this.formatGrade(this.activeTicket.grade)}`, 14, 39);
-    doc.text(`Código do Ingresso: ${this.activeTicket.code}`, 14, 46);
+    doc.text(`Jogo: ${this.selectedTicket.gameTitle}`, 14, 32);
+    doc.text(`Turma: ${this.formatGrade(this.selectedTicket.grade)}`, 14, 39);
+    doc.text(`Código do Ingresso: ${this.selectedTicket.code}`, 14, 46);
     doc.text(`Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}`, 14, 53);
 
-    // Table
     autoTable(doc, {
       startY: 63,
       head: [['Nome do Aluno', 'Fase Atual', 'Total de Erros', 'Status', 'Hora de Início']],
@@ -246,7 +266,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       alternateRowStyles: { fillColor: [245, 245, 245] }
     });
 
-    // Summary below table
     const finalY = (doc as any).lastAutoTable.finalY + 15;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
@@ -258,12 +277,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     doc.text(`Alunos Finalizados: ${this.completedCount}`, 14, finalY + 24);
     doc.text(`Total de Erros da Turma: ${this.totalMistakesCount}`, 14, finalY + 31);
 
-    // Save — downloads to the browser's default Downloads folder
-    const fileName = `relatorio-${this.activeTicket.code}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const fileName = `relatorio-${this.selectedTicket.code}-${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(fileName);
   }
 
-  // ============ Demo Mode ============
+  // Demo Mode
   openDemoFullscreen() {
     this.isDemoFullscreen = true;
   }

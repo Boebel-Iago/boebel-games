@@ -11,7 +11,9 @@ import com.boebel.api.repository.StudentSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AccessTicketService {
@@ -29,11 +31,11 @@ public class AccessTicketService {
     }
 
     public TicketResponseDTO generateTicket(Teacher teacher, TicketRequestDTO request) {
-        // Limpa ticket expirado se existir, para liberar a criação de novo
-        cleanupExpiredTicket(teacher);
+        // Limpa tickets expirados para liberar espaço
+        cleanupExpiredTickets(teacher);
 
-        if (accessTicketRepository.existsByTeacher(teacher)) {
-            throw new IllegalStateException("Você já tem um ingresso ativo! Exclua-o antes de criar outro.");
+        if (accessTicketRepository.countByTeacher(teacher) >= 20) {
+            throw new IllegalStateException("Limite atingido: você já tem 20 ingressos ativos. Exclua algum antigo ou aguarde expirarem para criar um novo.");
         }
 
         Game game = gameRepository.findById(request.gameId())
@@ -54,20 +56,28 @@ public class AccessTicketService {
         return toDTO(savedTicket);
     }
 
-    public TicketResponseDTO getActiveTicketForTeacher(Teacher teacher) {
-        AccessTicket ticket = accessTicketRepository.findByTeacher(teacher).orElse(null);
-        if (ticket == null) return null;
+    public List<TicketResponseDTO> getActiveTicketsForTeacher(Teacher teacher) {
+        List<AccessTicket> tickets = accessTicketRepository.findAllByTeacher(teacher);
+        
+        // Separa os válidos dos expirados
+        List<AccessTicket> validTickets = tickets.stream()
+                .filter(t -> !t.getExpirationDate().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
 
-        // CORREÇÃO: Deleta APENAS se estiver expirado no tempo.
-        // Ingressos inativados manualmente (pausados) não são deletados.
-        if (ticket.getExpirationDate().isBefore(LocalDateTime.now())) {
-            // Auto-cleanup: deleta sessões e o ticket expirado
-            studentSessionRepository.deleteByTicketCode(ticket.getCode());
-            accessTicketRepository.delete(ticket);
-            return null;
+        List<AccessTicket> expiredTickets = tickets.stream()
+                .filter(t -> t.getExpirationDate().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
+
+        // Deleta os expirados
+        for (AccessTicket expired : expiredTickets) {
+            studentSessionRepository.deleteByTicketCode(expired.getCode());
+            accessTicketRepository.delete(expired);
         }
 
-        return toDTO(ticket);
+        // Retorna DTOs dos válidos ordenados
+        return validTickets.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public TicketResponseDTO extendTicket(UUID ticketId, Teacher teacher, int additionalHours) {
@@ -90,7 +100,6 @@ public class AccessTicketService {
         return toDTO(ticket);
     }
 
-    // NOVO: Método para pausar e reativar o ingresso
     public TicketResponseDTO toggleTicketStatus(UUID ticketId, Teacher teacher) {
         AccessTicket ticket = accessTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ingresso não encontrado!"));
@@ -99,7 +108,7 @@ public class AccessTicketService {
             throw new SecurityException("Sem permissão para alterar este ingresso.");
         }
 
-        // Inverte o status atual (se true vira false, se false vira true)
+        // Inverte o status atual
         ticket.setIsActive(!ticket.getIsActive());
         accessTicketRepository.save(ticket);
 
@@ -118,18 +127,19 @@ public class AccessTicketService {
     }
 
     /**
-     * Limpa ticket expirado silenciosamente para que o professor possa criar um novo.
+     * Limpa tickets expirados silenciosamente.
      */
-    private void cleanupExpiredTicket(Teacher teacher) {
-        AccessTicket ticket = accessTicketRepository.findByTeacher(teacher).orElse(null);
-        if (ticket != null && ticket.getExpirationDate().isBefore(LocalDateTime.now())) {
-            studentSessionRepository.deleteByTicketCode(ticket.getCode());
-            accessTicketRepository.delete(ticket);
+    private void cleanupExpiredTickets(Teacher teacher) {
+        List<AccessTicket> tickets = accessTicketRepository.findAllByTeacher(teacher);
+        for (AccessTicket ticket : tickets) {
+            if (ticket.getExpirationDate().isBefore(LocalDateTime.now())) {
+                studentSessionRepository.deleteByTicketCode(ticket.getCode());
+                accessTicketRepository.delete(ticket);
+            }
         }
     }
 
     private TicketResponseDTO toDTO(AccessTicket ticket) {
-        // CORREÇÃO: Passando ticket.getIsActive() para o DTO resolver o erro de compilação
         return new TicketResponseDTO(
                 ticket.getUuid(),
                 ticket.getCode(),

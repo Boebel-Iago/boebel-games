@@ -1,0 +1,43 @@
+<div class="flex flex-col lg:flex-row gap-6 w-full items-center lg:items-start justify-center">
+
+    <!-- Tabuleiro -->
+    <div class="p-1 bg-[repeating-linear-gradient(45deg,#0d9488,#0d9488_16px,#1e293b_16px,#1e293b_32px)] rounded-2xl shadow-xl">
+      <div class="bg-gray-700 p-2 rounded-xl border-4 border-gray-800 relative"
+           [style.width.px]="(grid.length > 0 ? grid[0].length : 1) * 52"
+           [style.height.px]="grid.length * 52">
+        <div class="grid gap-0.5 w-full h-full"
+             [style.grid-template-columns]="'repeat(' + (grid.length > 0 ? grid[0].length : 1) + ', 1fr)'"
+             [style.grid-template-rows]="'repeat(' + grid.length + ', 1fr)'">
+          <ng-container *ngFor="let row of grid; let r = index">
+            <div *ngFor="let cell of row; let c = index"
+                 class="rounded-sm flex items-center justify-center text-xl relative"
+                 [ngClass]="{
+                   'bg-gray-200 border border-gray-300': cell === 0,
+                   'bg-amber-900 border-b-2 border-amber-950': cell === 1,
+                   'bg-teal-500 border-b-2 border-teal-700 animate-pulse': cell === 2
+                 }">
+              <span *ngIf="cell === 1">🪨</span>
+              <span *ngIf="cell === 2">🌊</span>
+  
+              <div *ngIf="playerPos.r === r && playerPos.c === c"
+                   class="absolute inset-0 flex items-center justify-center text-2xl transition-all duration-300"
+                   [ngClass]="{'animate-pulse scale-110': isRunning}">
+                🐢
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Blockly + botão -->
+    <div class="flex flex-col gap-4 w-full max-w-md">
+      <div #blocklyDiv class="w-full rounded-xl border-4 border-slate-700 overflow-hidden bg-slate-800 min-h-[280px] h-[320px]"></div>
+  
+      <button (click)="run()"
+              [disabled]="isRunning"
+              class="w-full bg-teal-600 hover:bg-teal-700 text-white font-black text-xl py-3 rounded-xl shadow-[0_6px_0_#0f766e] active:shadow-none active:translate-y-[6px] transition-all disabled:opacity-50 uppercase">
+        {{ isRunning ? 'Nadando...' : '▶ Guiar até o Mar' }}
+      </button>
+    </div>
+  </div>

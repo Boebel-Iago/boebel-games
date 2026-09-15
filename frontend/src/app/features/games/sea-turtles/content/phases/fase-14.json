@@ -1,0 +1,35 @@
+{
+    "id": "fase-14-app-comunidade",
+    "fase": 14,
+    "activityType": "safety-scenario",
+    "skillCodes": ["EF01CO07"],
+    "title": "O App de Avistamentos",
+    "objective": "Escolha a atitude mais segura em cada situação.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Criamos um aplicativo pra comunidade reportar tartarugas que avista na praia." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Mas usar a internet com segurança é tão importante quanto proteger as tartarugas." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Vamos ver algumas situações. Qual é a atitude mais segura?" }
+    ],
+    "scenarios": [
+      {
+        "id": "s1",
+        "situation": "Você quer postar uma foto de uma tartaruga que viu na praia. O que você faz?",
+        "options": [
+          { "id": "a", "text": "Peço ajuda de um adulto de confiança pra postar, sem colocar meu endereço", "isSafe": true,
+            "feedback": "Isso mesmo! Sempre peça ajuda de um adulto de confiança pra postar coisas." },
+          { "id": "b", "text": "Posto sozinho e coloco o endereço da minha casa, pra mostrar onde eu vi", "isSafe": false,
+            "feedback": "Cuidado! Nunca compartilhe o endereço da sua casa na internet." }
+        ]
+      },
+      {
+        "id": "s2",
+        "situation": "Uma pessoa que você não conhece pede seu nome completo e telefone, prometendo um prêmio.",
+        "options": [
+          { "id": "a", "text": "Dou meu nome e telefone pra ganhar o prêmio", "isSafe": false,
+            "feedback": "Não é seguro dar informações pessoais pra desconhecidos, mesmo com promessa de prêmio." },
+          { "id": "b", "text": "Não dou e conto pra um adulto de confiança o que aconteceu", "isSafe": true,
+            "feedback": "Isso mesmo! Sempre conte a um adulto se alguém desconhecido pedir seus dados." }
+        ]
+      }
+    ]
+  }

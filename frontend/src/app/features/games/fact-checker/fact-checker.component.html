@@ -20,7 +20,7 @@
       <div>
         <h3 class="text-xl font-bold text-blue-900 mb-1">Missão do Detetive:</h3>
         <p class="text-xl text-blue-800 font-medium">
-          {{ gameStage === 1 ? newsTasks[currentTaskIndex].instruction : 'Leia a mensagem suspeita, faça a pesquisa e dê o seu veredito.' }}
+          {{ gameStage === 1 ? currentNewsTask?.instruction : 'Leia a mensagem suspeita, faça a pesquisa e dê o seu veredito.' }}
         </p>
       </div>
     </div>
@@ -77,12 +77,12 @@
       <!-- Celular com a Notícia Suspeita -->
       <div class="w-full md:w-1/2 bg-gray-800 p-4 rounded-3xl shadow-2xl border-8 border-gray-900 flex flex-col">
         <div class="bg-gray-100 text-gray-600 text-xs text-center font-bold py-1 rounded-t-xl mb-4">
-          Origem: {{ factCheckTasks[currentTaskIndex].sourceType }}
+          Origem: {{ currentFactCheckTask?.sourceType }}
         </div>
         
         <div class="bg-[#dcf8c6] p-6 rounded-2xl rounded-tl-none shadow-md mb-8">
           <p class="text-xl text-gray-800 font-medium">
-            {{ factCheckTasks[currentTaskIndex].suspiciousNews }}
+            {{ currentFactCheckTask?.suspiciousNews }}
           </p>
         </div>
   
@@ -105,7 +105,7 @@
             <span>🌐</span> Resultados Oficiais encontrados:
           </div>
           <p class="text-gray-700 text-lg">
-            {{ factCheckTasks[currentTaskIndex].reliableSearch }}
+            {{ currentFactCheckTask?.reliableSearch }}
           </p>
         </div>
   

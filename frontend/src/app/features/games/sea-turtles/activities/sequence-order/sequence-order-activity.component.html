@@ -1,0 +1,30 @@
+<div class="flex flex-col items-center gap-8 w-full py-4">
+
+    <!-- Sequência sendo montada -->
+    <div class="flex flex-wrap justify-center gap-2 min-h-[90px] bg-slate-900/60 rounded-2xl px-4 py-4 border-2 border-slate-700 w-full max-w-2xl">
+      <div *ngFor="let card of placedSequence; let i = index"
+           class="flex flex-col items-center gap-1 bg-emerald-900/40 border-2 border-emerald-600 rounded-xl p-2 w-20">
+        <span class="text-emerald-400 text-xs font-black">{{ i + 1 }}º</span>
+        <span class="text-3xl">{{ card.emoji }}</span>
+      </div>
+      <p *ngIf="placedSequence.length === 0" class="text-slate-500 text-sm self-center">
+        Toque nos cards abaixo, na ordem certa.
+      </p>
+    </div>
+  
+    <!-- Cards disponíveis -->
+    <div class="flex flex-wrap justify-center gap-3 max-w-2xl">
+      <button *ngFor="let card of pool"
+              (click)="selectCard(card)"
+              class="flex flex-col items-center gap-1 bg-slate-800 border-4 rounded-2xl p-3 w-28 transition-transform"
+              [ngClass]="wrongCardId === card.id ? 'border-red-500' : 'border-slate-700 hover:border-yellow-400 hover:scale-105'">
+        <span class="text-4xl">{{ card.emoji }}</span>
+        <span class="text-white text-xs font-bold text-center leading-tight">{{ card.label }}</span>
+      </button>
+    </div>
+  
+    <p *ngIf="wrongCardId" class="text-red-400 font-bold">Ainda não é a vez desse — pensa no que vem primeiro!</p>
+    <p *ngIf="pool.length === 0 && placedSequence.length > 0" class="text-emerald-400 font-black text-xl">
+      Sequência completa! 🎉
+    </p>
+  </div>

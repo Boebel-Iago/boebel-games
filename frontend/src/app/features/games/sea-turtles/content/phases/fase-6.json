@@ -1,0 +1,18 @@
+{
+    "id": "fase-6-ciclo-de-vida",
+    "fase": 6,
+    "activityType": "sequence-order",
+    "skillCodes": ["EF01CO02"],
+    "title": "O Ciclo de Vida",
+    "objective": "Coloque as fases da vida da tartaruga marinha na ordem certa.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Assim como a rotina de proteger o ninho, a vida da tartaruga também segue uma sequência." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Ela sempre passa pelas mesmas fases, sempre na mesma ordem. Você lembra qual é?" }
+    ],
+    "cards": [
+      { "id": "ovo", "label": "Ovo", "emoji": "🥚", "correctOrder": 0 },
+      { "id": "filhote", "label": "Filhote", "emoji": "🐢", "correctOrder": 1 },
+      { "id": "jovem", "label": "Jovem", "emoji": "🐢", "correctOrder": 2 },
+      { "id": "adulto", "label": "Adulto", "emoji": "🐢", "correctOrder": 3 }
+    ]
+  }

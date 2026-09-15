@@ -17,7 +17,7 @@ import { BLOCK_LABELS } from './blockly/custom-blocks';
 import { LevelRepository } from './content/level-repository.service';
 import { LevelConfig, BlockType, CellType, NarrativeLine } from './content/level.model';
 import { TOTAL_LEVELS } from './content/tiers'; 
-import { ProgressReporter } from './progress/progress-reporter.service';
+import { ProgressReporter } from '../../../core/progress/progress-reporter';
 
 interface InventoryItem {
   type: BlockType;

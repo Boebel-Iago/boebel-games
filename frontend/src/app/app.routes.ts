@@ -10,11 +10,16 @@ import { FactCheckerComponent } from './features/games/fact-checker/fact-checker
 import { CreatorsVsCopiersComponent } from './features/games/creators-vs-copiers/creators-vs-copiers.component';
 import { EmergencyEscapeComponent } from './features/games/emergency-escape/emergency-escape.component';
 import { LevelRepository, LocalLevelRepositoryService } from './features/games/emergency-escape/content/level-repository.service';
-import { ProgressReporter } from './features/games/emergency-escape/progress/progress-reporter.service';
-import { ApiProgressReporterService } from './features/games/emergency-escape/progress/api-progress-reporter.service';
+import { ProgressReporter } from './core/progress/progress-reporter';
+import { ApiProgressReporterService } from './core/progress/api-progress-reporter.service';
 import { SeaTurtlesComponent } from './features/games/sea-turtles/sea-turtles.component';
 import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/sea-turtles/content/phase-repository.service';
 import { FreeGamesComponent } from './features/public/free-games/free-games.component';
+import { BrowserSearchRepository } from './features/games/browser-search/content/browser-search-repository.service';
+import { ProfessionsRepository } from './features/games/professions/content/professions-repository.service';
+import { FactCheckerRepository } from './features/games/fact-checker/content/fact-checker-repository.service';
+import { CreatorsVsCopiersRepository } from './features/games/creators-vs-copiers/content/creators-vs-copiers-repository.service';
+import { PixelArtRepository } from './features/games/pixel-art/content/pixel-art-repository.service';
 
 export const routes: Routes = [
     
@@ -51,10 +56,7 @@ export const routes: Routes = [
         component: SeaTurtlesComponent,
         canActivate: [ticketGuard],
         providers: [
-            // O serviço de telemetria que você já usa no outro jogo
             { provide: ProgressReporter, useClass: ApiProgressReporterService },
-            
-            // Supondo que você criou um LocalPhaseRepositoryService seguindo a mesma lógica do LevelRepository
             { provide: PhaseRepository, useClass: LocalPhaseRepositoryService } 
         ]
     },
@@ -68,29 +70,49 @@ export const routes: Routes = [
         ] 
     },
     { 
+        path: 'games/browser-search', 
+        component: BrowserSearchComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            BrowserSearchRepository
+        ]
+    },
+    { 
         path: 'games/creators-vs-copiers', 
         component: CreatorsVsCopiersComponent,
-        canActivate: [ticketGuard] 
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            CreatorsVsCopiersRepository
+        ]
     },
     { 
         path: 'games/fact-checker', 
         component: FactCheckerComponent,
-        canActivate: [ticketGuard] 
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            FactCheckerRepository
+        ]
     },
     { 
         path: 'games/pixel-art', 
         component: PixelArtComponent,
-        canActivate: [ticketGuard] // Cadeado aplicado
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            PixelArtRepository
+        ]
     },
     { 
         path: 'games/professions', 
         component: ProfessionsComponent,
-        canActivate: [ticketGuard] // Cadeado aplicado
-    },
-    { 
-        path: 'games/browser-search', 
-        component: BrowserSearchComponent,
-        canActivate: [ticketGuard] // Cadeado aplicado
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            ProfessionsRepository
+        ]
     },
     { path: '', component: StudentLoginComponent },
     { path: '', redirectTo: 'login', pathMatch: 'full' },

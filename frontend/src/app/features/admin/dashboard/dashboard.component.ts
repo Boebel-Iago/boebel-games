@@ -9,11 +9,12 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 import { environment } from '../../../../environments/environment';
+import { UnpluggedActivityComponent } from './unplugged-activity/unplugged-activity.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SafeUrlPipe],
+  imports: [CommonModule, ReactiveFormsModule, SafeUrlPipe, UnpluggedActivityComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -44,8 +45,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   sessions: StudentSession[] = [];
   private stompClient: Client | null = null;
 
-  // Tabs: 'monitor' | 'demo'
-  activeTab: 'monitor' | 'demo' = 'monitor';
+  // Tabs: 'monitor' | 'demo' | 'unplugged'
+  activeTab: 'monitor' | 'demo' | 'unplugged' = 'monitor';
 
   // Demo mode
   isDemoFullscreen = false;

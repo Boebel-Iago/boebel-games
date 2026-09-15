@@ -1,0 +1,22 @@
+{
+    "id": "fase-9-algoritmo-completo",
+    "fase": 9,
+    "activityType": "algorithm",
+    "skillCodes": ["EF01CO03"],
+    "title": "Algoritmo Completo",
+    "objective": "Esse é o labirinto mais desafiador até aqui. Planeje antes de arrastar os blocos.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Última sala dessa parte. É a mais desafiadora até agora." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Olhe o caminho inteiro antes de começar a arrastar os blocos." }
+    ],
+    "grid": [
+      [0, 0, 0, 0, 1, 0],
+      [1, 0, 0, 0, 1, 1],
+      [0, 0, 0, 0, 0, 0],
+      [1, 0, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 2]
+    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": ["move_up", "move_down", "move_left", "move_right"]
+  }

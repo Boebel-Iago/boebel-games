@@ -1,0 +1,20 @@
+{
+    "id": "fase-5-rotina-ninho",
+    "fase": 5,
+    "activityType": "sequence-order",
+    "skillCodes": ["EF01CO02"],
+    "title": "Protegendo o Ninho",
+    "objective": "Toque nos cards na ordem certa pra mostrar os passos de proteger um ninho de tartaruga.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "No meu trabalho, sigo sempre os mesmos passos pra proteger um ninho." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Isso é uma sequência: uma ordem certa de passos que uso todo dia pra resolver o mesmo problema." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Você consegue colocar esses passos na ordem certa?" }
+    ],
+    "cards": [
+      { "id": "encontrar", "label": "Encontrar o Ninho", "emoji": "🔍", "correctOrder": 0 },
+      { "id": "cercar", "label": "Cercar com Proteção", "emoji": "🚧", "correctOrder": 1 },
+      { "id": "observar", "label": "Observar Todo Dia", "emoji": "👀", "correctOrder": 2 },
+      { "id": "esperar", "label": "Esperar os Ovos Eclodirem", "emoji": "🥚", "correctOrder": 3 },
+      { "id": "guiar", "label": "Guiar os Filhotes ao Mar", "emoji": "🌊", "correctOrder": 4 }
+    ]
+  }

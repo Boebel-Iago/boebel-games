@@ -1,0 +1,60 @@
+{
+    "id": "fase-12-artefatos",
+    "fase": 12,
+    "activityType": "pattern",
+    "skillCodes": ["EF01CO06"],
+    "title": "Ferramentas dos Pesquisadores",
+    "objective": "Isso é um artefato computacional (algo com tecnologia dentro) ou não?",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Hoje, cientistas usam tecnologia de verdade pra proteger as tartarugas." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Um artefato computacional é qualquer objeto que tem um computador por dentro, mesmo pequeno." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Vamos ver quais ferramentas do meu trabalho são assim?" }
+    ],
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "Rastreador GPS preso na tartaruga: é um artefato computacional?",
+        "contextSequence": ["📡"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r2",
+        "prompt": "Rede de pesca: é um artefato computacional?",
+        "contextSequence": ["🥅"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      },
+      {
+        "id": "r3",
+        "prompt": "Aplicativo de celular pra reportar avistamentos: é um artefato computacional?",
+        "contextSequence": ["📱"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r4",
+        "prompt": "Balde de praia: é um artefato computacional?",
+        "contextSequence": ["🪣"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      },
+      {
+        "id": "r5",
+        "prompt": "Computador do laboratório: é um artefato computacional?",
+        "contextSequence": ["💻"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      }
+    ]
+  }

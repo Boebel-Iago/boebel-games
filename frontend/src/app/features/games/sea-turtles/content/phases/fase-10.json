@@ -1,0 +1,22 @@
+{
+    "id": "fase-10-cartaz-lixo",
+    "fase": 10,
+    "activityType": "icon-message",
+    "skillCodes": ["EF01CO04", "EF01CO05"],
+    "title": "O Cartaz da Exposição",
+    "objective": "Monte a mensagem certa escolhendo os ícones na ordem certa, entre outros que não têm nada a ver.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Pra exposição da escola, vamos criar um cartaz usando só símbolos, sem palavras." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Isso é representar uma informação usando outra linguagem: os ícones." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Monte a mensagem: NÃO JOGUE LIXO NO MAR. Cuidado, tem ícones que não têm nada a ver!" }
+    ],
+    "targetMessage": "Não jogue lixo no mar",
+    "availableIcons": [
+      { "id": "proibido", "emoji": "🚫", "meaning": "Não / Proibido" },
+      { "id": "lixo", "emoji": "🗑️", "meaning": "Lixo" },
+      { "id": "mar", "emoji": "🌊", "meaning": "Mar" },
+      { "id": "sol", "emoji": "☀️", "meaning": "Sol" },
+      { "id": "pizza", "emoji": "🍕", "meaning": "Pizza" }
+    ],
+    "correctSequence": ["proibido", "lixo", "mar"]
+  }

@@ -1,0 +1,32 @@
+<div class="flex flex-col items-center gap-6 w-full py-4 max-w-2xl mx-auto">
+
+    <p class="text-slate-400 text-sm font-bold uppercase tracking-wide">
+      Situação {{ scenarioIndex + 1 }} de {{ phase.scenarios.length }}
+    </p>
+  
+    <div class="bg-slate-900/60 border-2 border-slate-700 rounded-2xl px-6 py-5 w-full text-center">
+      <p class="text-white text-lg font-medium">{{ currentScenario.situation }}</p>
+    </div>
+  
+    <!-- Opções -->
+    <div class="flex flex-col gap-3 w-full" *ngIf="!selectedOption">
+      <button *ngFor="let option of currentScenario.options"
+              (click)="selectOption(option)"
+              class="w-full text-left bg-slate-800 border-4 border-slate-700 hover:border-yellow-400 rounded-2xl p-4 text-white font-medium transition-colors">
+        {{ option.text }}
+      </button>
+    </div>
+  
+    <!-- Feedback -->
+    <div *ngIf="selectedOption"
+         class="w-full rounded-2xl p-5 border-4 text-center"
+         [ngClass]="selectedOption.isSafe ? 'bg-emerald-900/40 border-emerald-500' : 'bg-red-900/40 border-red-500'">
+      <div class="text-4xl mb-2">{{ selectedOption.isSafe ? '✅' : '⚠️' }}</div>
+      <p class="text-white font-medium mb-4">{{ selectedOption.feedback }}</p>
+      <button *ngIf="!selectedOption.isSafe"
+              (click)="tryAgain()"
+              class="bg-slate-700 hover:bg-slate-600 text-white font-bold uppercase text-sm px-6 py-2 rounded-xl transition-colors">
+        Tentar de Novo
+      </button>
+    </div>
+  </div>

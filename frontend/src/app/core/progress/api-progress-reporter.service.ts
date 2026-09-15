@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { GameService } from '../../../../core/services/game.service';
-import { ProgressReporter, ProgressEvent } from './progress-reporter.service';
+import { GameService } from '../services/game.service';
+import { ProgressReporter, ProgressEvent } from './progress-reporter';
 
 @Injectable()
 export class ApiProgressReporterService extends ProgressReporter {

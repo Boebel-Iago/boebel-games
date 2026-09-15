@@ -5,7 +5,7 @@ export const ticketGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   
   // Se for modo demonstração do professor (tem JWT salvo), libera sem ingresso
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('jwt_token');
   if (token && state.url.includes('demo=1')) {
     return true;
   }

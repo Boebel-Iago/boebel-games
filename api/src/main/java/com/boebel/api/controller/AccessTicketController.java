@@ -165,6 +165,31 @@ public class AccessTicketController {
         return ResponseEntity.noContent().build();
     }
 
+    // NEW: Extend ticket expiration time
+    @PutMapping("/{id}/extend")
+    public ResponseEntity<?> extendTicket(@PathVariable UUID id,
+                                          @RequestBody Map<String, Integer> body,
+                                          Principal principal) {
+        String email = principal.getName();
+        Teacher teacher = teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        int additionalHours = body.getOrDefault("additionalHours", 1);
+        TicketResponseDTO updated = accessTicketService.extendTicket(id, teacher, additionalHours);
+        return ResponseEntity.ok(updated);
+    }
+
+    // NEW: Toggle ticket status (Pause/Resume)
+    @PutMapping("/{id}/toggle-status")
+    public ResponseEntity<?> toggleTicketStatus(@PathVariable UUID id, Principal principal) {
+        String email = principal.getName();
+        Teacher teacher = teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        TicketResponseDTO updated = accessTicketService.toggleTicketStatus(id, teacher);
+        return ResponseEntity.ok(updated);
+    }
+
     // MODIFIED: Broadcast via WebSocket after updating progress
     @PutMapping("/sessions/{sessionId}/progress")
     public ResponseEntity<?> updateProgress(

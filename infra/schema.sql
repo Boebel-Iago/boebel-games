@@ -41,7 +41,7 @@ CREATE TABLE access_tickets (
     CONSTRAINT fk_ticket_teacher FOREIGN KEY (teacher_uuid) REFERENCES teachers (uuid)
 );
 
-    -- Inserindo jogo de teste (Pixel Art)
+    -- Inserindo jogo: Pixel Art Maker (ID = 1)
     INSERT INTO games (title, description, route) 
     VALUES ('Pixel Art Maker', 'Uma tela de 10x10 para criar desenhos pixelados e treinar lógica e coordenadas espaciais.', 'pixel-art');
 
@@ -49,20 +49,42 @@ CREATE TABLE access_tickets (
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (1, 'ELEMENTARY_2');
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (1, 'ELEMENTARY_3');
     
-    --Adicionando novo jogo--
+    -- Inserindo jogo: Máquinas e Profissões (ID = 2)
     INSERT INTO games (title, description, route) 
     VALUES ('Máquinas e Profissões', 'Associe tecnologias ao trabalho e ao lazer.', 'professions');
 
-    -- Vinculando o jogo (que provavelmente será o ID 2) à turma do 2º Ano
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (2, 'ELEMENTARY_2');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (2, 'ELEMENTARY_3');
     
-    --Adicionando novo jogo
+    -- Inserindo jogo: Detetive Digital (ID = 3)
     INSERT INTO games (title, description, route) 
     VALUES ('Detetive Digital', 'Avaliação prática de uso de navegadores e palavras-chave.', 'browser-search');
 
-    -- Supondo que o ID gerado seja 3
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (3, 'ELEMENTARY_3');
-    
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (3, 'ELEMENTARY_4');
+
+    -- Inserindo jogo: Detetive de Notícias (ID = 4)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Detetive de Notícias', 'Identifique partes de uma notícia e avalie se é verdadeira ou falsa.', 'fact-checker');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (4, 'ELEMENTARY_4');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (4, 'ELEMENTARY_5');
+
+    -- Inserindo jogo: Criadores vs Copiadores (ID = 5)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Criadores vs Copiadores', 'Aprenda sobre direitos autorais e licenças Creative Commons.', 'creators-vs-copiers');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (5, 'ELEMENTARY_4');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (5, 'ELEMENTARY_5');
+
+    -- Inserindo jogo: Fuga de Emergência (ID = 6)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Fuga de Emergência', 'Escape-room com programação em blocos usando Blockly.', 'emergency-escape');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (6, 'ELEMENTARY_3');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (6, 'ELEMENTARY_4');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (6, 'ELEMENTARY_5');
+
     -- Nova tabela pra sessão dos estudantes.
     
     CREATE TABLE student_sessions (
@@ -76,9 +98,9 @@ CREATE TABLE access_tickets (
     started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO games (title, description, route) 
-VALUES ('Tartarugas Marinhas', 'Aprenda a classificar e reconhecer padrões com as tartarugas marinhas.', 'sea-turtles');
+    -- Inserindo jogo: Das Areias ao Mar (ID = 7)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Das Areias ao Mar', 'Aprenda a classificar e reconhecer padrões com as tartarugas marinhas.', 'sea-turtles');
 
--- Considerando que este seja o jogo de ID 7 (ajuste o número verificando qual foi gerado no insert acima)
-INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_1');
-INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_2');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_1');
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (7, 'ELEMENTARY_2');

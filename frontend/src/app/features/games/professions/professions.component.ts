@@ -39,7 +39,7 @@ export class ProfessionsComponent implements OnInit {
  professions: Profession[] = [
   {
     name: 'Médica', icon: '👩‍⚕️',
-    correctTool: { name: 'Máquina de Ultrassom', icon: '🖥️' },
+    correctTool: { name: 'Máquina de Ultrassom', icon: 'assets/images/professions/lousa_interativa.jpg' },
     wrongTools: [{ name: 'Batedeira', icon: '🥣' }, { name: 'Trator', icon: '🚜' }],
     feedback: 'A médica usa a tecnologia para ver dentro do nosso corpo!',
     hardwareDesc: 'O monitor e o sensor (a parte física que toca na pele).',
@@ -54,9 +54,9 @@ export class ProfessionsComponent implements OnInit {
     softwareDesc: 'O aplicativo de gravação e os instrumentos virtuais que geram o som.'
   },
   {
-    name: 'Arquiteta', icon: '📐',
+    name: 'Arquiteta', icon: 'assets/images/professions/prancheta_digital.jpg',
     correctTool: { name: 'Mesa Digitalizadora', icon: '🖊️' },
-    wrongTools: [{ name: 'Panela', icon: '🥘' }, { name: 'Câmera', icon: '📸' }],
+    wrongTools: [{ name: 'Panela', icon: '🥘' }, { name: 'Câmera', icon: 'assets/images/professions/camera_digital.jpg' }],
     feedback: 'Antes de construir uma casa real, ela é desenhada no computador.',
     hardwareDesc: 'A caneta digital e a tela física onde ela desenha.',
     softwareDesc: 'O sistema de desenho 3D que calcula as medidas das paredes.'
@@ -70,7 +70,7 @@ export class ProfessionsComponent implements OnInit {
     softwareDesc: 'O sistema do mercado que sabe o preço exato de cada produto.'
   },
   {
-    name: 'Professor', icon: '👨‍🏫',
+    name: 'Professor', icon: 'assets/images/professions/professor_prof.jpg',
     correctTool: { name: 'Lousa Digital', icon: '📺' },
     wrongTools: [{ name: 'Pá de Construção', icon: '⛏️' }, { name: 'Frigideira', icon: '🍳' }],
     feedback: 'O professor usa a lousa interativa para deixar a aula mais divertida!',
@@ -78,8 +78,8 @@ export class ProfessionsComponent implements OnInit {
     softwareDesc: 'O aplicativo de desenho e os jogos educativos que rodam nela.'
   },
   {
-    name: 'Fotógrafa', icon: '📷',
-    correctTool: { name: 'Câmera Digital', icon: '📸' },
+    name: 'Fotógrafa', icon: 'assets/images/professions/fotografa_prof.jpg',
+    correctTool: { name: 'Câmera Digital', icon: 'assets/images/professions/camera_digital.jpg' },
     wrongTools: [{ name: 'Martelo', icon: '🔨' }, { name: 'Regador', icon: '🚿' }],
     feedback: 'Ela captura momentos especiais usando muita tecnologia.',
     hardwareDesc: 'A lente, os botões e o cartão de memória da câmera.',
@@ -87,14 +87,14 @@ export class ProfessionsComponent implements OnInit {
   },
   {
     name: 'Piloto de Avião', icon: '✈️',
-    correctTool: { name: 'Painel de Navegação', icon: '🎛️' },
+    correctTool: { name: 'Painel de Navegação', icon: 'assets/images/professions/painel_aviao.jpg' },
     wrongTools: [{ name: 'Tinta e Pincel', icon: '🎨' }, { name: 'Vara de Pescar', icon: '🎣' }],
     feedback: 'O avião é uma máquina super inteligente que voa pelo céu.',
     hardwareDesc: 'As telas do painel e o manche (volante) do avião.',
     softwareDesc: 'O programa de GPS que mostra a rota nas nuvens.'
   },
   {
-    name: 'Mecânico', icon: '👨‍🔧',
+    name: 'Mecânico', icon: 'assets/images/professions/mecanico_prof.jpg',
     correctTool: { name: 'Scanner Automotivo', icon: '📟' },
     wrongTools: [{ name: 'Microfone', icon: '🎤' }, { name: 'Prancha de Surf', icon: '🏄' }],
     feedback: 'Hoje em dia, os carros também têm computadores dentro deles!',
@@ -102,7 +102,7 @@ export class ProfessionsComponent implements OnInit {
     softwareDesc: 'O programa que lê a "mente" do carro para achar o defeito.'
   },
   {
-    name: 'Cientista', icon: '👩‍🔬',
+    name: 'Cientista', icon: 'assets/images/professions/cientista_prof.jpg',
     correctTool: { name: 'Microscópio Digital', icon: '🔬' },
     wrongTools: [{ name: 'Bola de Futebol', icon: '⚽' }, { name: 'Violão', icon: '🎸' }],
     feedback: 'A ciência usa a tecnologia para descobrir coisas minúsculas.',
@@ -110,7 +110,7 @@ export class ProfessionsComponent implements OnInit {
     softwareDesc: 'O software que dá zoom e tira fotos das bactérias.'
   },
   {
-    name: 'Agricultor', icon: '👨‍🌾',
+    name: 'Agricultor', icon: 'assets/images/professions/agricultor_prof.jpg',
     correctTool: { name: 'Drone de Plantação', icon: '🚁' },
     wrongTools: [{ name: 'Liquidificador', icon: '🥤' }, { name: 'Maquiagem', icon: '💄' }],
     feedback: 'A tecnologia voa sobre a fazenda para cuidar das plantas.',

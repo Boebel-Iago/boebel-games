@@ -14,13 +14,18 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copia o build do Angular (ATENÇÃO: ajuste 'boebel-games' para o nome exato da pasta que o seu Angular gera dentro de dist/)
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 
-# Configuração para evitar erro 404 nas rotas do Angular
+# Configuração para servir o Angular e redirecionar a API
 RUN echo 'server { \
     listen 80; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
         try_files $uri $uri/ /index.html; \
+    } \
+    location /api/ { \
+        proxy_pass http://backend:8080; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 

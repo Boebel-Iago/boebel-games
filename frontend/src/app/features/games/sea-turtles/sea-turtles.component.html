@@ -64,6 +64,30 @@
         (completed)="onActivityCompleted($event)">
       </app-pattern-activity>
 
+      <app-sequence-order-activity
+        *ngSwitchCase="'sequence-order'"
+        [phase]="sequenceOrderPhase"
+        (completed)="onActivityCompleted($event)">
+      </app-sequence-order-activity>
+
+      <app-algorithm-activity
+        *ngSwitchCase="'algorithm'"
+        [phase]="algorithmPhase"
+        (completed)="onActivityCompleted($event)">
+      </app-algorithm-activity>
+
+      <app-icon-message-activity
+        *ngSwitchCase="'icon-message'"
+        [phase]="iconMessagePhase"
+        (completed)="onActivityCompleted($event)">
+      </app-icon-message-activity>
+
+      <app-safety-scenario-activity
+        *ngSwitchCase="'safety-scenario'"
+        [phase]="safetyScenarioPhase"
+        (completed)="onActivityCompleted($event)">
+      </app-safety-scenario-activity>
+
       <p *ngSwitchDefault class="text-white text-center py-16">
         Mecânica "{{ currentPhase.activityType }}" ainda não implementada.
       </p>

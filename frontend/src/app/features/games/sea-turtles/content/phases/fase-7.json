@@ -1,0 +1,22 @@
+{
+    "id": "fase-7-primeiro-algoritmo",
+    "fase": 7,
+    "activityType": "algorithm",
+    "skillCodes": ["EF01CO03"],
+    "title": "Primeiro Algoritmo",
+    "objective": "Monte a sequência de blocos que leva o filhote até o mar.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Agora é a parte mais importante: criar um algoritmo de verdade." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Algoritmo é o nome que damos pra uma sequência de passos que criamos pra resolver um problema." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Monte os blocos de movimento pra guiar o filhote até o mar!" }
+    ],
+    "grid": [
+      [0, 0, 0, 1, 0],
+      [0, 0, 0, 1, 1],
+      [1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 2]
+    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": ["move_up", "move_down", "move_left", "move_right"]
+  }

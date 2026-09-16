@@ -1,0 +1,44 @@
+{
+    "id": "fase-15-desafio-final",
+    "fase": 15,
+    "activityType": "safety-scenario",
+    "skillCodes": ["EF01CO07"],
+    "title": "Desafio Final: Seguro e Esperto",
+    "objective": "Última etapa! Mostre que você sabe se proteger enquanto ajuda as tartarugas.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Chegamos na última fase! Você já aprendeu a organizar, seguir passos, criar algoritmos e representar informação." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Agora, o último passo: continuar se protegendo enquanto usa a tecnologia pra ajudar o planeta." }
+    ],
+    "scenarios": [
+      {
+        "id": "s1",
+        "situation": "Você vai criar uma senha pro seu perfil no app de tartarugas. Qual é mais segura?",
+        "options": [
+          { "id": "a", "text": "123456, porque é fácil de lembrar", "isSafe": false,
+            "feedback": "Senhas fáceis de adivinhar não protegem sua conta. Evite números em sequência." },
+          { "id": "b", "text": "Uma senha que só eu e meus pais sabemos, com letras e números", "isSafe": true,
+            "feedback": "Isso mesmo! Uma senha forte, guardada só com pessoas de confiança, protege sua conta." }
+        ]
+      },
+      {
+        "id": "s2",
+        "situation": "Um colega da escola pede sua senha do app, pra 'ajudar' numa tarefa.",
+        "options": [
+          { "id": "a", "text": "Compartilho a senha, já que é só um colega", "isSafe": false,
+            "feedback": "Senha é pessoal, mesmo pra amigos e colegas. Nunca compartilhe." },
+          { "id": "b", "text": "Não compartilho — senha é só minha (e dos meus pais)", "isSafe": true,
+            "feedback": "Isso mesmo! Sua senha não deve ser compartilhada com ninguém." }
+        ]
+      },
+      {
+        "id": "s3",
+        "situation": "Aparece uma mensagem estranha pedindo pra você clicar num link pra 'ganhar pontos'.",
+        "options": [
+          { "id": "a", "text": "Clico rápido, quero os pontos!", "isSafe": false,
+            "feedback": "Links assim podem ser perigosos. Nunca clique sem perguntar a um adulto de confiança primeiro." },
+          { "id": "b", "text": "Não clico e mostro a mensagem pra um adulto de confiança", "isSafe": true,
+            "feedback": "Isso mesmo! Na dúvida, sempre mostre pra um adulto antes de clicar em qualquer coisa." }
+        ]
+      }
+    ]
+  }

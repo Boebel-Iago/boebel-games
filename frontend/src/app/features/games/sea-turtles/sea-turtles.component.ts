@@ -1,16 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PhaseRepository } from './content/phase-repository.service';
-import { PhaseConfig, ClassifyPhaseConfig, PatternPhaseConfig, NarrativeLine } from './content/phase.model';
+import { PhaseConfig, ClassifyPhaseConfig, PatternPhaseConfig, SequenceOrderPhaseConfig, AlgorithmPhaseConfig, IconMessagePhaseConfig, SafetyScenarioPhaseConfig, NarrativeLine } from './content/phase.model';
 import { TOTAL_PHASES_IMPLEMENTED } from './content/tiers';
 import { ClassifyActivityComponent } from './activities/classify/classify-activity.component';
 import { PatternActivityComponent } from './activities/pattern/pattern-activity.component';
-import { ProgressReporter } from '../emergency-escape/progress/progress-reporter.service';
+import { SequenceOrderActivityComponent } from './activities/sequence-order/sequence-order-activity.component';
+import { AlgorithmActivityComponent } from './activities/algorithm/algorithm-activity.component';
+import { IconMessageActivityComponent } from './activities/icon-message/icon-message-activity.component';
+import { SafetyScenarioActivityComponent } from './activities/safety-scenario/safety-scenario-activity.component';
 
 @Component({
   selector: 'app-sea-turtles',
   standalone: true,
-  imports: [CommonModule, ClassifyActivityComponent, PatternActivityComponent],
+  imports: [
+    CommonModule, ClassifyActivityComponent, PatternActivityComponent, SequenceOrderActivityComponent,
+    AlgorithmActivityComponent, IconMessageActivityComponent, SafetyScenarioActivityComponent
+  ],
   templateUrl: './sea-turtles.component.html'
 })
 export class SeaTurtlesComponent implements OnInit {
@@ -23,27 +29,10 @@ export class SeaTurtlesComponent implements OnInit {
   feedbackText = '';
   gameFinished = false;
 
-  constructor(
-    private phases: PhaseRepository,
-    private progress: ProgressReporter
-  ) {}
+  constructor(private phases: PhaseRepository) {}
 
   ngOnInit(): void {
-    const savedStage = sessionStorage.getItem('currentStage');
-    let startPhase = 1;
-
-    if (savedStage && savedStage !== 'undefined' && savedStage !== 'null') {
-      const parsed = parseInt(savedStage, 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        startPhase = parsed;
-        if (startPhase > TOTAL_PHASES_IMPLEMENTED) {
-          this.gameFinished = true;
-          return;
-        }
-      }
-    }
-
-    this.loadPhase(startPhase);
+    this.loadPhase(1);
   }
 
   loadPhase(fase: number): void {
@@ -84,35 +73,28 @@ export class SeaTurtlesComponent implements OnInit {
     return this.currentPhase as PatternPhaseConfig;
   }
 
+  get sequenceOrderPhase(): SequenceOrderPhaseConfig {
+    return this.currentPhase as SequenceOrderPhaseConfig;
+  }
+
+  get algorithmPhase(): AlgorithmPhaseConfig {
+    return this.currentPhase as AlgorithmPhaseConfig;
+  }
+
+  get iconMessagePhase(): IconMessagePhaseConfig {
+    return this.currentPhase as IconMessagePhaseConfig;
+  }
+
+  get safetyScenarioPhase(): SafetyScenarioPhaseConfig {
+    return this.currentPhase as SafetyScenarioPhaseConfig;
+  }
+
   onActivityCompleted(success: boolean): void {
-    if (!this.currentPhase) return;
-
-    if (!success) {
-      // Só contabiliza o erro, NÃO mostra modal (a atividade já deu feedback visual)
-      this.progress.report({
-        levelId: this.currentPhase.id,
-        fase: this.currentPhase.fase,
-        result: 'failure',
-        attempts: 0,
-        timestamp: new Date().toISOString()
-      });
-      return;
-    }
-
-    // Sucesso na fase: mostra modal e reporta progresso
-    this.isSuccess = true;
-    this.feedbackText = `Fase ${this.currentPhase.fase} concluída: ${this.currentPhase.title}!`;
+    this.isSuccess = success;
+    this.feedbackText = success
+      ? `Fase ${this.currentPhase?.fase} concluída: ${this.currentPhase?.title}!`
+      : 'Não foi dessa vez. Vamos tentar de novo?';
     this.showFeedbackModal = true;
-
-    const isLast = this.currentPhase.fase >= TOTAL_PHASES_IMPLEMENTED;
-    this.progress.report({
-      levelId: this.currentPhase.id,
-      fase: this.currentPhase.fase,
-      result: 'success',
-      attempts: 0,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isLast
-    });
   }
 
   nextStep(): void {

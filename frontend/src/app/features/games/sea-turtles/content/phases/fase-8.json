@@ -1,0 +1,22 @@
+{
+    "id": "fase-8-mais-um-caminho",
+    "fase": 8,
+    "activityType": "algorithm",
+    "skillCodes": ["EF01CO03"],
+    "title": "Mais um Caminho",
+    "objective": "O caminho ficou maior. Continue montando o algoritmo até a porta.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Muito bem no primeiro algoritmo! Esse caminho é um pouco maior." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Continue montando os blocos com calma, um de cada vez." }
+    ],
+    "grid": [
+      [0, 0, 1, 0, 0, 0],
+      [0, 0, 1, 0, 0, 0],
+      [0, 1, 1, 1, 1, 0],
+      [0, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 0, 2]
+    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": ["move_up", "move_down", "move_left", "move_right"]
+  }

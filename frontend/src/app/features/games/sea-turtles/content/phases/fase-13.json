@@ -1,0 +1,67 @@
+{
+    "id": "fase-13-artefatos-dificeis",
+    "fase": 13,
+    "activityType": "pattern",
+    "skillCodes": ["EF01CO06"],
+    "title": "Nem Tudo é Óbvio",
+    "objective": "Dessa vez alguns são mais difíceis de perceber. Pense se tem tecnologia por dentro.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Você já sabe reconhecer o óbvio. Agora vem o desafio: coisas que parecem simples, mas têm tecnologia escondida." }
+    ],
+    "rounds": [
+      {
+        "id": "r1",
+        "prompt": "Relógio inteligente que mede a distância que eu caminho na praia: é um artefato computacional?",
+        "contextSequence": ["⌚"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r2",
+        "prompt": "Uma pedra na areia: é um artefato computacional?",
+        "contextSequence": ["🪨"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      },
+      {
+        "id": "r3",
+        "prompt": "Robô que ajuda a limpar o mar: é um artefato computacional?",
+        "contextSequence": ["🤖"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r4",
+        "prompt": "Uma árvore na beira da praia: é um artefato computacional?",
+        "contextSequence": ["🌳"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      },
+      {
+        "id": "r5",
+        "prompt": "Câmera escondida que tira fotos sozinha quando um animal passa: é um artefato computacional?",
+        "contextSequence": ["📷"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": true },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": false }
+        ]
+      },
+      {
+        "id": "r6",
+        "prompt": "Uma colher: é um artefato computacional?",
+        "contextSequence": ["🥄"],
+        "options": [
+          { "id": "sim", "emoji": "✅", "label": "Sim", "isCorrect": false },
+          { "id": "nao", "emoji": "❌", "label": "Não", "isCorrect": true }
+        ]
+      }
+    ]
+  }

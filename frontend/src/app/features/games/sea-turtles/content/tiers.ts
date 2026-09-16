@@ -32,4 +32,4 @@ export const TOTAL_PHASES_PLANNED = 15;
  * cada vez que uma nova mecânica ganhar as fases JSON correspondentes —
  * é o que o orquestrador usa pra saber até onde pode avançar.
  */
-export const TOTAL_PHASES_IMPLEMENTED = 4;
+export const TOTAL_PHASES_IMPLEMENTED = 15;

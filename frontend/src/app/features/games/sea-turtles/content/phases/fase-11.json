@@ -1,0 +1,23 @@
+{
+    "id": "fase-11-cartaz-reciclar",
+    "fase": 11,
+    "activityType": "icon-message",
+    "skillCodes": ["EF01CO04", "EF01CO05"],
+    "title": "Mais um Cartaz",
+    "objective": "Mensagem maior dessa vez, e mais ícones que não têm nada a ver. Preste atenção na ordem.",
+    "briefing": [
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Muito bem no primeiro cartaz! Vamos fazer outro, um pouco mais longo." },
+      { "speaker": "Bióloga Marinha", "avatar": "🐢", "text": "Monte: RECICLAR AJUDA A TARTARUGA DO MAR." }
+    ],
+    "targetMessage": "Reciclar ajuda a tartaruga do mar",
+    "availableIcons": [
+      { "id": "reciclar", "emoji": "♻️", "meaning": "Reciclar" },
+      { "id": "ajuda", "emoji": "❤️", "meaning": "Ajuda / Cuidado" },
+      { "id": "tartaruga", "emoji": "🐢", "meaning": "Tartaruga" },
+      { "id": "mar", "emoji": "🌊", "meaning": "Mar" },
+      { "id": "carro", "emoji": "🚗", "meaning": "Carro" },
+      { "id": "bola", "emoji": "⚽", "meaning": "Bola" },
+      { "id": "sorvete", "emoji": "🍦", "meaning": "Sorvete" }
+    ],
+    "correctSequence": ["reciclar", "ajuda", "tartaruga", "mar"]
+  }

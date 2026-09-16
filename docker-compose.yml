@@ -3,16 +3,14 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: boebelgames
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # Adicione esta linha abaixo mapeando o seu arquivo SQL para a pasta de inicialização do Postgres:
       - ./infra/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
-      # Se você tiver um arquivo com os INSERTS dos jogos, pode mapear também:
-      # - ./api/src/main/resources/data.sql:/docker-entrypoint-initdb.d/2-data.sql
 
   backend:
     build: ./api
@@ -20,14 +18,12 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/boebelgames
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       PDF_STORAGE_PATH: /app/pdfs
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - /home/ubuntu/pdfs:/app/pdfs
 

@@ -1,174 +1,44 @@
 {
     "id": "fase-13",
     "fase": 13,
-    "title": "Desafio Final II",
-    "objective": "As células com ⚠️ podem pegar fogo DURANTE a execução. Padrão maior, mais zonas de risco. Continue combinando REPETIR com o condicional.",
+    "title": "A Escadaria",
+    "objective": "As células com ⚠️ podem pegar fogo. O caminho agora é uma escada em zigue-zague. Você tem poucos blocos de movimento, use o REPETIR!",
     "briefing": [
       {
         "speaker": "Capitão Alerta",
         "avatar": "🧑‍🚒",
-        "text": "Essa sala é mais longa que a anterior. O raciocínio é o mesmo, só que em maior escala."
+        "text": "O corredor agora forma uma escada perfeita até a saída, mas você quase não tem blocos na mochila."
       },
       {
         "speaker": "Capitão Alerta",
         "avatar": "🧑‍🚒",
-        "text": "Não se esqueça: o condicional precisa estar onde o fogo pode aparecer."
+        "text": "Coloque a sequência de movimentos e o 'SE FOGO' dentro do 'REPETIR' para economizar blocos!"
       }
     ],
     "grid": [
-      [
-        0,
-        3,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        3,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        3,
-        0,
-        0
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        2
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
+      [ 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 ],
+      [ 1, 0, 0, 1, 1, 1, 1, 1, 1, 1 ],
+      [ 1, 1, 3, 0, 1, 1, 1, 1, 1, 1 ],
+      [ 1, 1, 1, 0, 0, 1, 1, 1, 1, 1 ],
+      [ 1, 1, 1, 1, 3, 0, 1, 1, 1, 1 ],
+      [ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 ],
+      [ 1, 1, 1, 1, 1, 1, 3, 0, 1, 1 ],
+      [ 1, 1, 1, 1, 1, 1, 1, 0, 0, 1 ],
+      [ 1, 1, 1, 1, 1, 1, 1, 1, 3, 0 ],
+      [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 ]
     ],
-    "startPosition": {
-      "r": 0,
-      "c": 0
-    },
-    "availableBlocks": [
-      "move_down",
-      "move_right",
-      "if_fire",
-      "repeat_loop"
-    ],
+    "startPosition": { "r": 0, "c": 0 },
+    "availableBlocks": [ "move_down", "move_right", "if_fire", "repeat_loop" ],
     "blockLimits": [
-      {
-        "type": "move_down",
-        "max": 3
-      },
-      {
-        "type": "move_right",
-        "max": 9
-      },
-      {
-        "type": "if_fire",
-        "max": 1
-      },
-      {
-        "type": "repeat_loop",
-        "max": 1
-      }
+      { "type": "move_down", "max": 2 },
+      { "type": "move_right", "max": 2 },
+      { "type": "if_fire", "max": 1 },
+      { "type": "repeat_loop", "max": 1 }
     ],
     "requireConditional": true,
     "randomFire": {
       "enabled": true,
-      "probabilityPerRiskCell": 0.55,
-      "minStepsBeforeFirstEvent": 2
+      "probabilityPerRiskCell": 0.6,
+      "minStepsBeforeFirstEvent": 1
     }
-  }
+}

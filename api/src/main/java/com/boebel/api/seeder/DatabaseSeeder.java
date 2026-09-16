@@ -27,16 +27,17 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (teacherRepository.count() == 0) {
+        // Busca o admin pelo email ou cria um novo se não existir
+        Teacher admin = teacherRepository.findByEmail(adminEmail).orElse(
+                Teacher.builder()
+                        .name("Administrador")
+                        .email(adminEmail)
+                        .build()
+        );
 
-            Teacher admin = Teacher.builder()
-                    .name("Iago Boebel")
-                    .email(adminEmail)
-                    .password(passwordEncoder.encode(adminPassword))
-                    .build();
+        // Sempre sobrescreve a senha com a que está no .env atual
+        admin.setPassword(passwordEncoder.encode(adminPassword));
 
-            teacherRepository.save(admin);
-
-        }
+        teacherRepository.save(admin);
     }
 }

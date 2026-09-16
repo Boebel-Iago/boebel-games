@@ -6,6 +6,7 @@ import { PixelArtComponent } from './features/games/pixel-art/pixel-art.componen
 import { ProfessionsComponent } from './features/games/professions/professions.component';
 import { BrowserSearchComponent } from './features/games/browser-search/browser-search.component';
 import { ticketGuard } from './core/guards/ticket.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { FactCheckerComponent } from './features/games/fact-checker/fact-checker.component';
 import { CreatorsVsCopiersComponent } from './features/games/creators-vs-copiers/creators-vs-copiers.component';
 import { EmergencyEscapeComponent } from './features/games/emergency-escape/emergency-escape.component';
@@ -102,5 +103,5 @@ export const routes: Routes = [
     { path: '', component: StudentLoginComponent },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent},
-    { path: 'admin/dashboard', component: DashboardComponent},
+    { path: 'admin/dashboard', component: DashboardComponent, canActivate: [adminGuard]},
     ];

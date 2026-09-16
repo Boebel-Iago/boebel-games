@@ -116,6 +116,7 @@ export class BrowserSearchComponent implements OnInit {
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
+    if (sessionStorage.getItem("isDemoMode") === "true") { this.browserTasks = this.browserTasks.slice(0, 2); this.searchTasks = []; }
     this.restoreProgress();
     this.loadStage();
   }

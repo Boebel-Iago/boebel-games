@@ -16,6 +16,13 @@ import { SeaTurtlesComponent } from './features/games/sea-turtles/sea-turtles.co
 import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/sea-turtles/content/phase-repository.service';
 import { FreeGamesComponent } from './features/public/free-games/free-games.component';
 
+// Repórter falso para bloquear 100% o contato com o servidor e BD nas rotas /free
+class MockProgressReporter {
+  report(data: any) {
+    console.log('[Free Mode] Telemetria bloqueada. Nenhum dado enviado.', data);
+  }
+}
+
 export const routes: Routes = [
     
     // ==========================================
@@ -30,7 +37,7 @@ export const routes: Routes = [
         path: 'free/sea-turtles', 
         component: SeaTurtlesComponent,
         providers: [
-            { provide: ProgressReporter, useClass: ApiProgressReporterService },
+            { provide: ProgressReporter, useClass: MockProgressReporter },
             { provide: PhaseRepository, useClass: LocalPhaseRepositoryService } 
         ]
     },
@@ -39,7 +46,7 @@ export const routes: Routes = [
         component: EmergencyEscapeComponent,
         providers: [
             { provide: LevelRepository, useClass: LocalLevelRepositoryService },
-            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+            { provide: ProgressReporter, useClass: MockProgressReporter }
         ] 
     },
 

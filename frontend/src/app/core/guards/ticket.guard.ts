@@ -6,7 +6,14 @@ export const ticketGuard: CanActivateFn = (route, state) => {
   
   // Se for modo demonstração do professor (tem JWT salvo), libera sem ingresso
   const token = localStorage.getItem('jwt_token');
+  
   if (token && state.url.includes('demo=1')) {
+    sessionStorage.setItem('isDemoMode', 'true');
+    return true;
+  }
+
+  // Se o jogo recarregar e perder o demo=1 da URL, mas a sessão ainda estiver marcada como demo
+  if (token && sessionStorage.getItem('isDemoMode') === 'true') {
     return true;
   }
 

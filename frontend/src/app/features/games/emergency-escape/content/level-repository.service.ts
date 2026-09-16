@@ -44,6 +44,9 @@ export class LocalLevelRepositoryService implements LevelRepository {
   }
 
   getAllLevels(): Observable<LevelConfig[]> {
+    if (sessionStorage.getItem('isDemoMode') === 'true') {
+      return of(this.levels.slice(0, 2));
+    }
     return of(this.levels);
   }
 }

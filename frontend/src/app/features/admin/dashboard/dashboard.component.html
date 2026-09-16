@@ -169,6 +169,11 @@
                 [ngClass]="activeTab === 'demo' ? 'text-forest-900 border-b-2 border-forest-900' : 'text-gray-400 hover:text-gray-600'">
           📽️ Demonstração
         </button>
+        <button (click)="activeTab = 'unplugged'"
+                class="px-6 py-3 text-sm font-bold transition-colors"
+                [ngClass]="activeTab === 'unplugged' ? 'text-forest-900 border-b-2 border-forest-900' : 'text-gray-400 hover:text-gray-600'">
+          🔌 Atividade Desplugada
+        </button>
       </div>
 
       <!-- TAB: MONITORAMENTO -->
@@ -249,6 +254,11 @@
             <iframe [src]="demoUrl | safeUrl" class="w-full h-full border-0" title="Demonstração do Jogo"></iframe>
           </div>
         </div>
+      </div>
+
+      <!-- TAB: ATIVIDADE DESPLUGADA -->
+      <div *ngIf="activeTab === 'unplugged'">
+        <app-unplugged-activity [gameRoute]="selectedTicket.gameRoute"></app-unplugged-activity>
       </div>
 
     </div>

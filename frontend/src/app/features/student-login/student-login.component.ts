@@ -42,6 +42,7 @@ export class StudentLoginComponent {
         
         // Salva a ROTA para o Guarda liberar a porta
         sessionStorage.setItem('activeGameRoute', response.gameRoute);
+        sessionStorage.removeItem('isDemoMode'); // Garante que aluno joga o jogo inteiro
         
         // Salva o ID da sessão, nome e a fase atual
         sessionStorage.setItem('sessionId', response.sessionId);

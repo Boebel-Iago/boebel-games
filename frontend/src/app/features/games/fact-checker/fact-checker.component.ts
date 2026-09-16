@@ -129,6 +129,7 @@ export class FactCheckerComponent implements OnInit {
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
+    if (sessionStorage.getItem("isDemoMode") === "true") { this.newsTasks = this.newsTasks.slice(0, 2); this.factCheckTasks = []; }
     this.restoreProgress();
   }
 

@@ -97,6 +97,7 @@ export class PixelArtComponent implements OnInit {
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
+    if (sessionStorage.getItem("isDemoMode") === "true") { this.levels = this.levels.slice(0, 2); }
     const saved = sessionStorage.getItem('currentStage');
     let startLevel = 0;
     if (saved) {

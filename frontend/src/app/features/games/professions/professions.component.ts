@@ -217,6 +217,7 @@ scenarios: Scenario[] = [
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
+    if (sessionStorage.getItem("isDemoMode") === "true") { this.professions = this.professions.slice(0, 2); this.scenarios = []; }
     this.restoreProgress();
     this.loadProfession();
   }

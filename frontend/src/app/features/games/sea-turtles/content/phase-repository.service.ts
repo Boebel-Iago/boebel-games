@@ -26,6 +26,9 @@ export class LocalPhaseRepositoryService implements PhaseRepository {
   }
 
   getAllPhases(): Observable<PhaseConfig[]> {
+    if (sessionStorage.getItem('isDemoMode') === 'true') {
+      return of(this.phases.slice(0, 2));
+    }
     return of(this.phases);
   }
 }

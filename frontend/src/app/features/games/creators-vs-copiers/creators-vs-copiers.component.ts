@@ -169,6 +169,7 @@ export class CreatorsVsCopiersComponent implements OnInit {
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
+    if (sessionStorage.getItem("isDemoMode") === "true") { this.licenseTasks = this.licenseTasks.slice(0, 2); this.plagiarismTasks = []; }
     this.restoreProgress();
     this.loadStage();
   }

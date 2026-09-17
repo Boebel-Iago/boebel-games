@@ -147,7 +147,7 @@
           <button (click)="onExtendTicket(selectedTicket.id, 2)" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
             +2h
           </button>
-          <button (click)="onExtendTicket(selectedTicket.id, 24)" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">
+          <button (click)="onExtendTicket(selectedTicket.id, 24)" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold">
             📅 +24h (Aula)
           </button>
         </div>
@@ -225,7 +225,7 @@
                 <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
                 <td class="px-6 py-4">
-                  <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">✅ Finalizado</span>
+                  <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">✅ Finalizado</span>
                   <span *ngIf="!s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">🟢 Jogando</span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500">{{ s.startedAt | date:'HH:mm' }}</td>
@@ -246,7 +246,7 @@
             <button (click)="openDemoFullscreen()" class="bg-forest-900 hover:bg-forest-800 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
               🖥️ Abrir Aqui (Tela Cheia)
             </button>
-            <button (click)="openDemoNewWindow()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+            <button (click)="openDemoNewWindow()" class="bg-forest-900 hover:bg-forest-800 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
               🪟 Abrir em Nova Janela
             </button>
           </div>

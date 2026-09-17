@@ -96,7 +96,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Mecânico', icon: 'assets/images/professions/mecanico_prof.jpg',
     correctTool: { name: 'Scanner Automotivo', icon: 'assets/images/professions/scanner_automotivo.jpg' },
-    wrongTools: [{ name: 'Microfone', icon: '🎤' }, { name: 'Prancha de Surf', icon: '🏄' }],
+    wrongTools: [{ name: 'Microfone', icon: 'assets/images/professions/microfone.jpg' }, { name: 'Prancha de Surf', icon: 'assets/images/professions/prancha_surf.jpg' }],
     feedback: 'Hoje em dia, os carros também têm computadores dentro deles!',
     hardwareDesc: 'O cabo e a maquininha com tela que ele liga no carro.',
     softwareDesc: 'O programa que lê a "mente" do carro para achar o defeito.'
@@ -104,7 +104,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Cientista', icon: 'assets/images/professions/cientista_prof.jpg',
     correctTool: { name: 'Microscópio Digital', icon: 'assets/images/professions/microscopio_digital.jpg' },
-    wrongTools: [{ name: 'Bola de Futebol', icon: '⚽' }, { name: 'Violão', icon: '🎸' }],
+    wrongTools: [{ name: 'Bola de Futebol', icon: 'assets/images/professions/bola_futebol.jpg' }, { name: 'Violão', icon: 'assets/images/professions/violao.jpg' }],
     feedback: 'A ciência usa a tecnologia para descobrir coisas minúsculas.',
     hardwareDesc: 'As lentes especiais e o cabo que liga no computador.',
     softwareDesc: 'O software que dá zoom e tira fotos das bactérias.'
@@ -112,7 +112,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Agricultor', icon: 'assets/images/professions/agricultor_prof.jpg',
     correctTool: { name: 'Drone de Plantação', icon: 'assets/images/professions/drone_plantacao.jpg' },
-    wrongTools: [{ name: 'Liquidificador', icon: '🥤' }, { name: 'Maquiagem', icon: '💄' }],
+    wrongTools: [{ name: 'Liquidificador', icon: 'assets/images/professions/liquidificador.jpg' }, { name: 'Maquiagem', icon: 'assets/images/professions/maquiagem.jpg' }],
     feedback: 'A tecnologia voa sobre a fazenda para cuidar das plantas.',
     hardwareDesc: 'As hélices, a bateria e o controle remoto do Drone.',
     softwareDesc: 'O aplicativo de celular que faz o Drone voar sozinho.'
@@ -123,7 +123,7 @@ export class ProfessionsComponent implements OnInit {
 scenarios: Scenario[] = [
   { 
     description: 'Assistir a um filme de animação.', 
-    icon: '🍿', 
+    icon: 'assets/images/professions/cenario_filme.jpg', 
     type: 'LAZER', 
     feedback: 'Você usou a tecnologia para se divertir e relaxar!',
     hardwareDesc: 'A tela do Tablet ou a Smart TV.',
@@ -131,7 +131,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Digitar um relatório do escritório.', 
-    icon: '📄', 
+    icon: 'assets/images/professions/cenario_relatorio.jpg', 
     type: 'TRABALHO', 
     feedback: 'A tecnologia é essencial para organizar informações.',
     hardwareDesc: 'O teclado físico e o mouse do Notebook.',
@@ -139,7 +139,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Jogar online com os amigos.', 
-    icon: '🎮', 
+    icon: 'assets/images/professions/cenario_jogar.jpg', 
     type: 'LAZER', 
     feedback: 'A diversão conectada depende da tecnologia!',
     hardwareDesc: 'O console do videogame e os botões do controle.',
@@ -147,7 +147,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Programar um aplicativo novo.', 
-    icon: '👨‍💻', 
+    icon: 'assets/images/professions/cenario_programar.jpg', 
     type: 'TRABALHO', 
     feedback: 'Criar novas tecnologias é uma profissão muito importante!',
     hardwareDesc: 'Os servidores, os monitores e o computador.',
@@ -155,7 +155,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Ouvir músicas no fone de ouvido enquanto descansa.', 
-    icon: '🎧', 
+    icon: 'assets/images/professions/cenario_musica.jpg', 
     type: 'LAZER', 
     feedback: 'A música digital viaja pelo ar até o seu fone.',
     hardwareDesc: 'O fone de ouvido sem fio (Bluetooth) e o celular.',
@@ -163,7 +163,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Fazer uma videochamada de reunião com o chefe.', 
-    icon: '👔', 
+    icon: 'assets/images/professions/cenario_videochamada.jpg', 
     type: 'TRABALHO', 
     feedback: 'A tecnologia conecta profissionais do mundo inteiro.',
     hardwareDesc: 'A câmera (webcam) e o microfone do notebook.',
@@ -171,7 +171,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Ler um livro digital (e-book) de aventuras na cama.', 
-    icon: '📖', 
+    icon: 'assets/images/professions/cenario_ebook.jpg', 
     type: 'LAZER', 
     feedback: 'Milhares de livros podem caber em um único aparelho!',
     hardwareDesc: 'O leitor digital (como o Kindle) e sua tela.',
@@ -179,7 +179,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Controlar o estoque de roupas de uma loja.', 
-    icon: '👗', 
+    icon: 'assets/images/professions/cenario_estoque.jpg', 
     type: 'TRABALHO', 
     feedback: 'A tecnologia evita que as lojas percam produtos.',
     hardwareDesc: 'O tablet que o vendedor segura na mão.',
@@ -187,7 +187,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Brincar de fazer um desenho digital colorido.', 
-    icon: '🎨', 
+    icon: 'assets/images/professions/cenario_desenho.jpg', 
     type: 'LAZER', 
     feedback: 'A arte digital não precisa de papel ou tinta de verdade.',
     hardwareDesc: 'O tablet e a caneta especial de toque.',
@@ -195,7 +195,7 @@ scenarios: Scenario[] = [
   },
   { 
     description: 'Motorista de aplicativo levando passageiros.', 
-    icon: '🚗', 
+    icon: 'assets/images/professions/cenario_motorista.jpg', 
     type: 'TRABALHO', 
     feedback: 'O GPS mudou a forma como as pessoas viajam pela cidade.',
     hardwareDesc: 'O suporte e o celular no painel do carro.',

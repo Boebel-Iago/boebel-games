@@ -40,7 +40,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Médica', icon: 'assets/images/professions/medica_prof.jpg',
     correctTool: { name: 'Máquina de Ultrassom', icon: 'assets/images/professions/maquina_ultrassom.jpg' },
-    wrongTools: [{ name: 'Batedeira', icon: '🥣' }, { name: 'Trator', icon: '🚜' }],
+    wrongTools: [{ name: 'Batedeira', icon: 'assets/images/professions/batedeira.jpg' }, { name: 'Trator', icon: 'assets/images/professions/trator.jpg' }],
     feedback: 'A médica usa a tecnologia para ver dentro do nosso corpo!',
     hardwareDesc: 'O monitor e o sensor (a parte física que toca na pele).',
     softwareDesc: 'O programa de computador que transforma o sinal em uma imagem na tela.'
@@ -48,7 +48,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Produtor Musical', icon: 'assets/images/professions/produtor_musical_prof.jpg',
     correctTool: { name: 'Teclado e Computador', icon: 'assets/images/professions/teclado_musical.jpg' },
-    wrongTools: [{ name: 'Microscópio', icon: '🔬' }, { name: 'Foguete', icon: '🚀' }],
+    wrongTools: [{ name: 'Microscópio', icon: 'assets/images/professions/microscopio_digital.jpg' }, { name: 'Foguete', icon: 'assets/images/professions/foguete.jpg' }],
     feedback: 'A tecnologia ajuda a criar e gravar músicas incríveis!',
     hardwareDesc: 'As teclas físicas do controlador, o cabo e o notebook.',
     softwareDesc: 'O aplicativo de gravação e os instrumentos virtuais que geram o som.'
@@ -56,7 +56,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Arquiteta', icon: 'assets/images/professions/arquiteta_prof.jpg',
     correctTool: { name: 'Mesa Digitalizadora', icon: 'assets/images/professions/mesa_digitalizadora.jpg' },
-    wrongTools: [{ name: 'Panela', icon: '🥘' }, { name: 'Câmera', icon: 'assets/images/professions/camera_digital.jpg' }],
+    wrongTools: [{ name: 'Panela', icon: 'assets/images/professions/panela.jpg' }, { name: 'Câmera', icon: 'assets/images/professions/camera_digital.jpg' }],
     feedback: 'Antes de construir uma casa real, ela é desenhada no computador.',
     hardwareDesc: 'A caneta digital e a tela física onde ela desenha.',
     softwareDesc: 'O sistema de desenho 3D que calcula as medidas das paredes.'
@@ -64,7 +64,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Caixa de Mercado', icon: 'assets/images/professions/caixa_mercado_prof.jpg',
     correctTool: { name: 'Caixa Registradora', icon: 'assets/images/professions/caixa_registradora.jpg' },
-    wrongTools: [{ name: 'Vassoura', icon: '🧹' }, { name: 'Secador', icon: '💨' }],
+    wrongTools: [{ name: 'Vassoura', icon: 'assets/images/professions/vassoura.jpg' }, { name: 'Secador', icon: 'assets/images/professions/secador.jpg' }],
     feedback: 'A tecnologia faz a conta das compras muito mais rápido!',
     hardwareDesc: 'O leitor de código de barras e a gaveta de dinheiro.',
     softwareDesc: 'O sistema do mercado que sabe o preço exato de cada produto.'
@@ -72,7 +72,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Professor', icon: 'assets/images/professions/professor_prof.jpg',
     correctTool: { name: 'Lousa Digital', icon: 'assets/images/professions/lousa_interativa.jpg' },
-    wrongTools: [{ name: 'Pá de Construção', icon: '⛏️' }, { name: 'Frigideira', icon: '🍳' }],
+    wrongTools: [{ name: 'Pá de Construção', icon: 'assets/images/professions/pa_construcao.jpg' }, { name: 'Frigideira', icon: 'assets/images/professions/frigideira.jpg' }],
     feedback: 'O professor usa a lousa interativa para deixar a aula mais divertida!',
     hardwareDesc: 'A tela gigante que podemos tocar com o dedo.',
     softwareDesc: 'O aplicativo de desenho e os jogos educativos que rodam nela.'
@@ -80,7 +80,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Fotógrafa', icon: 'assets/images/professions/fotografa_prof.jpg',
     correctTool: { name: 'Câmera Digital', icon: 'assets/images/professions/camera_digital.jpg' },
-    wrongTools: [{ name: 'Martelo', icon: '🔨' }, { name: 'Regador', icon: '🚿' }],
+    wrongTools: [{ name: 'Martelo', icon: 'assets/images/professions/martelo.jpg' }, { name: 'Regador', icon: 'assets/images/professions/regador.jpg' }],
     feedback: 'Ela captura momentos especiais usando muita tecnologia.',
     hardwareDesc: 'A lente, os botões e o cartão de memória da câmera.',
     softwareDesc: 'O sistema interno que ajusta a luz e salva a foto.'
@@ -88,7 +88,7 @@ export class ProfessionsComponent implements OnInit {
   {
     name: 'Piloto de Avião', icon: 'assets/images/professions/piloto_prof.jpg',
     correctTool: { name: 'Painel de Navegação', icon: 'assets/images/professions/painel_aviao.jpg' },
-    wrongTools: [{ name: 'Tinta e Pincel', icon: '🎨' }, { name: 'Vara de Pescar', icon: '🎣' }],
+    wrongTools: [{ name: 'Tinta e Pincel', icon: 'assets/images/professions/tinta_pincel.jpg' }, { name: 'Vara de Pescar', icon: 'assets/images/professions/vara_pescar.jpg' }],
     feedback: 'O avião é uma máquina super inteligente que voa pelo céu.',
     hardwareDesc: 'As telas do painel e o manche (volante) do avião.',
     softwareDesc: 'O programa de GPS que mostra a rota nas nuvens.'
@@ -103,7 +103,7 @@ export class ProfessionsComponent implements OnInit {
   },
   {
     name: 'Cientista', icon: 'assets/images/professions/cientista_prof.jpg',
-    correctTool: { name: 'Microscópio Digital', icon: '🔬' },
+    correctTool: { name: 'Microscópio Digital', icon: 'assets/images/professions/microscopio_digital.jpg' },
     wrongTools: [{ name: 'Bola de Futebol', icon: '⚽' }, { name: 'Violão', icon: '🎸' }],
     feedback: 'A ciência usa a tecnologia para descobrir coisas minúsculas.',
     hardwareDesc: 'As lentes especiais e o cabo que liga no computador.',

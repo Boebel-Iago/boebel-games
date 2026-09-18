@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
-// Interface que define o pacote de dados que vai pro Java (com nomes iguais ao seu Record Java)
 export interface ProgressUpdatePayload {
   nextStage: number;
   mistakesInThisLevel: number;
@@ -15,17 +16,10 @@ export interface ProgressUpdatePayload {
 })
 export class GameService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   
-  // URL mapeada exatamente igual ao @RequestMapping + @PutMapping do Spring Boot
   private apiUrl = `${environment.apiBaseUrl}/api/tickets/sessions`; 
 
-  /**
-   * Envia o progresso e a quantidade de falhas da fase atual para o Spring Boot.
-   * sessionId: O ID salvo no sessionStorage quando o aluno fez login.
-   * nextStage: A próxima fase que o aluno vai jogar.
-   * mistakes: Quantas vezes a tela de Game Over apareceu nesta fase.
-   * isFinished: Se o aluno acabou de passar da última fase.
-   */
   updateGameProgress(sessionId: string, nextStage: number, mistakes: number, isFinished: boolean): Observable<any> {
     const payload: ProgressUpdatePayload = {
       nextStage: nextStage,
@@ -33,7 +27,15 @@ export class GameService {
       gameFinished: isFinished
     };
     
-    // Dispara o PUT para: /api/tickets/sessions/{id}/progress
-    return this.http.put(`${this.apiUrl}/${sessionId}/progress`, payload);
+    return this.http.put(`${this.apiUrl}/${sessionId}/progress`, payload).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 403) {
+          alert('⏸️ Esta sala foi pausada ou encerrada pelo professor!\n\nVocê será redirecionado.');
+          sessionStorage.clear();
+          this.router.navigate(['/']);
+        }
+        return throwError(() => error);
+      })
+    );
   }
 }

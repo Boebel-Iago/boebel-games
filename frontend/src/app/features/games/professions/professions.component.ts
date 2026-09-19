@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressReporter } from '../../../core/services/progress-reporter.service';
+import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 interface Tool {
   name: string;
@@ -17,6 +18,14 @@ interface Profession {
   softwareDesc: string; // Descrição do Lógico
 }
 
+
+interface Phase3Item {
+  id: string;
+  name: string;
+  icon: string;
+  category: 'TRABALHO' | 'ESTUDO' | 'LAZER';
+}
+
 interface Scenario {
   description: string;
   icon: string;
@@ -29,7 +38,7 @@ interface Scenario {
 @Component({
   selector: 'app-professions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DragDropModule],
   templateUrl: './professions.component.html',
   styleUrl: './professions.component.scss'
 })
@@ -203,7 +212,74 @@ scenarios: Scenario[] = [
   }
 ];
 
-  gameStage: 1 | 2 = 1;
+  
+  // FASE 3: Drag & Drop (Categorização)
+  gameStage: 1 | 2 | 3 = 1;
+  showFeedback: boolean = false;
+  phase3Level: number = 1;
+
+  unassignedItems: Phase3Item[] = [];
+  workColumn: Phase3Item[] = [];
+  studyColumn: Phase3Item[] = [];
+  leisureColumn: Phase3Item[] = [];
+
+  phase3Data: Phase3Item[][] = [
+    // Nível 1
+    [
+      { id: '1', name: 'Planilha Financeira', icon: '📊', category: 'TRABALHO' },
+      { id: '2', name: 'Editor de Código', icon: '💻', category: 'TRABALHO' },
+      { id: '3', name: 'Reunião de Equipe', icon: '👔', category: 'TRABALHO' },
+      { id: '4', name: 'Email Profissional', icon: '✉️', category: 'TRABALHO' },
+      { id: '5', name: 'Controle de Estoque', icon: '📦', category: 'TRABALHO' },
+      { id: '6', name: 'Videoaula', icon: '📐', category: 'ESTUDO' },
+      { id: '7', name: 'Resumo Acadêmico', icon: '📄', category: 'ESTUDO' },
+      { id: '8', name: 'Fórum de Dúvidas', icon: '🙋', category: 'ESTUDO' },
+      { id: '9', name: 'Simulado Online', icon: '📝', category: 'ESTUDO' },
+      { id: '10', name: 'Pesquisa Escolar', icon: '🔍', category: 'ESTUDO' },
+      { id: '11', name: 'Série Animada', icon: '📺', category: 'LAZER' },
+      { id: '12', name: 'Jogo de Aventura', icon: '🎮', category: 'LAZER' },
+      { id: '13', name: 'Rede Social', icon: '📱', category: 'LAZER' },
+      { id: '14', name: 'Música Relaxante', icon: '🎧', category: 'LAZER' },
+      { id: '15', name: 'Quadrinhos', icon: '🗯️', category: 'LAZER' }
+    ],
+    // Nível 2
+    [
+      { id: '16', name: 'App de Vendas', icon: '📈', category: 'TRABALHO' },
+      { id: '17', name: 'App de Motorista', icon: '🚗', category: 'TRABALHO' },
+      { id: '18', name: 'Edição de Vídeo', icon: '🎬', category: 'TRABALHO' },
+      { id: '19', name: 'Prancheta Digital', icon: '📏', category: 'TRABALHO' },
+      { id: '20', name: 'Sistema de Caixa', icon: '🛒', category: 'TRABALHO' },
+      { id: '21', name: 'Livro Didático', icon: '📚', category: 'ESTUDO' },
+      { id: '22', name: 'Grupo de Estudos', icon: '💬', category: 'ESTUDO' },
+      { id: '23', name: 'Curso de Idiomas', icon: '🌍', category: 'ESTUDO' },
+      { id: '24', name: 'Calculadora', icon: '🧮', category: 'ESTUDO' },
+      { id: '25', name: 'Mapa Mental', icon: '🧠', category: 'ESTUDO' },
+      { id: '26', name: 'Vlog de Viagem', icon: '✈️', category: 'LAZER' },
+      { id: '27', name: 'Futebol Online', icon: '⚽', category: 'LAZER' },
+      { id: '28', name: 'Playlist de Festa', icon: '🎵', category: 'LAZER' },
+      { id: '29', name: 'Vídeos Engraçados', icon: '😂', category: 'LAZER' },
+      { id: '30', name: 'Live de Jogos', icon: '🔴', category: 'LAZER' }
+    ],
+    // Nível 3
+    [
+      { id: '31', name: 'Prontuário Médico', icon: '⚕️', category: 'TRABALHO' },
+      { id: '32', name: 'Projeto 3D', icon: '🏗️', category: 'TRABALHO' },
+      { id: '33', name: 'Design Gráfico', icon: '🎨', category: 'TRABALHO' },
+      { id: '34', name: 'Contabilidade', icon: '🧾', category: 'TRABALHO' },
+      { id: '35', name: 'Agenda de Clientes', icon: '📅', category: 'TRABALHO' },
+      { id: '36', name: 'Tutorial Python', icon: '⌨️', category: 'ESTUDO' },
+      { id: '37', name: 'Artigo Científico', icon: '🔬', category: 'ESTUDO' },
+      { id: '38', name: 'Documentário', icon: '🏛️', category: 'ESTUDO' },
+      { id: '39', name: 'Treinamento', icon: '🎯', category: 'ESTUDO' },
+      { id: '40', name: 'Teste Lógico', icon: '🧩', category: 'ESTUDO' },
+      { id: '41', name: 'Comédia Stand-up', icon: '🍿', category: 'LAZER' },
+      { id: '42', name: 'Chat com Amigos', icon: '🗣️', category: 'LAZER' },
+      { id: '43', name: 'Jogo de Cartas', icon: '🃏', category: 'LAZER' },
+      { id: '44', name: 'Loja de Roupas', icon: '👗', category: 'LAZER' },
+      { id: '45', name: 'Planejar Férias', icon: '🏖️', category: 'LAZER' }
+    ]
+  ];
+
   currentIndex: number = 0;
   currentOptions: Tool[] = [];
   
@@ -222,14 +298,20 @@ scenarios: Scenario[] = [
     this.loadProfession();
   }
 
+  
   private restoreProgress() {
     const saved = sessionStorage.getItem('currentStage');
     if (saved) {
       const stage = parseInt(saved, 10);
       if (!isNaN(stage) && stage > 0) {
         const phase1Total = this.professions.length;
-        if (stage >= phase1Total + this.scenarios.length) {
+        const phase2Total = this.scenarios.length;
+        if (stage >= phase1Total + phase2Total + 3) {
           this.gameFinished = true;
+        } else if (stage >= phase1Total + phase2Total) {
+          this.gameStage = 3;
+          this.phase3Level = stage - (phase1Total + phase2Total) + 1;
+          this.loadPhase3();
         } else if (stage >= phase1Total) {
           this.gameStage = 2;
           this.currentIndex = stage - phase1Total;
@@ -241,11 +323,23 @@ scenarios: Scenario[] = [
     }
   }
 
-  private getAbsoluteStage(): number {
-    return this.gameStage === 1
-      ? this.currentIndex
-      : this.professions.length + this.currentIndex;
+  loadPhase3() {
+    this.workColumn = [];
+    this.studyColumn = [];
+    this.leisureColumn = [];
+    // Clonar e embaralhar
+    this.unassignedItems = [...this.phase3Data[this.phase3Level - 1]].sort(() => Math.random() - 0.5);
   }
+
+
+  private getAbsoluteStage(): number {
+    const p1 = this.professions.length;
+    const p2 = this.scenarios.length;
+    if (this.gameStage === 1) return this.currentIndex;
+    if (this.gameStage === 2) return p1 + this.currentIndex;
+    return p1 + p2 + (this.phase3Level - 1);
+  }
+
 
   loadProfession() {
     const prof = this.professions[this.currentIndex];
@@ -299,6 +393,7 @@ scenarios: Scenario[] = [
       return;
     }
 
+    
     this.currentIndex++;
     const phase1Total = this.professions.length;
     let isFinished = false;
@@ -307,8 +402,9 @@ scenarios: Scenario[] = [
       this.gameStage = 2;
       this.currentIndex = 0;
     } else if (this.gameStage === 2 && this.currentIndex >= this.scenarios.length) {
-      this.gameFinished = true;
-      isFinished = true;
+      this.gameStage = 3;
+      this.phase3Level = 1;
+      this.loadPhase3();
     } else if (this.gameStage === 1) {
       this.loadProfession();
     }
@@ -322,4 +418,63 @@ scenarios: Scenario[] = [
       isLastLevel: isFinished
     });
   }
+
+  drop(event: CdkDragDrop<Phase3Item[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    }
+  }
+
+  checkPhase3Answers() {
+    if (this.unassignedItems.length > 0) return; // Não deveria ser clicável, mas por segurança
+    
+    // Validar cada coluna
+    let hasError = false;
+    this.workColumn.forEach(item => { if(item.category !== 'TRABALHO') hasError = true; });
+    this.studyColumn.forEach(item => { if(item.category !== 'ESTUDO') hasError = true; });
+    this.leisureColumn.forEach(item => { if(item.category !== 'LAZER') hasError = true; });
+
+    if (hasError) {
+      this.feedbackSoftware = 'Ops! Alguns artefatos estão na coluna errada. Revise!';
+      this.showFeedback = true;
+      
+      this.progressReporter.report({
+        levelId: `professions-${this.getAbsoluteStage()}`,
+        fase: this.getAbsoluteStage(),
+        result: 'failure',
+        attempts: 0,
+        timestamp: new Date().toISOString(), isLastLevel: false
+      });
+      return;
+    }
+
+    // Sucesso!
+    this.showFeedback = false;
+    this.feedbackSoftware = '';
+
+    this.progressReporter.report({
+      levelId: `professions-${this.getAbsoluteStage()}`,
+      fase: this.getAbsoluteStage(),
+      result: 'success',
+      attempts: 0,
+      timestamp: new Date().toISOString(), isLastLevel: this.phase3Level === 3
+    });
+
+    if (this.phase3Level < 3) {
+      this.phase3Level++;
+      this.loadPhase3();
+      sessionStorage.setItem('currentStage', this.getAbsoluteStage().toString());
+    } else {
+      this.gameFinished = true;
+      sessionStorage.setItem('currentStage', this.getAbsoluteStage().toString());
+    }
+  }
+
 }

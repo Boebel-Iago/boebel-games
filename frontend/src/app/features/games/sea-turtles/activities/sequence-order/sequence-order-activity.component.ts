@@ -23,8 +23,21 @@ export class SequenceOrderActivityComponent implements OnChanges {
   }
 
   private reset(): void {
-    // Embaralha só a ordem de exibição no "pool" — a ordem certa continua em correctOrder.
-    this.pool = [...this.phase.cards].sort(() => Math.random() - 0.5);
+    this.pool = [...this.phase.cards];
+    
+    // Algoritmo Fisher-Yates verdadeiro para embaralhamento e trava contra a ordem correta
+    let isPerfectlyOrdered = true;
+    while (isPerfectlyOrdered && this.pool.length > 1) {
+      // Fisher-Yates Shuffle
+      for (let i = this.pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.pool[i], this.pool[j]] = [this.pool[j], this.pool[i]];
+      }
+      
+      // Checa se, por azar, as cartas caíram na ordem exata da resposta
+      isPerfectlyOrdered = this.pool.every((card, index) => card.correctOrder === index);
+    }
+    
     this.placedSequence = [];
     this.wrongCardId = null;
   }

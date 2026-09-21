@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/tickets/validate/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/tickets/validate").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/tickets/sessions/*/progress").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/sessions/*/status").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

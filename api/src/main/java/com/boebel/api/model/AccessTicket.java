@@ -45,6 +45,9 @@ public class AccessTicket {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Column(name = "paused_at")
+    private LocalDateTime pausedAt;
+
     @Column(name = "grade", nullable = false, length = 50)
     private String grade;
 

@@ -109,7 +109,21 @@ public class AccessTicketService {
         }
 
         // Inverte o status atual
-        ticket.setIsActive(!ticket.getIsActive());
+        boolean newStatus = !ticket.getIsActive();
+        ticket.setIsActive(newStatus);
+        
+        if (!newStatus) {
+            // A sala foi PAUSADA: grava o momento exato
+            ticket.setPausedAt(java.time.LocalDateTime.now());
+        } else {
+            // A sala foi REATIVADA: calcula o tempo que ficou pausada e estende a validade
+            if (ticket.getPausedAt() != null) {
+                java.time.Duration pausedDuration = java.time.Duration.between(ticket.getPausedAt(), java.time.LocalDateTime.now());
+                ticket.setExpirationDate(ticket.getExpirationDate().plus(pausedDuration));
+                ticket.setPausedAt(null);
+            }
+        }
+        
         accessTicketRepository.save(ticket);
 
         return toDTO(ticket);

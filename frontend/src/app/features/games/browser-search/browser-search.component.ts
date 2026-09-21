@@ -1,20 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressReporter } from '../../../core/services/progress-reporter.service';
-
-interface BrowserTask {
-  id: string;
-  instruction: string;
-  feedback: string;
-}
-
-interface SearchTask {
-  situation: string;
-  correctKeywords: string[];
-  alternativeKeywords?: string[][];
-  distractorWords: string[]; 
-  feedback: string;
-}
+import { CyberMission, AnatomyTask, SearchTask } from './models';
 
 @Component({
   selector: 'app-browser-search',
@@ -24,163 +11,230 @@ interface SearchTask {
   styleUrl: './browser-search.component.scss'
 })
 export class BrowserSearchComponent implements OnInit {
-  
-  // FASE 1: Identificar partes do Navegador (10 Fases - Fácil para Difícil)
-  browserTasks: BrowserTask[] = [
-    { id: 'search-bar', instruction: 'Fase 1: Toque na BARRA DE PESQUISA (A lupa grande no meio da tela).', feedback: 'Fácil, né? A barra de pesquisa é onde digitamos o que queremos achar no Google.' },
-    { id: 'back', instruction: 'Fase 2: Você entrou no site errado. Toque no botão VOLTAR para a página anterior.', feedback: 'Isso! A setinha para a esquerda sempre nos salva quando clicamos onde não devíamos.' },
-    { id: 'forward', instruction: 'Fase 3: Você voltou sem querer! Toque no botão AVANÇAR para ir para a próxima página.', feedback: 'Perfeito! A setinha para a direita refaz o nosso caminho.' },
-    { id: 'refresh', instruction: 'Fase 4: A internet travou. Toque no botão de ATUALIZAR (Recarregar) o site.', feedback: 'Muito bem! A setinha em círculo faz o navegador carregar tudo de novo.' },
-    { id: 'home', instruction: 'Fase 5: Você quer voltar para a tela inicial. Toque no botão PÁGINA INICIAL.', feedback: 'Exato! O ícone da Casinha (Home) nos leva para o começo do navegador.' },
-    { id: 'address-bar', instruction: 'Fase 6: Toque na BARRA DE ENDEREÇOS (Onde está escrito o site "https://...").', feedback: 'Ótimo! É aí que digitamos o caminho exato para visitar uma página direta.' },
-    { id: 'new-tab', instruction: 'Fase 7: Você quer fazer uma pesquisa sem fechar o site atual. Abra uma NOVA GUIA.', feedback: 'Muito bem! O botão de Nova Guia (+) abre uma aba limpa para você usar.' },
-    { id: 'close-tab', instruction: 'Fase 8: Terminou de usar o site? Toque no botão de FECHAR A GUIA.', feedback: 'Isso! A bolinha vermelha com o "X" fecha a página quando não precisamos mais dela.' },
-    { id: 'bookmark', instruction: 'Fase 9: Você adorou esse site e quer salvar! Toque nos FAVORITOS.', feedback: 'Excelente! A Estrela guarda o site na sua lista de favoritos para você achar rápido amanhã.' },
-    { id: 'lock', instruction: 'Fase 10: Como saber se o site é seguro e não tem vírus? Toque no CADEADO de segurança.', feedback: 'Incrível! O Cadeado fechado significa que suas informações estão protegidas nesse site!' }
-  ];
 
-  // FASE 2: Palavras-chave (10 Fases - Simples para Complexas)
-  searchTasks: SearchTask[] = [
+  missions: CyberMission[] = [
     {
-      situation: 'Fase 1: Você quer ver fotos de gatos filhotes fofinhos.',
-      correctKeywords: ['fotos', 'gatos', 'filhotes'],
-      alternativeKeywords: [['gatos', 'filhotes'], ['fotos', 'gatos']],
-      distractorWords: ['eu', 'quero', 'ver', 'de', 'muito', 'fofinhos'],
-      feedback: 'Fácil e direto! "Fotos gatos filhotes" ou apenas "gatos filhotes" é tudo o que o computador precisa ler.'
+      id: 'mission_1',
+      title: 'Missão 1: O Painel da Nave',
+      type: 'anatomy',
+      briefing: [
+        { speaker: 'T-B0T', text: 'Bip-bop! Olá, recruta! Eu sou T-B0T, seu navegador de bordo. Bem-vindo à Agência de Cyber Exploradores!' },
+        { speaker: 'T-B0T', text: 'Antes de mergulharmos na Grande Teia, você precisa conhecer o painel de controle da nossa Nave-Navegador.' },
+        { speaker: 'T-B0T', text: 'Eu vou pedir um comando e você deve tocar no botão correto do painel. Preparado para a decolagem?' }
+      ],
+      tasks: [
+        { id: 'url', instruction: 'Onde digitamos o endereço do planeta... digo, do site que queremos visitar? Toque na BARRA DE ENDEREÇO.', feedback: 'Bip-Bop! Exato! A Barra de Endereço é o volante da nossa nave.' },
+        { id: 'back', instruction: 'Entrou num buraco negro por engano? Toque no botão para VOLTAR à página anterior.', feedback: 'Isso! A seta para a esquerda sempre nos salva e nos traz de volta em segurança.' },
+        { id: 'forward', instruction: 'Voltou demais e se arrependeu? Toque no botão para AVANÇAR para a página que estávamos.', feedback: 'Muito bem! A seta para a direita avança no tempo do nosso histórico.' },
+        { id: 'refresh', instruction: 'A página travou no meio do caminho? Toque no botão de RECARREGAR (aquela setinha em círculo).', feedback: 'Perfeito! Recarregar faz o painel buscar a página de novo do zero.' },
+        { id: 'lock', instruction: 'Quer ter certeza que não há piratas roubando nossos dados? Toque no CADEADO DE SEGURANÇA.', feedback: 'Atenção total! Se o cadeado estiver fechado e verde, a conexão da nossa nave está criptografada e segura.' },
+        { id: 'bookmark', instruction: 'Achou um planeta super legal e quer salvar o mapa? Toque na ESTRELINHA DE FAVORITOS.', feedback: 'Excelente! Favoritos guardam os endereços para viajarmos para lá rapidinho da próxima vez!' }
+      ]
     },
     {
-      situation: 'Fase 2: Você precisa saber o resultado do jogo do Brasil de ontem.',
-      correctKeywords: ['resultado', 'jogo', 'Brasil'],
-      alternativeKeywords: [['jogo', 'Brasil', 'ontem'], ['resultado', 'Brasil']],
-      distractorWords: ['qual', 'foi', 'o', 'do', 'de', 'ontem', 'quem', 'ganhou'],
-      feedback: 'Isso! Evite perguntar "quem ganhou", foque em palavras concretas como "resultado" e "Brasil".'
+      id: 'mission_2',
+      title: 'Missão 2: O Filtro Mágico',
+      type: 'keyword_search',
+      briefing: [
+        { speaker: 'T-B0T', text: 'Excelente pilotagem! Mas agora temos um problema no motor de busca.' },
+        { speaker: 'T-B0T', text: 'A nave está muito pesada porque você está digitando palavras desnecessárias! Precisamos usar o Filtro Mágico.' },
+        { speaker: 'T-B0T', text: 'A regra de ouro dos Cyber Exploradores: O motor de busca ODEIA pronomes (eu, você, meu) e preposições (de, para, com). Selecione apenas as palavras essenciais!' }
+      ],
+      tasks: [
+        {
+          situation: 'Você quer ver vídeos de cachorros engraçados. Qual a melhor pesquisa?',
+          correctKeywords: ['vídeos', 'cachorros', 'engraçados'],
+          alternativeKeywords: [['cachorros', 'engraçados']],
+          distractorWords: ['eu', 'quero', 'ver', 'uns', 'de', 'para', 'mim'],
+          feedback: 'Bip! Perfeito! Tirando "eu quero ver", sobrou apenas a essência da pesquisa!'
+        },
+        {
+          situation: 'Você precisa saber qual é o menor país do mundo inteiro.',
+          correctKeywords: ['menor', 'país', 'mundo'],
+          distractorWords: ['qual', 'é', 'o', 'do', 'inteiro', 'me', 'diga'],
+          feedback: 'Acelerando! Se você perguntar "qual é o", o motor se confunde. "Menor país mundo" é muito mais rápido!'
+        },
+        {
+          situation: 'Você quer comprar uma bola de futebol vermelha.',
+          correctKeywords: ['comprar', 'bola', 'futebol', 'vermelha'],
+          alternativeKeywords: [['preço', 'bola', 'futebol', 'vermelha'], ['bola', 'futebol', 'vermelha']],
+          distractorWords: ['eu', 'quero', 'uma', 'para', 'brincar', 'qual', 'o'],
+          feedback: 'Na mosca! Objeto + Cor + Ação. A busca ideal!'
+        }
+      ]
     },
     {
-      situation: 'Fase 3: Você quer aprender a fazer um bolo de cenoura com chocolate.',
-      correctKeywords: ['receita', 'bolo', 'cenoura', 'chocolate'],
-      alternativeKeywords: [['bolo', 'cenoura', 'chocolate'], ['fazer', 'bolo', 'cenoura', 'chocolate']],
-      distractorWords: ['como', 'fazer', 'um', 'com', 'cobertura', 'de', 'para', 'mim'],
-      feedback: 'Ótimo! A palavra "Receita" já diz ao computador o que você quer, mas citar os ingredientes principais também funciona perfeitamente!'
+      id: 'mission_3',
+      title: 'Missão 3: Resgate Amazônico',
+      type: 'keyword_search',
+      briefing: [
+        { speaker: 'T-B0T', text: 'ALERTA VERMELHO! O sistema da Escola Municipal perdeu todos os dados de biologia e história.' },
+        { speaker: 'T-B0T', text: 'As crianças não têm como fazer o dever de casa! Você precisa encontrar as informações perdidas na selva de dados do Brasil.' },
+        { speaker: 'T-B0T', text: 'Cuidado: se você não for específico, vai encontrar animais de outro país!' }
+      ],
+      tasks: [
+        {
+          situation: 'O professor perguntou onde fica o ninho do Pica-Pau-Amarelo no Brasil.',
+          correctKeywords: ['ninho', 'Pica-Pau-Amarelo', 'Brasil'],
+          alternativeKeywords: [['onde', 'vive', 'Pica-Pau-Amarelo', 'Brasil']],
+          distractorWords: ['o', 'professor', 'perguntou', 'qual', 'lugar', 'do'],
+          feedback: 'Isso! Focar no pássaro e na região ("Brasil") garante que a resposta será exata.'
+        },
+        {
+          situation: 'Pesquise sobre a história do descobrimento do Brasil para um trabalho.',
+          correctKeywords: ['resumo', 'história', 'descobrimento', 'Brasil'],
+          alternativeKeywords: [['história', 'descobrimento', 'Brasil']],
+          distractorWords: ['fazer', 'trabalho', 'sobre', 'a', 'do', 'na', 'escola'],
+          feedback: 'Bip-Bop! A palavra mágica "resumo" ajuda muito quando precisamos de conteúdo escolar direto ao ponto.'
+        },
+        {
+          situation: 'Você precisa descobrir quanto pesa a onça pintada macho adulta.',
+          correctKeywords: ['peso', 'onça', 'pintada', 'macho'],
+          alternativeKeywords: [['quanto', 'pesa', 'onça', 'pintada']],
+          distractorWords: ['eu', 'preciso', 'descobrir', 'a', 'adulta', 'que', 'vive'],
+          feedback: 'Muito bem! "Peso" e a espécie exata é tudo que o banco de dados do Google precisa.'
+        }
+      ]
     },
     {
-      situation: 'Fase 4: Seu cachorro está comendo grama e você quer saber o motivo.',
-      correctKeywords: ['cachorro', 'comendo', 'grama', 'motivo'],
-      alternativeKeywords: [['cachorro', 'comendo', 'grama'], ['por que', 'cachorro', 'comendo', 'grama']],
-      distractorWords: ['por que', 'o', 'meu', 'está', 'fazendo', 'isso', 'agora'],
-      feedback: 'Excelente! Nós não conversamos com o computador como se fosse uma pessoa. Tiramos os "o meu" e "está fazendo".'
-    },
-    {
-      situation: 'Fase 5: Você precisa encontrar o endereço do Museu da Água na cidade de Blumenau.',
-      correctKeywords: ['endereço', 'museu', 'água', 'Blumenau'],
-      alternativeKeywords: [['museu', 'água', 'Blumenau'], ['onde', 'fica', 'museu', 'água', 'Blumenau']],
-      distractorWords: ['onde', 'fica', 'o', 'da', 'na', 'cidade', 'de', 'como', 'chegar'],
-      feedback: 'Muito bem! Ao colocar o nome da cidade e do local, você garante que não vai achar um museu de outro estado.'
-    },
-    {
-      situation: 'Fase 6: Você quer comprar um tênis azul tamanho 38.',
-      correctKeywords: ['comprar', 'tênis', 'azul', '38'],
-      alternativeKeywords: [['tênis', 'azul', '38'], ['preço', 'tênis', 'azul', '38']],
-      distractorWords: ['eu', 'quero', 'um', 'para', 'mim', 'qual', 'o', 'preço', 'do'],
-      feedback: 'Isso! Tamanho, cor e o objeto formam a pesquisa ideal para lojas online.'
-    },
-    {
-      situation: 'Fase 7: Seu teclado parou de funcionar e você usa o Windows 11.',
-      correctKeywords: ['teclado', 'não', 'funciona', 'Windows 11'],
-      alternativeKeywords: [['teclado', 'parou', 'Windows 11'], ['problema', 'teclado', 'Windows 11']],
-      distractorWords: ['meu', 'de', 'funcionar', 'como', 'consertar', 'no', 'problema', 'parou'],
-      feedback: 'Perfeito! Colocar a versão do seu sistema (Windows 11) ajuda a achar a solução certa para o seu computador.'
-    },
-    {
-      situation: 'Fase 8: Você tem um trabalho escolar sobre a história do descobrimento do Brasil.',
-      correctKeywords: ['resumo', 'história', 'descobrimento', 'Brasil'],
-      alternativeKeywords: [['história', 'descobrimento', 'Brasil'], ['trabalho', 'história', 'descobrimento', 'Brasil']],
-      distractorWords: ['eu', 'tenho', 'um', 'escolar', 'sobre', 'a', 'do', 'trabalho'],
-      feedback: 'Brilhante! "Resumo", "História" e "Descobrimento do Brasil" vai te levar direto aos melhores sites educativos!'
-    },
-    {
-      situation: 'Fase 9: Você quer saber se vai chover amanhã na sua cidade, Florianópolis.',
-      correctKeywords: ['previsão', 'tempo', 'amanhã', 'Florianópolis'],
-      alternativeKeywords: [['chover', 'amanhã', 'Florianópolis'], ['clima', 'amanhã', 'Florianópolis']],
-      distractorWords: ['vai', 'chover', 'na', 'minha', 'cidade', 'se', 'clima'],
-      feedback: 'Show! Pesquisar "previsão do tempo" mais a data e a cidade não tem erro.'
-    },
-    {
-      situation: 'Fase 10: Você esqueceu a senha do seu celular Samsung e quer formatar.',
-      correctKeywords: ['como', 'formatar', 'celular', 'Samsung'],
-      alternativeKeywords: [['formatar', 'celular', 'Samsung'], ['esqueci', 'senha', 'formatar', 'Samsung']],
-      distractorWords: ['eu', 'esqueci', 'a', 'senha', 'do', 'meu', 'e', 'quero'],
-      feedback: 'Muito bem! "Como formatar" seguido da marca do aparelho acha exatamente o tutorial que você precisa!'
+      id: 'mission_4',
+      title: 'Missão 4: O Hacker',
+      type: 'keyword_search',
+      briefing: [
+        { speaker: 'T-B0T', text: 'Bzzzt! Tem algo errado! Nossas telas estão piscando.' },
+        { speaker: 'T-B0T', text: 'Os computadores do laboratório estão com problemas técnicos! Muitas vezes o suporte técnico demora para chegar.' },
+        { speaker: 'T-B0T', text: 'Um verdadeiro Cyber Explorador sabe pesquisar seus próprios problemas técnicos. Ajude-me a consertar os computadores formulando perguntas técnicas precisas!' }
+      ],
+      tasks: [
+        {
+          situation: 'A tela do seu computador com Windows 11 ficou de cabeça para baixo sem querer.',
+          correctKeywords: ['tela', 'cabeça', 'para', 'baixo', 'Windows 11'],
+          alternativeKeywords: [['como', 'desvirar', 'tela', 'Windows 11'], ['virar', 'tela', 'Windows 11']],
+          distractorWords: ['sem', 'querer', 'ficou', 'de', 'do', 'meu', 'ajuda'],
+          feedback: 'Exatamente! Ao colocar "Windows 11", a internet sabe exatamente para qual sistema dar a solução.'
+        },
+        {
+          situation: 'Seu celular da marca Motorola não está conectando no Wi-Fi da escola.',
+          correctKeywords: ['celular', 'Motorola', 'não', 'conecta', 'Wi-Fi'],
+          alternativeKeywords: [['Motorola', 'não', 'conecta', 'Wi-Fi']],
+          distractorWords: ['meu', 'na', 'escola', 'ajuda', 'o', 'que', 'fazer'],
+          feedback: 'Bip! Informar a marca (Motorola) e o problema (não conecta Wi-Fi) te leva direto à página de suporte da fabricante.'
+        },
+        {
+          situation: 'O teclado do computador parou de funcionar e você quer saber como abrir o teclado virtual na tela.',
+          correctKeywords: ['como', 'abrir', 'teclado', 'virtual'],
+          alternativeKeywords: [['teclado', 'virtual', 'tela']],
+          distractorWords: ['meu', 'quebrou', 'parou', 'de', 'funcionar', 'quero', 'saber'],
+          feedback: 'Formidável! Às vezes não precisamos pesquisar o problema ("teclado quebrou"), mas sim pesquisar direto a SOLUÇÃO ("teclado virtual")!'
+        },
+        {
+          situation: 'Você precisa limpar o histórico de navegação do seu Google Chrome porque ele está lento.',
+          correctKeywords: ['como', 'limpar', 'histórico', 'Google Chrome'],
+          alternativeKeywords: [['limpar', 'histórico', 'Chrome']],
+          distractorWords: ['ele', 'está', 'muito', 'lento', 'do', 'meu', 'porque'],
+          feedback: 'Sensacional! Você é oficialmente um Mestre da Pesquisa. A internet não guarda mais nenhum segredo para você!'
+        }
+      ]
     }
   ];
 
-  gameStage: 1 | 2 = 1;
+  // Estado Geral
+  currentMissionIndex: number = 0;
   currentTaskIndex: number = 0;
   
+  // Modos de Exibição
+  displayMode: 'briefing' | 'gameplay' | 'feedback' = 'briefing';
+  briefingIndex: number = 0;
+
+  // Estado da Pesquisa (Keyword Mode)
   availableWords: string[] = [];
   selectedWords: string[] = [];
   currentMistakes: number = 0;
 
-  showFeedbackModal: boolean = false;
-  feedbackText: string = '';
+  // Estados Locais (para o feedback)
   isCorrectGuess: boolean = false;
+  feedbackText: string = '';
   gameFinished: boolean = false;
 
   constructor(private progressReporter: ProgressReporter) {}
 
   ngOnInit() {
-    if (sessionStorage.getItem("isDemoMode") === "true") { this.browserTasks = this.browserTasks.slice(0, 2); this.searchTasks = []; }
     this.restoreProgress();
-    this.loadStage();
   }
 
-  private restoreProgress() {
-    const saved = sessionStorage.getItem('currentStage');
-    if (saved) {
-      const stage = parseInt(saved, 10);
-      if (!isNaN(stage) && stage > 0) {
-        const phase1Total = this.browserTasks.length; // 10
-        if (stage >= phase1Total + this.searchTasks.length) {
-          this.gameFinished = true;
-        } else if (stage >= phase1Total) {
-          this.gameStage = 2;
-          this.currentTaskIndex = stage - phase1Total;
-        } else {
-          this.gameStage = 1;
-          this.currentTaskIndex = stage;
-        }
-      }
+  // ==== GERENCIAMENTO ====
+
+  get activeMission(): CyberMission {
+    return this.missions[this.currentMissionIndex];
+  }
+
+  get activeTask(): any {
+    return this.activeMission.tasks[this.currentTaskIndex];
+  }
+
+  // ==== TRANSIÇÕES ====
+
+  nextBriefing() {
+    if (this.briefingIndex < this.activeMission.briefing.length - 1) {
+      this.briefingIndex++;
+    } else {
+      this.displayMode = 'gameplay';
+      this.setupTask();
     }
   }
 
-  private getAbsoluteStage(): number {
-    return this.gameStage === 1
-      ? this.currentTaskIndex
-      : this.browserTasks.length + this.currentTaskIndex;
-  }
-
-  loadStage() {
-    if (this.gameStage === 2 && this.currentTaskIndex < this.searchTasks.length) {
-      const task = this.searchTasks[this.currentTaskIndex];
+  setupTask() {
+    if (this.activeMission.type === 'keyword_search') {
+      const task = this.activeTask as SearchTask;
       this.selectedWords = [];
       this.availableWords = [...task.correctKeywords, ...task.distractorWords].sort(() => Math.random() - 0.5);
+      this.currentMistakes = 0;
     }
   }
 
+  nextStep() {
+    this.displayMode = 'gameplay';
+
+    if (!this.isCorrectGuess) {
+      this.reportProgress('failure', false);
+      this.setupTask(); // Reseta a task para tentar novamente
+      return;
+    }
+
+    if (this.currentTaskIndex < this.activeMission.tasks.length - 1) {
+      this.currentTaskIndex++;
+      this.setupTask();
+    } else {
+      // Missão concluída
+      if (this.currentMissionIndex < this.missions.length - 1) {
+        this.currentMissionIndex++;
+        this.currentTaskIndex = 0;
+        this.briefingIndex = 0;
+        this.displayMode = 'briefing';
+      } else {
+        this.gameFinished = true;
+      }
+    }
+    
+    this.saveLocalProgress();
+    this.reportProgress('success', this.gameFinished);
+  }
+
+  // ==== MECÂNICAS ====
+
   checkBrowserPart(partId: string, event?: Event) {
-    if (event) event.stopPropagation(); // Evita que clique no cadeado ative a barra de endereços junto
+    if (event) event.stopPropagation();
     
-    if (this.gameStage !== 1) return;
+    if (this.activeMission.type !== 'anatomy') return;
     
-    const task = this.browserTasks[this.currentTaskIndex];
-    if (partId === task.id) {
+    if (partId === this.activeTask.id) {
       this.isCorrectGuess = true;
-      this.feedbackText = task.feedback;
-      this.showFeedbackModal = true;
+      this.feedbackText = this.activeTask.feedback;
     } else {
       this.isCorrectGuess = false;
-      this.feedbackText = 'Ainda não é essa parte! Leia com atenção a instrução e toque no lugar correto do navegador.';
-      this.showFeedbackModal = true;
+      this.feedbackText = 'Bzzz! Erro de navegação. Leia com atenção a instrução e toque no lugar correto do painel.';
     }
+    this.displayMode = 'feedback';
   }
 
   selectWord(word: string) {
@@ -194,10 +248,11 @@ export class BrowserSearchComponent implements OnInit {
   }
 
   checkKeywords() {
-    const task = this.searchTasks[this.currentTaskIndex];
+    if (this.activeMission.type !== 'keyword_search') return;
     
-    // Testa a combinação principal
+    const task = this.activeTask as SearchTask;
     let isCorrect = false;
+    
     const hasAllCorrectPrimary = task.correctKeywords.every(w => this.selectedWords.includes(w));
     const hasNoDistractorsPrimary = this.selectedWords.every(w => task.correctKeywords.includes(w));
     
@@ -205,7 +260,6 @@ export class BrowserSearchComponent implements OnInit {
       isCorrect = true;
     }
 
-    // Testa as combinações alternativas, se houver
     if (!isCorrect && task.alternativeKeywords) {
       for (const alt of task.alternativeKeywords) {
         const hasAllAlt = alt.every(w => this.selectedWords.includes(w));
@@ -220,58 +274,56 @@ export class BrowserSearchComponent implements OnInit {
     if (isCorrect) {
       this.isCorrectGuess = true;
       this.feedbackText = task.feedback;
-      this.showFeedbackModal = true;
-      this.currentMistakes = 0; // Reseta os erros ao acertar
+      
     } else {
       this.isCorrectGuess = false;
       this.currentMistakes++;
       
       if (this.currentMistakes >= 5) {
-        this.feedbackText = '💡 DICA: As palavras essenciais poderiam ser: ' + task.correctKeywords.join(', ') + '.';
+        this.feedbackText = '💡 DICA DO T-B0T: As palavras mais importantes poderiam ser: ' + task.correctKeywords.join(', ') + '.';
       } else {
-        this.feedbackText = 'Sua pesquisa está um pouco confusa! Lembre-se: remova palavras como "eu", "o", "que", "como". Deixe apenas as palavras mais importantes!';
+        this.feedbackText = 'Bzzzt! Sobrecarga no motor. Remova palavras inúteis (eu, meu, o, que) e deixe apenas as essenciais!';
       }
-      this.showFeedbackModal = true;
+      
     }
+    this.displayMode = 'feedback';
   }
 
-  nextStep() {
-    this.showFeedbackModal = false;
+  // ==== PROGRESSO ====
 
-    if (!this.isCorrectGuess) {
-      this.progressReporter.report({
-        levelId: `browser-search-${this.getAbsoluteStage()}`,
-        fase: this.getAbsoluteStage(),
-        result: 'failure',
-        attempts: 0,
-        timestamp: new Date().toISOString(),
-        isLastLevel: false
-      });
-      return;
-    }
-
-    this.currentTaskIndex++;
-    const phase1Total = this.browserTasks.length;
-    let isFinished = false;
-
-    if (this.gameStage === 1 && this.currentTaskIndex >= phase1Total) {
-      this.gameStage = 2;
-      this.currentTaskIndex = 0;
-      this.loadStage();
-    } else if (this.gameStage === 2 && this.currentTaskIndex >= this.searchTasks.length) {
-      this.gameFinished = true;
-      isFinished = true;
-    } else {
-      this.loadStage();
-    }
-
+  private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
+    const absoluteFase = (this.currentMissionIndex * 10) + this.currentTaskIndex;
+    
     this.progressReporter.report({
-      levelId: `browser-search-${this.getAbsoluteStage()}`,
-      fase: this.getAbsoluteStage(),
-      result: 'success',
+      levelId: `browser-search-m${this.currentMissionIndex}-t${this.currentTaskIndex}`,
+      fase: absoluteFase,
+      result: result,
       attempts: 0,
       timestamp: new Date().toISOString(),
       isLastLevel: isFinished
     });
+  }
+
+  private saveLocalProgress() {
+    const progress = JSON.stringify({
+      missionIndex: this.currentMissionIndex,
+      taskIndex: this.currentTaskIndex
+    });
+    sessionStorage.setItem('browserSearchProgress', progress);
+  }
+
+  private restoreProgress() {
+    const saved = sessionStorage.getItem('browserSearchProgress');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.missionIndex !== undefined && parsed.taskIndex !== undefined) {
+          this.currentMissionIndex = parsed.missionIndex;
+          this.currentTaskIndex = parsed.taskIndex;
+          this.briefingIndex = 0;
+          this.displayMode = 'briefing';
+        }
+      } catch (e) {}
+    }
   }
 }

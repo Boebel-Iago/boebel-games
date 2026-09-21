@@ -53,7 +53,11 @@ export class StudentLoginComponent {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = "Código incorreto ou expirado. Chame o professor!";
+        if (err.error && err.error.error) {
+          this.errorMessage = err.error.error;
+        } else {
+          this.errorMessage = "Código incorreto ou indisponível. Chame o professor!";
+        }
       }
     });
   }

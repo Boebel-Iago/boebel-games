@@ -47,6 +47,10 @@ export class TicketService {
     return this.http.delete<any>(`${this.apiUrl}/tickets/${id}`, { headers: this.getHeaders() });
   }
 
+    checkSessionStatus(sessionId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/tickets/sessions/${sessionId}/status`);
+  }
+
   validateTicket(payload: JoinGamePayload): Observable<JoinGameResponse> {
     return this.http.post<JoinGameResponse>(`${this.apiUrl}/tickets/validate`, payload);
   }

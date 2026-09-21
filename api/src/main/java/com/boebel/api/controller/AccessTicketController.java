@@ -193,7 +193,6 @@ public class AccessTicketController {
     }
 
     // MODIFIED: Broadcast via WebSocket after updating progress
-    @PutMapping("/sessions/{sessionId}/progress")
     
     // NEW: Verifica se a sessão do aluno ainda é de um ticket ativo e válido (Proteção F5)
     @GetMapping("/sessions/{sessionId}/status")

@@ -222,7 +222,7 @@
             <tbody class="divide-y divide-gray-100">
               <tr *ngFor="let s of sessions" class="hover:bg-gray-50 transition-colors">
                 <td class="px-6 py-4 font-medium text-gray-900">{{ s.studentName }}</td>
-                <td class="px-6 py-4 text-gray-700">{{ s.currentStage }}</td>
+                <td class="px-6 py-4 text-gray-700">{{ s.completed ? s.currentStage : (s.currentStage + 1) }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>
                 <td class="px-6 py-4">
                   <span *ngIf="s.completed" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">✅ Finalizado</span>

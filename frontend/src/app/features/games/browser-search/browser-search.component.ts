@@ -11,6 +11,7 @@ interface BrowserTask {
 interface SearchTask {
   situation: string;
   correctKeywords: string[];
+  alternativeKeywords?: string[][];
   distractorWords: string[]; 
   feedback: string;
 }
@@ -43,62 +44,72 @@ export class BrowserSearchComponent implements OnInit {
     {
       situation: 'Fase 1: Você quer ver fotos de gatos filhotes fofinhos.',
       correctKeywords: ['fotos', 'gatos', 'filhotes'],
+      alternativeKeywords: [['gatos', 'filhotes'], ['fotos', 'gatos']],
       distractorWords: ['eu', 'quero', 'ver', 'de', 'muito', 'fofinhos'],
-      feedback: 'Fácil e direto! "Fotos gatos filhotes" é tudo o que o computador precisa ler.'
+      feedback: 'Fácil e direto! "Fotos gatos filhotes" ou apenas "gatos filhotes" é tudo o que o computador precisa ler.'
     },
     {
       situation: 'Fase 2: Você precisa saber o resultado do jogo do Brasil de ontem.',
       correctKeywords: ['resultado', 'jogo', 'Brasil'],
+      alternativeKeywords: [['jogo', 'Brasil', 'ontem'], ['resultado', 'Brasil']],
       distractorWords: ['qual', 'foi', 'o', 'do', 'de', 'ontem', 'quem', 'ganhou'],
       feedback: 'Isso! Evite perguntar "quem ganhou", foque em palavras concretas como "resultado" e "Brasil".'
     },
     {
       situation: 'Fase 3: Você quer aprender a fazer um bolo de cenoura com chocolate.',
       correctKeywords: ['receita', 'bolo', 'cenoura', 'chocolate'],
+      alternativeKeywords: [['bolo', 'cenoura', 'chocolate'], ['fazer', 'bolo', 'cenoura', 'chocolate']],
       distractorWords: ['como', 'fazer', 'um', 'com', 'cobertura', 'de', 'para', 'mim'],
-      feedback: 'Ótimo! A palavra "Receita" já diz ao computador que você quer o passo a passo de como fazer.'
+      feedback: 'Ótimo! A palavra "Receita" já diz ao computador o que você quer, mas citar os ingredientes principais também funciona perfeitamente!'
     },
     {
       situation: 'Fase 4: Seu cachorro está comendo grama e você quer saber o motivo.',
       correctKeywords: ['cachorro', 'comendo', 'grama', 'motivo'],
-      distractorWords: ['por', 'que', 'o', 'meu', 'está', 'fazendo', 'isso', 'agora'],
-      feedback: 'Excelente! Nós não conversamos com o computador como se fosse uma pessoa. Tiramos os "por que" e os "o meu".'
+      alternativeKeywords: [['cachorro', 'comendo', 'grama'], ['por que', 'cachorro', 'comendo', 'grama']],
+      distractorWords: ['por que', 'o', 'meu', 'está', 'fazendo', 'isso', 'agora'],
+      feedback: 'Excelente! Nós não conversamos com o computador como se fosse uma pessoa. Tiramos os "o meu" e "está fazendo".'
     },
     {
       situation: 'Fase 5: Você precisa encontrar o endereço do Museu da Água na cidade de Blumenau.',
       correctKeywords: ['endereço', 'museu', 'água', 'Blumenau'],
+      alternativeKeywords: [['museu', 'água', 'Blumenau'], ['onde', 'fica', 'museu', 'água', 'Blumenau']],
       distractorWords: ['onde', 'fica', 'o', 'da', 'na', 'cidade', 'de', 'como', 'chegar'],
-      feedback: 'Muito bem! Ao colocar o nome da cidade, você garante que não vai achar um museu de outro estado.'
+      feedback: 'Muito bem! Ao colocar o nome da cidade e do local, você garante que não vai achar um museu de outro estado.'
     },
     {
-      situation: 'Fase 6: O seu computador deu uma tela azul com o erro "ERR_NETWORK".',
-      correctKeywords: ['erro', 'tela', 'azul', 'ERR_NETWORK'],
-      distractorWords: ['meu', 'computador', 'deu', 'uma', 'com', 'o', 'o', 'que', 'fazer'],
-      feedback: 'Perfeito! Se você digitar exatamente o código do erro (ERR_NETWORK), vai achar a solução rapidinho.'
+      situation: 'Fase 6: Você quer comprar um tênis azul tamanho 38.',
+      correctKeywords: ['comprar', 'tênis', 'azul', '38'],
+      alternativeKeywords: [['tênis', 'azul', '38'], ['preço', 'tênis', 'azul', '38']],
+      distractorWords: ['eu', 'quero', 'um', 'para', 'mim', 'qual', 'o', 'preço', 'do'],
+      feedback: 'Isso! Tamanho, cor e o objeto formam a pesquisa ideal para lojas online.'
     },
     {
-      situation: 'Fase 7: Você quer comprar um teclado sem fio barato para o seu tablet.',
-      correctKeywords: ['comprar', 'teclado', 'sem fio', 'barato'],
-      distractorWords: ['eu', 'quero', 'um', 'para', 'o', 'meu', 'tablet', 'onde', 'vende'],
-      feedback: 'Isso! O computador lê "comprar", "teclado" e "barato" e já mostra as melhores lojas para você.'
+      situation: 'Fase 7: Seu teclado parou de funcionar e você usa o Windows 11.',
+      correctKeywords: ['teclado', 'não', 'funciona', 'Windows 11'],
+      alternativeKeywords: [['teclado', 'parou', 'Windows 11'], ['problema', 'teclado', 'Windows 11']],
+      distractorWords: ['meu', 'de', 'funcionar', 'como', 'consertar', 'no', 'problema', 'parou'],
+      feedback: 'Perfeito! Colocar a versão do seu sistema (Windows 11) ajuda a achar a solução certa para o seu computador.'
     },
     {
       situation: 'Fase 8: Você tem um trabalho escolar sobre a história do descobrimento do Brasil.',
-      correctKeywords: ['história', 'descobrimento', 'Brasil', 'resumo'],
-      distractorWords: ['um', 'trabalho', 'escolar', 'sobre', 'a', 'do', 'quem', 'descobriu'],
-      feedback: 'Gênio! A palavra "Resumo" é um truque secreto excelente para trabalhos escolares!'
+      correctKeywords: ['resumo', 'história', 'descobrimento', 'Brasil'],
+      alternativeKeywords: [['história', 'descobrimento', 'Brasil'], ['trabalho', 'história', 'descobrimento', 'Brasil']],
+      distractorWords: ['eu', 'tenho', 'um', 'escolar', 'sobre', 'a', 'do', 'trabalho'],
+      feedback: 'Brilhante! "Resumo", "História" e "Descobrimento do Brasil" vai te levar direto aos melhores sites educativos!'
     },
     {
-      situation: 'Fase 9: Como traduzir a palavra "teclado" do português para o inglês.',
-      correctKeywords: ['tradutor', 'teclado', 'inglês'],
-      distractorWords: ['como', 'escrever', 'a', 'palavra', 'do', 'português', 'para', 'o', 'em'],
-      feedback: 'Exato! Só usar a palavra "Tradutor" acompanhada do idioma que você quer.'
+      situation: 'Fase 9: Você quer saber se vai chover amanhã na sua cidade, Florianópolis.',
+      correctKeywords: ['previsão', 'tempo', 'amanhã', 'Florianópolis'],
+      alternativeKeywords: [['chover', 'amanhã', 'Florianópolis'], ['clima', 'amanhã', 'Florianópolis']],
+      distractorWords: ['vai', 'chover', 'na', 'minha', 'cidade', 'se', 'clima'],
+      feedback: 'Show! Pesquisar "previsão do tempo" mais a data e a cidade não tem erro.'
     },
     {
-      situation: 'Fase 10: Seu jogo Roblox não quer abrir e fica fechando sozinho no celular.',
-      correctKeywords: ['Roblox', 'fechando', 'sozinho', 'celular'],
-      distractorWords: ['o', 'meu', 'jogo', 'não', 'quer', 'abrir', 'e', 'fica', 'toda', 'hora'],
-      feedback: 'Missão cumprida! Retirando o desespero e focando no nome do jogo e no problema, a internet sempre ajuda!'
+      situation: 'Fase 10: Você esqueceu a senha do seu celular Samsung e quer formatar.',
+      correctKeywords: ['como', 'formatar', 'celular', 'Samsung'],
+      alternativeKeywords: [['formatar', 'celular', 'Samsung'], ['esqueci', 'senha', 'formatar', 'Samsung']],
+      distractorWords: ['eu', 'esqueci', 'a', 'senha', 'do', 'meu', 'e', 'quero'],
+      feedback: 'Muito bem! "Como formatar" seguido da marca do aparelho acha exatamente o tutorial que você precisa!'
     }
   ];
 
@@ -107,6 +118,7 @@ export class BrowserSearchComponent implements OnInit {
   
   availableWords: string[] = [];
   selectedWords: string[] = [];
+  currentMistakes: number = 0;
 
   showFeedbackModal: boolean = false;
   feedbackText: string = '';
@@ -183,16 +195,42 @@ export class BrowserSearchComponent implements OnInit {
 
   checkKeywords() {
     const task = this.searchTasks[this.currentTaskIndex];
-    const hasAllCorrect = task.correctKeywords.every(w => this.selectedWords.includes(w));
-    const hasNoDistractors = this.selectedWords.every(w => task.correctKeywords.includes(w));
+    
+    // Testa a combinação principal
+    let isCorrect = false;
+    const hasAllCorrectPrimary = task.correctKeywords.every(w => this.selectedWords.includes(w));
+    const hasNoDistractorsPrimary = this.selectedWords.every(w => task.correctKeywords.includes(w));
+    
+    if (hasAllCorrectPrimary && hasNoDistractorsPrimary && this.selectedWords.length === task.correctKeywords.length) {
+      isCorrect = true;
+    }
 
-    if (hasAllCorrect && hasNoDistractors) {
+    // Testa as combinações alternativas, se houver
+    if (!isCorrect && task.alternativeKeywords) {
+      for (const alt of task.alternativeKeywords) {
+        const hasAllAlt = alt.every(w => this.selectedWords.includes(w));
+        const hasNoDistractorsAlt = this.selectedWords.every(w => alt.includes(w));
+        if (hasAllAlt && hasNoDistractorsAlt && this.selectedWords.length === alt.length) {
+          isCorrect = true;
+          break;
+        }
+      }
+    }
+
+    if (isCorrect) {
       this.isCorrectGuess = true;
       this.feedbackText = task.feedback;
       this.showFeedbackModal = true;
+      this.currentMistakes = 0; // Reseta os erros ao acertar
     } else {
       this.isCorrectGuess = false;
-      this.feedbackText = 'Sua pesquisa está confusa! Lembre-se: remova palavras como "eu", "o", "que", "como". Deixe apenas as palavras mais importantes!';
+      this.currentMistakes++;
+      
+      if (this.currentMistakes >= 5) {
+        this.feedbackText = '💡 DICA: As palavras essenciais poderiam ser: ' + task.correctKeywords.join(', ') + '.';
+      } else {
+        this.feedbackText = 'Sua pesquisa está um pouco confusa! Lembre-se: remova palavras como "eu", "o", "que", "como". Deixe apenas as palavras mais importantes!';
+      }
       this.showFeedbackModal = true;
     }
   }

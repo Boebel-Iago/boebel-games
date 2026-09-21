@@ -225,6 +225,7 @@ public class AccessTicketController {
         broadcastSessions(session.getTicketCode());
 
         return ResponseEntity.ok().build();
+    }
 
     /**
      * Broadcasts the full list of sessions for a given ticket code to all

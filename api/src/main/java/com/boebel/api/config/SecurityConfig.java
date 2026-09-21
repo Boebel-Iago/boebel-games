@@ -18,8 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.awt.desktop.AppForegroundEvent;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,7 +36,7 @@ public class SecurityConfig {
         http
                 .cors(cors-> cors.configurationSource(request -> {
                     var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+                    corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:4200", "http://13.58.205.20"));
                     corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
                     return corsConfiguration;
@@ -50,8 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/validate/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/tickets/validate").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/tickets/sessions/*/progress").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/tickets/sessions/*/status").permitAll()
+                        .requestMatchers("/api/tickets/sessions/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -60,13 +57,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    //An Bean to uses BCrypt to cryptography
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //An Bean to check passwords
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -78,9 +73,4 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
-
-
-
-
-
 }

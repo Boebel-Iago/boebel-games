@@ -30,6 +30,9 @@ CREATE TABLE access_tickets (
     current_uses INTEGER NOT NULL DEFAULT 0,
     expiration_date TIMESTAMP NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    paused_at TIMESTAMP,
+    ticket_name VARCHAR(100),
+    notes VARCHAR(500),
     
     -- Novos campos que mapeamos hoje:
     grade VARCHAR(50) NOT NULL,

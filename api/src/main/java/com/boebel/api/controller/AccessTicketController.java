@@ -168,7 +168,7 @@ public class AccessTicketController {
         }
 
         // Normaliza o nome para evitar problemas de maiúsculas/minúsculas na busca
-        String normalizedName = request.studentName().trim().toUpperCase();
+        String normalizedName = request.studentName().trim().toLowerCase();
 
         // Check if session already exists for this student + ticket (allows resume)
         StudentSession session = studentSessionRepository

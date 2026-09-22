@@ -32,7 +32,7 @@ export class StudentLoginComponent {
     this.errorMessage = '';
 
     const payload: JoinGamePayload = {
-      studentName: this.studentName.trim().toUpperCase(),
+      studentName: this.studentName.trim().toLowerCase(),
       ticketCode: this.ticketCode.trim().toUpperCase()
     };
 
@@ -46,7 +46,7 @@ export class StudentLoginComponent {
         
         // Salva o ID da sessão, nome normalizado e a fase atual
         sessionStorage.setItem('sessionId', response.sessionId);
-        sessionStorage.setItem('studentName', this.studentName.trim().toUpperCase());
+        sessionStorage.setItem('studentName', this.studentName.trim().toLowerCase());
         sessionStorage.setItem('currentStage', response.currentStage.toString());
         
         this.router.navigate([`/games/${response.gameRoute}`]);

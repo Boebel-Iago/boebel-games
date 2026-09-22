@@ -282,50 +282,41 @@ export class ProfessionsComponent implements OnInit {
   //  DADOS DA MISSÃO 4: DRAG & DROP
   // ═══════════════════════════════════════════════════════════════
   phase3Data: Phase3Item[][] = [
-    // Rodada 1: 9 itens fáceis
+    // Rodada 1: 6 itens (Fácil)
     [
-      { id: '1', name: 'Planilha Financeira', icon: '📊', category: 'TRABALHO' },
-      { id: '2', name: 'Editor de Código', icon: '💻', category: 'TRABALHO' },
-      { id: '3', name: 'Email Profissional', icon: '✉️', category: 'TRABALHO' },
-      { id: '6', name: 'Videoaula', icon: '📐', category: 'ESTUDO' },
-      { id: '7', name: 'Resumo Acadêmico', icon: '📄', category: 'ESTUDO' },
-      { id: '9', name: 'Simulado Online', icon: '📝', category: 'ESTUDO' },
-      { id: '11', name: 'Série Animada', icon: '📺', category: 'LAZER' },
-      { id: '12', name: 'Jogo de Aventura', icon: '🎮', category: 'LAZER' },
-      { id: '14', name: 'Música Relaxante', icon: '🎧', category: 'LAZER' },
+      { id: '1', name: 'Computador do Escritório', icon: '💻', category: 'TRABALHO' },
+      { id: '2', name: 'Caixa Registradora', icon: '📠', category: 'TRABALHO' },
+      { id: '3', name: 'Lousa Digital', icon: '🖥️', category: 'ESTUDO' },
+      { id: '4', name: 'Tablet da Escola', icon: '📱', category: 'ESTUDO' },
+      { id: '5', name: 'Videogame', icon: '🎮', category: 'LAZER' },
+      { id: '6', name: 'Smart TV', icon: '📺', category: 'LAZER' },
     ],
-    // Rodada 2: 12 itens médios
+    // Rodada 2: 9 itens (Médio)
     [
-      { id: '16', name: 'App de Vendas', icon: '📈', category: 'TRABALHO' },
-      { id: '17', name: 'App de Motorista', icon: '🚗', category: 'TRABALHO' },
-      { id: '18', name: 'Edição de Vídeo', icon: '🎬', category: 'TRABALHO' },
-      { id: '20', name: 'Sistema de Caixa', icon: '🛒', category: 'TRABALHO' },
-      { id: '21', name: 'Livro Didático', icon: '📚', category: 'ESTUDO' },
-      { id: '23', name: 'Curso de Idiomas', icon: '🌍', category: 'ESTUDO' },
-      { id: '24', name: 'Calculadora', icon: '🧮', category: 'ESTUDO' },
-      { id: '25', name: 'Mapa Mental', icon: '🧠', category: 'ESTUDO' },
-      { id: '26', name: 'Vlog de Viagem', icon: '✈️', category: 'LAZER' },
-      { id: '27', name: 'Futebol Online', icon: '⚽', category: 'LAZER' },
-      { id: '29', name: 'Vídeos Engraçados', icon: '😂', category: 'LAZER' },
-      { id: '30', name: 'Live de Jogos', icon: '🔴', category: 'LAZER' },
+      { id: '7', name: 'Trator com GPS', icon: '🚜', category: 'TRABALHO' },
+      { id: '8', name: 'Câmera Fotográfica', icon: '📷', category: 'TRABALHO' },
+      { id: '9', name: 'Máquina de Cartão', icon: '💳', category: 'TRABALHO' },
+      { id: '10', name: 'Notebook do Aluno', icon: '💻', category: 'ESTUDO' },
+      { id: '11', name: 'Leitor de Livros', icon: '📖', category: 'ESTUDO' },
+      { id: '12', name: 'Fone de Videoaula', icon: '🎧', category: 'ESTUDO' },
+      { id: '13', name: 'Óculos Virtual', icon: '🥽', category: 'LAZER' },
+      { id: '14', name: 'Caixa de Som', icon: '🔊', category: 'LAZER' },
+      { id: '15', name: 'Fliperama', icon: '🕹️', category: 'LAZER' },
     ],
-    // Rodada 3: 15 itens difíceis
+    // Rodada 3: 12 itens (Desafio Final)
     [
-      { id: '31', name: 'Prontuário Médico', icon: '⚕️', category: 'TRABALHO' },
-      { id: '32', name: 'Projeto 3D', icon: '🏗️', category: 'TRABALHO' },
-      { id: '33', name: 'Design Gráfico', icon: '🎨', category: 'TRABALHO' },
-      { id: '34', name: 'Contabilidade', icon: '🧾', category: 'TRABALHO' },
-      { id: '35', name: 'Agenda de Clientes', icon: '📅', category: 'TRABALHO' },
-      { id: '36', name: 'Tutorial Python', icon: '⌨️', category: 'ESTUDO' },
-      { id: '37', name: 'Artigo Científico', icon: '🔬', category: 'ESTUDO' },
-      { id: '38', name: 'Documentário', icon: '🏛️', category: 'ESTUDO' },
-      { id: '39', name: 'Treinamento', icon: '🎯', category: 'ESTUDO' },
-      { id: '40', name: 'Teste Lógico', icon: '🧩', category: 'ESTUDO' },
-      { id: '41', name: 'Comédia Stand-up', icon: '🍿', category: 'LAZER' },
-      { id: '42', name: 'Chat com Amigos', icon: '🗣️', category: 'LAZER' },
-      { id: '43', name: 'Jogo de Cartas', icon: '🃏', category: 'LAZER' },
-      { id: '44', name: 'Loja de Roupas', icon: '👗', category: 'LAZER' },
-      { id: '45', name: 'Planejar Férias', icon: '🏖️', category: 'LAZER' }
+      { id: '16', name: 'Painel do Avião', icon: '✈️', category: 'TRABALHO' },
+      { id: '17', name: 'Tablet do Vendedor', icon: '📱', category: 'TRABALHO' },
+      { id: '18', name: 'Balança Digital', icon: '⚖️', category: 'TRABALHO' },
+      { id: '19', name: 'Computador do Banco', icon: '🏦', category: 'TRABALHO' },
+      { id: '20', name: 'Projetor de Vídeo', icon: '📽️', category: 'ESTUDO' },
+      { id: '21', name: 'Microscópio', icon: '🔬', category: 'ESTUDO' },
+      { id: '22', name: 'Celular de Pesquisa', icon: '🔍', category: 'ESTUDO' },
+      { id: '23', name: 'Calculadora', icon: '🧮', category: 'ESTUDO' },
+      { id: '24', name: 'Drone de Brinquedo', icon: '🚁', category: 'LAZER' },
+      { id: '25', name: 'Relógio Smart', icon: '⌚', category: 'LAZER' },
+      { id: '26', name: 'Carrinho de Controle', icon: '🏎️', category: 'LAZER' },
+      { id: '27', name: 'Tablet de Jogos', icon: '👾', category: 'LAZER' }
     ]
   ];
 

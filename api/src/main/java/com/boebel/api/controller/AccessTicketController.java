@@ -167,9 +167,12 @@ public class AccessTicketController {
                     .body(Map.of("error", "Este ingresso já expirou!"));
         }
 
+        // Normaliza o nome para evitar problemas de maiúsculas/minúsculas na busca
+        String normalizedName = request.studentName().trim().toUpperCase();
+
         // Check if session already exists for this student + ticket (allows resume)
         StudentSession session = studentSessionRepository
-                .findByStudentNameAndTicketCode(request.studentName(), ticket.getCode())
+                .findByStudentNameAndTicketCode(normalizedName, ticket.getCode())
                 .orElse(null);
 
         if (session != null) {
@@ -195,7 +198,7 @@ public class AccessTicketController {
 
         // Create new session
         session = new StudentSession();
-        session.setStudentName(request.studentName());
+        session.setStudentName(normalizedName);
         session.setTicketCode(ticket.getCode());
         session.setGameRoute(ticket.getGame().getRoute());
         session = studentSessionRepository.save(session);

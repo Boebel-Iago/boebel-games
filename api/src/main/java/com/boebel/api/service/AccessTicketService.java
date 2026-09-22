@@ -66,11 +66,23 @@ public class AccessTicketService {
         
         // Separa os válidos dos expirados
         List<AccessTicket> validTickets = tickets.stream()
-                .filter(t -> !t.getExpirationDate().isBefore(LocalDateTime.now()))
+                .filter(t -> {
+                    LocalDateTime effectiveExp = t.getExpirationDate();
+                    if (!t.getIsActive() && t.getPausedAt() != null) {
+                        effectiveExp = effectiveExp.plus(java.time.Duration.between(t.getPausedAt(), LocalDateTime.now()));
+                    }
+                    return !effectiveExp.isBefore(LocalDateTime.now());
+                })
                 .collect(Collectors.toList());
 
         List<AccessTicket> expiredTickets = tickets.stream()
-                .filter(t -> t.getExpirationDate().isBefore(LocalDateTime.now()))
+                .filter(t -> {
+                    LocalDateTime effectiveExp = t.getExpirationDate();
+                    if (!t.getIsActive() && t.getPausedAt() != null) {
+                        effectiveExp = effectiveExp.plus(java.time.Duration.between(t.getPausedAt(), LocalDateTime.now()));
+                    }
+                    return effectiveExp.isBefore(LocalDateTime.now());
+                })
                 .collect(Collectors.toList());
 
         // Deleta os expirados
@@ -162,7 +174,11 @@ public class AccessTicketService {
     private void cleanupExpiredTickets(Teacher teacher) {
         List<AccessTicket> tickets = accessTicketRepository.findAllByTeacher(teacher);
         for (AccessTicket ticket : tickets) {
-            if (ticket.getExpirationDate().isBefore(LocalDateTime.now())) {
+            LocalDateTime effectiveExp = ticket.getExpirationDate();
+            if (!ticket.getIsActive() && ticket.getPausedAt() != null) {
+                effectiveExp = effectiveExp.plus(java.time.Duration.between(ticket.getPausedAt(), LocalDateTime.now()));
+            }
+            if (effectiveExp.isBefore(LocalDateTime.now())) {
                 studentSessionRepository.deleteByTicketCode(ticket.getCode());
                 accessTicketRepository.delete(ticket);
             }
@@ -170,6 +186,14 @@ public class AccessTicketService {
     }
 
     private TicketResponseDTO toDTO(AccessTicket ticket) {
+        LocalDateTime effectiveExp = ticket.getExpirationDate();
+        // Se estiver pausado, projeta a expiração para compensar o tempo já passado desde o pause,
+        // assim o tempo restante enviado ao frontend fica "congelado".
+        if (!ticket.getIsActive() && ticket.getPausedAt() != null) {
+            java.time.Duration pausedDuration = java.time.Duration.between(ticket.getPausedAt(), java.time.LocalDateTime.now());
+            effectiveExp = effectiveExp.plus(pausedDuration);
+        }
+
         return new TicketResponseDTO(
                 ticket.getUuid(),
                 ticket.getCode(),
@@ -179,7 +203,7 @@ public class AccessTicketService {
                 ticket.getMaxUses(),
                 ticket.getMaxUses() - ticket.getCurrentUses(),
                 null,
-                ticket.getExpirationDate().toString(),
+                effectiveExp.toString(),
                 ticket.getIsActive()
         );
     }

@@ -26,7 +26,7 @@ export class AuthService {
     return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { email, password})
       .pipe(
         tap(response => {
-          localStorage.setItem('jwt_token', response.token);
+          sessionStorage.setItem('jwt_token', response.token);
         })
       )
   }
@@ -37,14 +37,14 @@ export class AuthService {
    * @returns {string | null} O token JWT ou null se não houver token.
    */
   getToken(): string | null {
-    return localStorage.getItem('jwt_token');
+    return sessionStorage.getItem('jwt_token');
   }
   
   /**
    * Encerra a sessão do professor, removendo o JWT do armazenamento local.
    */
   logout(): void {
-    localStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_token');
   }
 
   /**

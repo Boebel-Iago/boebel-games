@@ -89,16 +89,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadTickets() {
     this.ticketService.getActiveTickets().subscribe({
       next: (tickets) => {
-        this.tickets = tickets || [];
-        
-        // Se houver um ingresso selecionado e a lista atualizar, atualizar os dados dele
-        if (this.selectedTicket) {
-          const updated = this.tickets.find(t => t.id === this.selectedTicket.id);
-          if (updated) {
-            this.selectedTicket = updated;
-          } else {
-            // Se o ingresso foi deletado/expirou no backend, voltar para a lista
-            this.closeTicketMonitor();
+        this.tickets = tickets;
+        // Restaurar ticket se F5 for pressionado
+        const savedTicketCode = sessionStorage.getItem('adminSelectedTicket');
+        if (savedTicketCode && !this.selectedTicket) {
+          const found = this.tickets.find(t => t.code === savedTicketCode);
+          if (found) {
+            this.openTicketMonitor(found);
           }
         }
       },
@@ -110,6 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openTicketMonitor(ticket: any) {
     this.selectedTicket = ticket;
     this.activeTab = 'monitor';
+    sessionStorage.setItem('adminSelectedTicket', ticket.code);
     this.loadSessions();
     this.connectWebSocket(ticket.code);
   }
@@ -117,6 +115,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   closeTicketMonitor() {
     this.selectedTicket = null;
     this.sessions = [];
+    sessionStorage.removeItem('adminSelectedTicket');
     this.disconnectWebSocket();
     this.loadTickets(); // Recarrega a lista para pegar possíveis status atualizados
   }
@@ -221,8 +220,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (diff <= 0) return 'Expirado';
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    if (hours > 0) return `${hours}h ${minutes}min restantes`;
-    return `${minutes}min restantes`;
+    
+    let timeString = '';
+    if (hours > 0) timeString = `${hours}h ${minutes}min restantes`;
+    else timeString = `${minutes}min restantes`;
+    
+    return ticket.isActive ? timeString : `Pausado (${timeString})`;
   }
 
   onDeleteTicket(id: string) {

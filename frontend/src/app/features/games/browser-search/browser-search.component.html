@@ -4,41 +4,15 @@
   <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-200 pb-4">
     <div class="text-center md:text-left mb-4 md:mb-0">
       <h2 class="text-3xl font-bold text-forest-900">Agência de Cyber Exploradores</h2>
-      <p class="text-gray-500 font-medium" *ngIf="!gameFinished">{{ activeMission.title }}</p>
+      <p class="text-gray-500 font-medium" *ngIf="!state.gameFinished">{{ activeMission.title }}</p>
     </div>
-    <div *ngIf="!gameFinished" class="bg-indigo-100 text-indigo-800 font-bold px-6 py-2 rounded-full border-2 border-indigo-200 shadow-sm">
-      Missão {{ currentMissionIndex + 1 }} de {{ missions.length }}
-    </div>
-  </div>
-
-  <!-- TELA DE BRIEFING (DIÁLOGO COM O ROBÔ) -->
-  <div *ngIf="displayMode === 'briefing' && !gameFinished" class="w-full max-w-4xl bg-white border-4 border-gray-300 rounded-xl shadow-xl overflow-hidden flex flex-col mt-4">
-    <div class="bg-indigo-900 text-white p-4 font-bold text-lg flex items-center gap-3 tracking-wider">
-      <span>🚀</span> TRANSMISSÃO DA CENTRAL DE COMANDO
-    </div>
-    
-    <div class="p-8 flex flex-col md:flex-row items-center gap-8 bg-slate-100">
-      <div class="text-8xl md:text-9xl drop-shadow-xl transform hover:scale-110 transition-transform">🤖</div>
-      <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-indigo-200 relative w-full">
-        <div class="absolute -left-3 top-10 w-6 h-6 bg-white border-b-2 border-l-2 border-indigo-200 transform rotate-45 hidden md:block"></div>
-        <h4 class="text-indigo-900 font-black mb-2 text-xl uppercase tracking-wider">T-B0T diz:</h4>
-        <p class="text-xl text-gray-800 font-medium leading-relaxed italic">
-          "{{ activeMission.briefing[briefingIndex].text }}"
-        </p>
-      </div>
-    </div>
-    
-    <div class="bg-gray-200 p-4 border-t-2 border-gray-300 flex justify-end">
-      <button 
-        (click)="nextBriefing()"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xl py-4 px-8 rounded-xl shadow-lg border-b-4 border-indigo-800 active:translate-y-1 active:border-b-0 transition-all">
-        {{ briefingIndex < activeMission.briefing.length - 1 ? 'Continuar Lendo ➔' : 'Iniciar Missão ➔' }}
-      </button>
+    <div *ngIf="!state.gameFinished" class="bg-indigo-100 text-indigo-800 font-bold px-6 py-2 rounded-full border-2 border-indigo-200 shadow-sm">
+      Missão {{ state.currentMissionIndex + 1 }} de {{ missionsLength }}
     </div>
   </div>
 
   <!-- AVISO DA MISSÃO DURANTE O GAMEPLAY -->
-  <div *ngIf="displayMode === 'gameplay' && !gameFinished" class="bg-indigo-50 border-l-8 border-indigo-500 p-6 rounded-xl shadow-md w-full max-w-5xl mb-8 flex items-center gap-4">
+  <div *ngIf="state.displayMode === 'gameplay' && !state.gameFinished" class="bg-indigo-50 border-l-8 border-indigo-500 p-6 rounded-xl shadow-md w-full max-w-5xl mb-8 flex items-center gap-4">
     <div class="text-5xl drop-shadow animate-pulse">🎯</div>
     <div>
       <h3 class="text-xl font-bold text-indigo-900 mb-1">Objetivo Atual:</h3>
@@ -51,115 +25,44 @@
     </div>
   </div>
 
-  <!-- GAMEPLAY: ANATOMIA DA NAVE (Fase 1) -->
-  <div *ngIf="displayMode === 'gameplay' && activeMission.type === 'anatomy' && !gameFinished" class="w-full max-w-4xl bg-white border-4 border-gray-300 rounded-xl shadow-2xl overflow-hidden flex flex-col relative">
-    
-    <!-- Top Bar (Chrome-like) -->
-    <div class="bg-gray-200 p-3 flex items-center gap-4 border-b border-gray-300">
-      <div class="flex gap-2">
-        <button (click)="checkBrowserPart('back')" class="w-10 h-10 rounded-full hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold hover:text-indigo-600 transition-colors text-xl">
-          ←
-        </button>
-        <button (click)="checkBrowserPart('forward')" class="w-10 h-10 rounded-full hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold hover:text-indigo-600 transition-colors text-xl">
-          →
-        </button>
-        <button (click)="checkBrowserPart('refresh')" class="w-10 h-10 rounded-full hover:bg-gray-300 flex items-center justify-center text-gray-600 font-bold hover:text-indigo-600 transition-colors text-xl">
-          ↻
-        </button>
-      </div>
+  <!-- Roteamento dos Estados -->
+  <app-briefing *ngIf="state.displayMode === 'briefing' && !state.gameFinished"></app-briefing>
 
-      <!-- URL Bar -->
-      <div (click)="checkBrowserPart('url')" class="flex-1 bg-white rounded-full px-4 py-2 flex items-center gap-3 border border-gray-300 hover:border-indigo-400 hover:shadow-inner cursor-pointer group transition-all">
-        <span (click)="checkBrowserPart('lock', $event)" class="text-gray-400 group-hover:text-green-600 hover:scale-125 transition-transform text-lg" title="Segurança">
-          🔒
-        </span>
-        <span class="font-mono text-gray-600 group-hover:text-indigo-900 w-full font-medium">
-          https://www.agenciacyber.edu.br/missoes
-        </span>
-        <span (click)="checkBrowserPart('bookmark', $event)" class="text-gray-300 hover:text-yellow-400 group-hover:text-yellow-300 hover:scale-125 transition-transform text-xl" title="Favoritar">
-          ★
-        </span>
-      </div>
+  <app-anatomy *ngIf="state.displayMode === 'gameplay' && activeMission.type === 'anatomy' && !state.gameFinished"></app-anatomy>
+
+  <app-keyword-search *ngIf="state.displayMode === 'gameplay' && activeMission.type === 'keyword_search' && !state.gameFinished"></app-keyword-search>
+
+  <!-- TELA DE FEEDBACK APÓS RESPOSTA -->
+  <div *ngIf="state.displayMode === 'feedback' && !state.gameFinished" class="w-full max-w-2xl bg-white border-4 rounded-xl shadow-xl overflow-hidden flex flex-col mt-4"
+       [ngClass]="state.isCorrectGuess ? 'border-emerald-400' : 'border-red-400'">
+    <div class="p-4 font-bold text-lg flex items-center gap-3 text-white"
+         [ngClass]="state.isCorrectGuess ? 'bg-emerald-500' : 'bg-red-500'">
+      <span class="text-2xl">{{ state.isCorrectGuess ? '✅' : '❌' }}</span> 
+      {{ state.isCorrectGuess ? 'SUCESSO!' : 'ERRO!' }}
     </div>
-    
-    <div class="p-12 text-center bg-white min-h-[400px] flex flex-col items-center justify-center">
-      <h1 class="text-5xl font-black text-gray-200 mb-4">Página da Missão</h1>
-      <p class="text-gray-400 text-xl font-medium">O conteúdo será carregado quando você dominar o painel.</p>
-    </div>
-  </div>
-
-
-  <!-- GAMEPLAY: PALAVRAS-CHAVE (Fase 2, 3 e 4) -->
-  <div *ngIf="displayMode === 'gameplay' && activeMission.type === 'keyword_search' && !gameFinished" class="w-full max-w-4xl flex flex-col gap-6">
-    
-    <div class="bg-white p-8 rounded-2xl shadow-lg border-4 border-gray-200 min-h-[150px] flex flex-col items-center justify-center relative">
-      <div class="absolute -top-4 bg-indigo-100 text-indigo-800 font-bold px-4 py-1 rounded-full border-2 border-indigo-300 text-sm">
-        SUA PESQUISA:
-      </div>
-      
-      <div class="flex flex-wrap gap-3 justify-center mt-4">
-        <div *ngIf="selectedWords.length === 0" class="text-gray-400 font-medium italic text-xl">
-          Toque nas palavras abaixo para formar sua pesquisa...
-        </div>
-        
-        <button 
-          *ngFor="let word of selectedWords" 
-          (click)="removeWord(word)"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-3 px-6 rounded-xl shadow border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 transition-all flex items-center gap-2 group">
-          {{ word }} <span class="text-blue-200 group-hover:text-white text-sm">✖</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="bg-gray-100 p-8 rounded-2xl shadow-inner border-4 border-gray-200 border-dashed">
-      <h4 class="text-gray-500 font-bold mb-4 text-center uppercase tracking-widest">Banco de Palavras Misturadas</h4>
-      <div class="flex flex-wrap gap-4 justify-center">
-        <button 
-          *ngFor="let word of availableWords" 
-          (click)="selectWord(word)"
-          class="bg-white hover:bg-indigo-50 text-gray-800 font-bold text-xl py-4 px-6 rounded-xl shadow-md border-2 border-gray-300 hover:border-indigo-400 hover:text-indigo-700 transition-all transform hover:-translate-y-1">
-          {{ word }}
-        </button>
-      </div>
-    </div>
-
-    <div class="flex justify-center mt-4">
-      <button 
-        (click)="checkKeywords()"
-        [disabled]="selectedWords.length === 0"
-        class="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 disabled:border-gray-500 disabled:transform-none text-white font-black text-2xl py-6 px-12 rounded-full shadow-xl border-b-8 border-emerald-700 active:border-b-0 active:translate-y-2 transition-all flex items-center gap-3">
-        <span>🚀</span> ACIONAR MOTOR DE BUSCA
+    <div class="p-8 flex flex-col items-center text-center gap-4">
+      <div class="text-6xl">{{ state.isCorrectGuess ? '🥳' : '🤖' }}</div>
+      <p class="text-xl font-medium text-gray-800">
+        {{ state.feedbackText }}
+      </p>
+      <button (click)="engine.nextStep()" 
+              class="mt-6 font-bold text-lg py-3 px-8 rounded-full shadow-md transition-all hover:scale-105 text-white"
+              [ngClass]="state.isCorrectGuess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'">
+        {{ state.isCorrectGuess ? 'Continuar Missão ➔' : 'Tentar Novamente ↺' }}
       </button>
     </div>
   </div>
-
 
   <!-- TELA DE VITÓRIA FINAL -->
-  <div *ngIf="gameFinished" class="bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center max-w-3xl mt-10">
+  <div *ngIf="state.gameFinished" class="bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center max-w-3xl mt-10">
     <div class="text-9xl mb-6">🏆</div>
     <h2 class="text-5xl font-black text-indigo-900 mb-6">Missão Cumprida!</h2>
-    <p class="text-2xl text-gray-700 mb-8 font-medium leading-relaxed">
-      Você dominou o painel da nave e aprendeu a usar o Filtro Mágico perfeitamente. A "Grande Teia" é um lugar melhor graças a exploradores como você!
+    <p class="text-2xl text-gray-700 font-medium mb-8 leading-relaxed">
+      Você dominou o painel de controle e aprendeu os segredos do Filtro Mágico! A Agência de Cyber Exploradores orgulha-se de ter você a bordo.
     </p>
-    <div class="bg-indigo-100 p-6 rounded-xl border-2 border-indigo-200 flex items-center justify-center gap-4">
-      <span class="text-4xl">🤖</span>
-      <p class="text-indigo-900 font-bold text-xl text-left">O T-B0T está muito orgulhoso. Você é oficialmente um Mestre da Pesquisa!</p>
-    </div>
-  </div>
-
-  <!-- MODAL DE FEEDBACK -->
-  <div *ngIf="displayMode === 'feedback'" class="fixed inset-0 bg-indigo-900/80 backdrop-blur-md flex justify-center items-center p-4 z-50">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full text-center transform transition-all" [ngClass]="isCorrectGuess ? 'border-8 border-emerald-500' : 'border-8 border-orange-500'">
-      <div class="text-8xl mb-6">{{ isCorrectGuess ? '✅' : '🤖' }}</div>
-      <h3 class="text-4xl font-black mb-4" [ngClass]="isCorrectGuess ? 'text-emerald-600' : 'text-orange-600'">
-        {{ isCorrectGuess ? 'Sistemas Ativados!' : 'Ops, Recruta!' }}
-      </h3>
-      <p class="text-2xl text-gray-800 font-medium mb-10 leading-relaxed">
-        {{ feedbackText }}
-      </p>
-      <button (click)="nextStep()" class="w-full py-5 text-white font-black text-2xl rounded-2xl shadow-lg border-b-8 active:border-b-0 active:translate-y-2 transition-all" [ngClass]="isCorrectGuess ? 'bg-emerald-500 hover:bg-emerald-600 border-emerald-700' : 'bg-orange-500 hover:bg-orange-600 border-orange-700'">
-        {{ isCorrectGuess ? 'Continuar Missão ➔' : 'Recalcular Rota' }}
-      </button>
+    <div class="inline-block bg-yellow-100 border-2 border-yellow-300 px-8 py-4 rounded-2xl">
+      <p class="text-yellow-800 font-bold text-xl uppercase tracking-widest">Patente Atualizada:</p>
+      <p class="text-4xl font-black text-yellow-600 mt-2">Mestre Navegador 🎖️</p>
     </div>
   </div>
 

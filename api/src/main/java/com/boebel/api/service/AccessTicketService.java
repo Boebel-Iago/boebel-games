@@ -49,6 +49,8 @@ public class AccessTicketService {
         AccessTicket accessTicket = AccessTicket.builder()
                 .teacher(teacher)
                 .code(generateRandomCode())
+                .ticketName(request.ticketName())
+                .notes(request.notes())
                 .maxUses(request.maxUses())
                 .grade(request.grade())
                 .game(game)
@@ -197,6 +199,8 @@ public class AccessTicketService {
         return new TicketResponseDTO(
                 ticket.getUuid(),
                 ticket.getCode(),
+                ticket.getTicketName(),
+                ticket.getNotes(),
                 ticket.getGrade(),
                 ticket.getGame().getTitle(),
                 ticket.getGame().getRoute(),

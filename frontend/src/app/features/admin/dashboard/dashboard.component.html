@@ -54,6 +54,16 @@
             <input type="number" formControlName="expirationHours" class="w-full px-4 py-2 border rounded-lg">
           </div>
 
+          <div>
+            <label class="block mb-1 text-sm font-semibold">Nome da Sala (Opcional)</label>
+            <input type="text" formControlName="ticketName" placeholder="Ex: Aula da Terça" class="w-full px-4 py-2 border rounded-lg">
+          </div>
+
+          <div>
+            <label class="block mb-1 text-sm font-semibold">Observações (Opcional)</label>
+            <textarea formControlName="notes" rows="2" placeholder="Ex: Focar no aluno João..." class="w-full px-4 py-2 border rounded-lg"></textarea>
+          </div>
+
           <button type="submit" [disabled]="ticketForm.invalid"
                   class="w-full py-3 bg-forest-900 hover:bg-forest-800 transition-colors text-white rounded-lg disabled:bg-gray-300">
             Criar Ingresso
@@ -80,12 +90,14 @@
                   {{ ticket.isActive ? 'Ativo' : 'Pausado' }}
                 </span>
                 <h4 class="font-bold text-lg text-gray-900">{{ ticket.gameTitle }}</h4>
+                <p *ngIf="ticket.ticketName" class="text-sm font-medium text-indigo-700 mt-1">{{ ticket.ticketName }}</p>
               </div>
               <code class="font-bold bg-gray-100 px-2 py-1 border rounded text-sm">{{ ticket.code }}</code>
             </div>
             
             <div class="text-sm text-gray-600 mb-4">
               <p>Turma: {{ formatGrade(ticket.grade) }}</p>
+              <p *ngIf="ticket.notes" class="text-xs italic mt-1 text-gray-500 bg-gray-50 p-2 rounded">"{{ ticket.notes }}"</p>
               <p>Alunos: {{ ticket.maxUses - ticket.remainingUses }}/{{ ticket.maxUses }}</p>
               <p class="mt-1 font-medium" [ngClass]="getTimeRemaining(ticket) === 'Expirado' ? 'text-red-600' : 'text-gray-500'">
                 ⏱️ {{ getTimeRemaining(ticket) }}
@@ -127,9 +139,17 @@
 
         <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ selectedTicket.code }}</code>
         
+        <div *ngIf="selectedTicket.ticketName" class="text-center mt-3 mb-1">
+          <span class="inline-block bg-indigo-100 text-indigo-800 text-sm font-bold px-3 py-1 rounded-full">{{ selectedTicket.ticketName }}</span>
+        </div>
+
         <p class="text-xs text-center mt-2" [ngClass]="selectedTicket.isActive ? 'text-gray-700' : 'text-yellow-800'">
           Turma: {{ formatGrade(selectedTicket.grade) }} | Vagas: {{ selectedTicket.remainingUses }}/{{ selectedTicket.maxUses }}
         </p>
+        
+        <div *ngIf="selectedTicket.notes" class="mt-3 bg-white/50 p-3 rounded text-sm text-gray-700 italic border border-gray-100">
+          "{{ selectedTicket.notes }}"
+        </div>
         
         <div *ngIf="!selectedTicket.isActive" class="bg-yellow-100 text-yellow-800 p-2 text-xs rounded mt-2 text-center">
           Os alunos estão bloqueados de entrar na sala até você reativar.

@@ -9,6 +9,8 @@ import java.util.UUID;
 public record TicketResponseDTO(
         UUID id,
         String code,
+        String ticketName,
+        String notes,
         String grade,
         String gameTitle,
         String gameRoute,

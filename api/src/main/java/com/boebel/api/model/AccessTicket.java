@@ -57,6 +57,18 @@ public class AccessTicket {
     @Column(name = "paused_at")
     private LocalDateTime pausedAt;
 
+    /**
+     * Nome personalizado do ingresso dado pelo professor (ex: "Aula de Terça").
+     */
+    @Column(name = "ticket_name", length = 100)
+    private String ticketName;
+
+    /**
+     * Observações livres do professor sobre este ingresso.
+     */
+    @Column(name = "notes", length = 500)
+    private String notes;
+
     @Column(name = "grade", nullable = false, length = 50)
     private String grade;
 

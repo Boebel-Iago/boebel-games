@@ -29,7 +29,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     grade: ['', Validators.required],
     gameId: [null, Validators.required],
     maxUses: [1, [Validators.required, Validators.min(1)]],
-    expirationHours: [24, [Validators.required, Validators.min(1)]]
+    expirationHours: [24, [Validators.required, Validators.min(1)]],
+    ticketName: ['', [Validators.maxLength(100)]],
+    notes: ['', [Validators.maxLength(500)]]
   });
 
   availableGrades: any[] = [];

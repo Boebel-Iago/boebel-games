@@ -20,6 +20,19 @@ export class GameService {
   
   private apiUrl = `${environment.apiBaseUrl}/api/tickets/sessions`; 
 
+  /**
+   * Atualiza o progresso da sessão do aluno no servidor, reportando falhas e avanço de fase.
+   * Caso o endpoint retorne HTTP 403, significa que o professor pausou ou deletou o ingresso
+   * associado a esta sessão. Nesse caso, a sessão local é limpa e o aluno volta à tela inicial.
+   * 
+   * Endpoint: PUT /api/tickets/sessions/{sessionId}/progress
+   * 
+   * @param {string} sessionId ID da sessão do aluno.
+   * @param {number} nextStage Próximo nível alcançado pelo aluno.
+   * @param {number} mistakes Quantidade de erros cometidos durante o último nível.
+   * @param {boolean} isFinished Indica se o aluno completou o jogo inteiro.
+   * @returns {Observable<any>} Confirmação da atualização de progresso.
+   */
   updateGameProgress(sessionId: string, nextStage: number, mistakes: number, isFinished: boolean): Observable<any> {
     const payload: ProgressUpdatePayload = {
       nextStage: nextStage,

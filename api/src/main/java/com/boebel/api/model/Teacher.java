@@ -15,6 +15,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Representa o perfil de Professor (Teacher) como usuário administrador.
+ * Implementa a interface {@link UserDetails} do Spring Security, garantindo
+ * acesso através de autenticação JWT com a permissão ROLE_ADMIN.
+ */
 @Entity
 @Table(name =  "teachers")
 @Data

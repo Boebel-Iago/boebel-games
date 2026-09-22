@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { GameService } from '../../core/services/game.service'; 
 
+/**
+ * Dados de progresso enviados pelo jogo para a camada de abstração de telemetria.
+ */
 export interface ProgressData {
   levelId: string;
   fase: number;
@@ -17,6 +20,15 @@ export class ProgressReporter {
 
   constructor(private gameService: GameService) {}
 
+  /**
+   * Processa eventos de telemetria emitidos por um jogo.
+   * Rastreia os erros do aluno localmente e, ao obter sucesso em um nível,
+   * despacha os dados consolidados via GameService para o backend.
+   * A flag isLastLevel determina se o jogo foi concluído, sem incrementar o nível.
+   * O currentStage é atualizado no sessionStorage (onde visualmente soma +1).
+   * 
+   * @param {ProgressData} data O payload de telemetria emitido pelo jogo.
+   */
   report(data: ProgressData): void {
     const sessionId = sessionStorage.getItem('sessionId');
     

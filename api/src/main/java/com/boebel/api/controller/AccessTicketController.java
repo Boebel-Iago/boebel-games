@@ -12,6 +12,12 @@ import com.boebel.api.repository.AccessTicketRepository;
 import com.boebel.api.repository.StudentSessionRepository;
 import com.boebel.api.repository.TeacherRepository;
 import com.boebel.api.service.AccessTicketService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Controlador principal responsável pela gestão de ingressos de acesso e sessões de alunos.
+ * Engloba rotas protegidas para professores (criação, edição e exclusão de ingressos) 
+ * e rotas públicas para os alunos (acesso ao jogo e atualização de progresso).
+ */
 @RestController
 @RequestMapping("/api/tickets")
 @RequiredArgsConstructor
+@Tags({
+    @Tag(name = "Ingressos - Professor", description = "Endpoints protegidos por JWT para gestão de ingressos de turma"),
+    @Tag(name = "Sessões - Aluno", description = "Endpoints públicos (sem JWT) para acesso e progresso dos alunos")
+})
 public class AccessTicketController {
 
     private final AccessTicketService accessTicketService;
@@ -35,9 +50,23 @@ public class AccessTicketController {
     private final AccessTicketRepository accessTicketRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Endpoint to generate a new code
+    /**
+     * Cria um novo ingresso (sala) para um jogo.
+     * Gera um código de 6 dígitos único para que os alunos possam acessar.
+     *
+     * @param ticketRequestDTO Dados necessários para a criação do ingresso, como o ID do jogo e configurações.
+     * @param principal O usuário (professor) autenticado que está realizando a requisição.
+     * @return Os dados do ingresso criado, incluindo o código gerado.
+     */
+    @Operation(summary = "Criar novo ingresso", description = "Gera um ingresso (sala) com um código de acesso para os alunos.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Ingresso criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou erro de negócio")
+    })
     @PostMapping
-    public ResponseEntity<?> createTicket(@RequestBody TicketRequestDTO ticketRequestDTO, Principal principal) {
+    public ResponseEntity<?> createTicket(
+            @Parameter(description = "Dados do novo ingresso a ser criado") @RequestBody TicketRequestDTO ticketRequestDTO, 
+            @Parameter(hidden = true) Principal principal) {
         try {
             String email = principal.getName();
             Teacher teacher = teacherRepository.findByEmail(email)
@@ -51,10 +80,18 @@ public class AccessTicketController {
         }
     }
 
-    // Endpoint for get active ticket for a Teacher
-    // MODIFIED: Get all active tickets for teacher
+    /**
+     * Retorna a lista de ingressos ativos de um professor.
+     *
+     * @param principal O usuário (professor) autenticado que está realizando a requisição.
+     * @return Lista com os dados resumidos dos ingressos atualmente ativos para o professor.
+     */
+    @Operation(summary = "Listar ingressos ativos", description = "Busca todos os ingressos atualmente ativos pertencentes ao professor logado.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de ingressos retornada com sucesso")
+    })
     @GetMapping("/active")
-    public ResponseEntity<List<TicketResponseDTO>> getActiveTickets(Principal principal) {
+    public ResponseEntity<List<TicketResponseDTO>> getActiveTickets(@Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -63,9 +100,24 @@ public class AccessTicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    // MODIFIED: Get sessions for a specific ticket code
+    /**
+     * Retorna as sessões de alunos atreladas a um ingresso específico.
+     * O professor deve ser o dono do ingresso para ter permissão.
+     *
+     * @param ticketCode Código do ingresso a ser consultado.
+     * @param principal O usuário (professor) autenticado.
+     * @return Uma lista de sessões de alunos contendo o progresso no jogo.
+     */
+    @Operation(summary = "Listar sessões de um ingresso", description = "Recupera todas as sessões e progressos dos alunos logados em um determinado ingresso/sala.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sessões retornadas com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Sem permissão para ver estas sessões"),
+            @ApiResponse(responseCode = "404", description = "Ingresso não encontrado")
+    })
     @GetMapping("/{ticketCode}/sessions")
-    public ResponseEntity<List<StudentSessionDTO>> getSessionsByTicket(@PathVariable String ticketCode, Principal principal) {
+    public ResponseEntity<List<StudentSessionDTO>> getSessionsByTicket(
+            @Parameter(description = "O código de acesso do ingresso") @PathVariable String ticketCode, 
+            @Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -87,10 +139,20 @@ public class AccessTicketController {
         return ResponseEntity.ok(sessions);
     }
 
-    // MODIFIED: Reuse existing session if student re-enters with same name + code
-    // Now properly validates ticket (active, not expired, max uses) via service
+    /**
+     * Valida um código de ingresso e permite a entrada de um aluno.
+     * Retorna a sessão criada ou recuperada para que o aluno possa (re)iniciar de onde parou.
+     *
+     * @param request Dados enviados pelo aluno, contendo o nome e o código de ingresso.
+     * @return Os dados da sessão, como ID, rota do jogo e fase atual.
+     */
+    @Operation(summary = "Validar ingresso e ingressar no jogo", description = "Valida o código informado pelo aluno. Se válido e com vagas, cria uma nova sessão anônima, ou retoma uma já existente com o mesmo nome. Além disso, transmite via WebSocket a atualização de status para o professor.", tags = {"Sessões - Aluno"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Acesso concedido e sessão retornada"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado (sala pausada, expirada, cheia ou código inválido)")
+    })
     @PostMapping("/validate")
-    public ResponseEntity<?> validateTicketAndJoin(@RequestBody JoinGameRequestDTO request) {
+    public ResponseEntity<?> validateTicketAndJoin(@Parameter(description = "Requisição contendo nome do aluno e código do ingresso") @RequestBody JoinGameRequestDTO request) {
 
         AccessTicket ticket = accessTicketRepository.findByCode(request.ticketCode())
                 .orElseThrow(() -> new RuntimeException("Código inválido ou não encontrado!"));
@@ -149,9 +211,22 @@ public class AccessTicketController {
         return ResponseEntity.ok(response);
     }
 
-    // MODIFIED: Also delete all sessions when ticket is deleted
+    /**
+     * Exclui um ingresso e todas as sessões de alunos a ele vinculadas.
+     * 
+     * @param id O identificador do ingresso a ser deletado.
+     * @param principal O usuário (professor) logado.
+     * @return Resposta sem conteúdo (204) em caso de sucesso.
+     */
+    @Operation(summary = "Excluir ingresso", description = "Deleta fisicamente um ingresso de turma e todas as sessões de alunos relacionadas. Apenas o professor dono do ingresso pode realizar esta ação.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Ingresso excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Ingresso não encontrado")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTicket(@PathVariable UUID id, Principal principal) {
+    public ResponseEntity<Void> deleteTicket(
+            @Parameter(description = "ID do ingresso") @PathVariable UUID id, 
+            @Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -167,11 +242,24 @@ public class AccessTicketController {
         return ResponseEntity.noContent().build();
     }
 
-    // NEW: Extend ticket expiration time
+    /**
+     * Estende a validade de um ingresso ativo adicionando horas extras.
+     *
+     * @param id O identificador do ingresso.
+     * @param body Mapa contendo a chave 'additionalHours' com a quantidade de horas a serem adicionadas.
+     * @param principal O usuário (professor) logado.
+     * @return O ingresso atualizado com a nova data de expiração.
+     */
+    @Operation(summary = "Estender duração do ingresso", description = "Adiciona mais horas à validade do ingresso (padrão: 1 hora a mais). Apenas o dono pode fazer isso.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ingresso estendido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Ingresso não encontrado")
+    })
     @PutMapping("/{id}/extend")
-    public ResponseEntity<?> extendTicket(@PathVariable UUID id,
-                                          @RequestBody Map<String, Integer> body,
-                                          Principal principal) {
+    public ResponseEntity<?> extendTicket(
+            @Parameter(description = "ID do ingresso") @PathVariable UUID id,
+            @Parameter(description = "Objeto JSON contendo 'additionalHours'") @RequestBody Map<String, Integer> body,
+            @Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -181,9 +269,21 @@ public class AccessTicketController {
         return ResponseEntity.ok(updated);
     }
 
-    // NEW: Toggle ticket status (Pause/Resume)
+    /**
+     * Alterna o status (ativo/pausado) de um ingresso.
+     *
+     * @param id O identificador do ingresso.
+     * @param principal O usuário (professor) logado.
+     * @return O ingresso com o status atualizado.
+     */
+    @Operation(summary = "Pausar/Retomar ingresso", description = "Ativa ou pausa a entrada de alunos na sala (ingresso). Salas pausadas negam novos logins ou o progresso de sessões existentes.", tags = {"Ingressos - Professor"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Status do ingresso alterado com sucesso")
+    })
     @PutMapping("/{id}/toggle-status")
-    public ResponseEntity<?> toggleTicketStatus(@PathVariable UUID id, Principal principal) {
+    public ResponseEntity<?> toggleTicketStatus(
+            @Parameter(description = "ID do ingresso") @PathVariable UUID id, 
+            @Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         Teacher teacher = teacherRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
@@ -194,9 +294,21 @@ public class AccessTicketController {
 
     // MODIFIED: Broadcast via WebSocket after updating progress
     
-    // NEW: Verifica se a sessão do aluno ainda é de um ticket ativo e válido (Proteção F5)
+    /**
+     * Verifica se a sessão do aluno ainda é de um ingresso ativo e válido.
+     * Útil para proteções contra reload da página (F5) pelo aluno.
+     *
+     * @param sessionId O identificador da sessão anônima do aluno.
+     * @return Confirmação de status válido ou uma mensagem de erro caso expirado/pausado.
+     */
+    @Operation(summary = "Checar status da sessão", description = "Verifica se a sessão do aluno ainda é permitida para continuar, conferindo a validade e status do ingresso pai.", tags = {"Sessões - Aluno"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sessão válida"),
+            @ApiResponse(responseCode = "403", description = "Sessão ou ingresso inválido/pausado/expirado")
+    })
     @GetMapping("/sessions/{sessionId}/status")
-    public ResponseEntity<?> checkSessionStatus(@PathVariable UUID sessionId) {
+    public ResponseEntity<?> checkSessionStatus(
+            @Parameter(description = "ID da sessão do aluno") @PathVariable UUID sessionId) {
         StudentSession session = studentSessionRepository.findById(sessionId).orElse(null);
         if (session == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Sessão não encontrada"));
@@ -218,10 +330,23 @@ public class AccessTicketController {
         return ResponseEntity.ok(Map.of("status", "valid"));
     }
 
+    /**
+     * Atualiza o progresso da sessão do aluno de acordo com o desempenho na fase do jogo.
+     * Notifica os professores via WebSocket em tempo real.
+     *
+     * @param sessionId O ID da sessão do aluno.
+     * @param request Dados contendo a fase atual e erros cometidos pelo aluno.
+     * @return Resposta indicando sucesso sem conteúdo adicional.
+     */
+    @Operation(summary = "Atualizar progresso da sessão", description = "Salva o progresso de uma sessão do aluno (fase alcançada, número de erros cometidos) e dispara evento WebSocket para o dashboard do professor. O currentStage salva é 0-indexado.", tags = {"Sessões - Aluno"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Progresso atualizado com sucesso e notificação disparada"),
+            @ApiResponse(responseCode = "403", description = "Sessão inválida, pausada ou expirada")
+    })
     @PutMapping("/sessions/{sessionId}/progress")
     public ResponseEntity<?> updateProgress(
-            @PathVariable UUID sessionId,
-            @RequestBody ProgressUpdateRequestDTO request) {
+            @Parameter(description = "ID da sessão do aluno") @PathVariable UUID sessionId,
+            @Parameter(description = "Objeto contendo a próxima fase e erros cometidos no nível anterior") @RequestBody ProgressUpdateRequestDTO request) {
 
         StudentSession session = studentSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada!"));

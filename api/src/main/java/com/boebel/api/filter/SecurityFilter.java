@@ -17,6 +17,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro de segurança customizado executado uma vez por requisição (OncePerRequestFilter).
+ * Encarregado de extrair e validar o token Bearer JWT do cabeçalho da requisição,
+ * configurando a corrente do filtro (filter chain) com o contexto de autenticação do professor.
+ */
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 

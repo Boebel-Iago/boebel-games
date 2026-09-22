@@ -8,6 +8,10 @@ import java.util.UUID;
 
 @Data // LOMBOK: Cria getters, setters, toString, equals e hashCode
 @NoArgsConstructor // LOMBOK: Construtor vazio para o JPA
+/**
+ * Representa a sessão anônima de um aluno, garantindo o rastreamento do seu progresso
+ * seguindo os princípios de Privacy by Design (sem armazenar dados sensíveis PII).
+ */
 @Entity
 @Table(name = "student_sessions")
 public class StudentSession {
@@ -25,6 +29,10 @@ public class StudentSession {
     @Column(nullable = false)
     private String gameRoute;
 
+    /**
+     * O estágio atual do aluno no jogo. 
+     * Observação: é indexado em 0 no banco de dados, mas exibido como +1 na UI.
+     */
     private int currentStage = 0;
 
     private int totalMistakes = 0;

@@ -16,6 +16,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Entidade que representa uma entrada de jogo no catálogo da plataforma educacional.
+ * Define informações como título, descrição, rota para acesso e séries permitidas.
+ */
 @Entity
 @Table(name = "games")
 @NoArgsConstructor
@@ -37,7 +41,10 @@ public class Game {
     @Column(nullable = false, unique = true)
     private String route;
 
-    // O JPA criará uma tabela auxiliar oculta chamada "game_allowed_grades"
+    /**
+     * Lista de séries escolares permitidas para este jogo.
+     * O JPA criará uma tabela auxiliar oculta chamada "game_allowed_grades" no banco de dados.
+     */
     @ElementCollection
     @CollectionTable(name = "game_allowed_grades", joinColumns = @JoinColumn(name = "game_id"))
     @Column(name = "grade_name")

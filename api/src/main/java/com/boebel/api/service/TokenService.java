@@ -12,12 +12,23 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+/**
+ * Serviço encarregado da geração e validação de tokens JWT para autenticação dos professores.
+ * Utiliza o algoritmo HMAC256 para assinar o token.
+ */
 @Service
 public class TokenService {
 
     @Value("${app.security.token.secret}")
     private String secret;
 
+    /**
+     * Gera um novo token JWT para o professor autenticado.
+     * O token possui validade de 2 horas e utiliza o ZoneOffset -03:00 (Brasil).
+     * @param teacher o professor para o qual o token será gerado.
+     * @return a string representando o token JWT gerado.
+     * @throws RuntimeException caso ocorra um erro (JWTCreationException) durante a criação.
+     */
     public String generateToken(Teacher teacher) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);

@@ -7,6 +7,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Semeador do banco de dados (Seeder) executado na inicialização da aplicação.
+ * Responsável por garantir (auto-seeding) que o usuário administrador e o catálogo de jogos
+ * estejam criados no sistema, lendo credenciais de variáveis de ambiente.
+ */
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
 

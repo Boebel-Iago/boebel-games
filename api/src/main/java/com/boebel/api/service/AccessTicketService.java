@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável por gerenciar o ciclo de vida dos bilhetes de acesso (AccessTicket).
+ * Inclui geração, extensão de validade, exclusão e o controle de status (pausado/ativo)
+ * que implementa um algoritmo de compensação temporal.
+ */
 @Service
 public class AccessTicketService {
 
@@ -100,6 +105,17 @@ public class AccessTicketService {
         return toDTO(ticket);
     }
 
+    /**
+     * Alterna o status do bilhete entre ativo e pausado.
+     * Implementa um algoritmo de compensação temporal: se o bilhete for pausado, salva o momento exato;
+     * ao ser reativado, calcula a duração da pausa (utilizando Duration.between) e estende a data de
+     * expiração original, compensando o tempo em que o bilhete ficou congelado.
+     * @param ticketId o UUID do bilhete a ser alternado.
+     * @param teacher o professor que está alterando o status (deve ser o proprietário).
+     * @return o DTO do bilhete atualizado.
+     * @throws RuntimeException se o bilhete não for encontrado.
+     * @throws SecurityException se o professor não for o proprietário do bilhete.
+     */
     public TicketResponseDTO toggleTicketStatus(UUID ticketId, Teacher teacher) {
         AccessTicket ticket = accessTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ingresso não encontrado!"));

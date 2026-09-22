@@ -16,6 +16,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Representa um bilhete de acesso (AccessTicket) efêmero para uma sala de aula.
+ * O bilhete é criado pelo professor e não armazena dados de identificação pessoal (PII) dos alunos (Privacy by Design).
+ * Controla os usos, validade e permite compensação temporal em caso de pausa.
+ */
 @Entity
 @Table(name = "access_tickets")
 @NoArgsConstructor
@@ -45,6 +50,10 @@ public class AccessTicket {
     @Builder.Default
     private Boolean isActive = true;
 
+    /**
+     * Armazena o momento exato em que o professor pausa a sala de aula.
+     * Utilizado para realizar a compensação temporal da validade do bilhete.
+     */
     @Column(name = "paused_at")
     private LocalDateTime pausedAt;
 

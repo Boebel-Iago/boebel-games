@@ -4,6 +4,15 @@ import { TicketService } from '../services/ticket.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
+/**
+ * Guarda de rotas responsável por proteger as URLs de acesso aos jogos.
+ * Garante o fluxo de 5 etapas de validação:
+ * 1. Verifica se é modo demonstração (Professor logado com JWT e url tem demo=1).
+ * 2. Verifica a persistência do modo de demonstração via sessionStorage.
+ * 3. Valida a existência do activeGameRoute e do sessionId no sessionStorage (indicando que validou o ticket localmente).
+ * 4. Assegura que o jogo acessado corresponde à rota autorizada pelo ticket.
+ * 5. Faz a validação final (server-side) questionando a API se o ticket da sessão continua ativo (não pausado/expirado).
+ */
 export const ticketGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const ticketService = inject(TicketService);

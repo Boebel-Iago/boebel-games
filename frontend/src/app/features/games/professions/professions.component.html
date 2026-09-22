@@ -1,345 +1,80 @@
 <div class="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50 flex flex-col items-center py-6 font-sans px-4 relative">
 
-
-
   <!-- ═══════ HEADER COM MISSÃO ATUAL ═══════ -->
-  <div *ngIf="displayMode !== 'finished'" class="w-full max-w-5xl flex justify-between items-center mb-6 border-b-2 border-indigo-200 pb-4">
+  <div *ngIf="state.displayMode !== 'finished'" class="w-full max-w-5xl flex justify-between items-center mb-6 border-b-2 border-indigo-200 pb-4">
     <div>
       <h2 class="text-2xl md:text-3xl font-bold text-indigo-900">Missão {{ currentMission.id }}: {{ currentMission.title }}</h2>
       <p class="text-gray-500 font-medium text-base md:text-lg">{{ currentMission.subtitle }}</p>
     </div>
     <div class="text-right">
       <span class="bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow text-sm">
-        Missão {{ currentMissionIndex + 1 }} de {{ missions.length }}
+        Missão {{ state.currentMissionIndex + 1 }} de {{ missionsLength }}
       </span>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  BRIEFING / DEBRIEFING (Professora Ada)     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'briefing' || displayMode === 'mission-complete'"
-       class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 md:p-10 border-4 border-indigo-200 flex flex-col items-center text-center">
+  <app-professions-briefing *ngIf="state.displayMode === 'briefing' || state.displayMode === 'mission-complete'"></app-professions-briefing>
 
-    <!-- Avatar Ada -->
-    <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-indigo-100 flex items-center justify-center mb-4 border-4 border-indigo-300 shadow-lg">
-      <span class="text-5xl md:text-6xl">👩‍🏫</span>
-    </div>
-
-    <h3 class="text-lg font-bold text-indigo-600 mb-2">Professora Ada</h3>
-
-    <!-- Balão de diálogo -->
-    <div class="bg-indigo-50 rounded-2xl p-6 md:p-8 w-full mb-6 border-2 border-indigo-100 relative">
-      <p class="text-lg md:text-xl text-gray-800 leading-relaxed font-medium">
-        {{ currentDialogue?.text }}
-      </p>
-    </div>
-
-    <button (click)="advanceDialogue()"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-colors">
-      {{ displayMode === 'mission-complete' && currentDialogueIndex >= currentMission.debriefing.length - 1
-         ? (currentMissionIndex >= missions.length - 1 ? '🏆 Ver Diploma' : '➔ Próxima Missão')
-         : 'Continuar ➔' }}
-    </button>
-  </div>
+  <app-tool-match *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'tool-match' && !state.isHwSwChallenge"></app-tool-match>
+  <app-hw-sw-challenge *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'tool-match' && state.isHwSwChallenge && state.currentHwSwChallenge"></app-hw-sw-challenge>
+  
+  <app-software-identify *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'software-identify'"></app-software-identify>
+  
+  <app-category-sort *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'category-sort'"></app-category-sort>
+  
+  <app-drag-drop *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'drag-drop'"></app-drag-drop>
 
   <!-- ═══════════════════════════════════════════ -->
-  <!--  MISSÃO 1: TOOL MATCH                       -->
+  <!--  TELA FINAL DE VITÓRIA                      -->
   <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'gameplay' && currentMission.type === 'tool-match' && !isHwSwChallenge"
-       class="w-full max-w-4xl flex flex-col md:flex-row gap-8 items-center justify-center">
-
-    <!-- O Profissional -->
-    <div class="bg-white p-8 rounded-3xl shadow-xl border-4 border-blue-100 flex flex-col items-center w-full md:w-1/3">
-      <ng-container *ngIf="professions[currentTaskIndex].icon.includes('/')">
-        <img [src]="professions[currentTaskIndex].icon" class="w-48 h-48 md:w-56 md:h-56 object-cover rounded-2xl shadow-md mb-4 border-4 border-white" alt="Profissão">
-      </ng-container>
-      <h3 class="text-2xl font-black text-gray-800">{{ professions[currentTaskIndex].name }}</h3>
-      <p class="text-sm text-gray-500 mt-1">Qual ferramenta este profissional usa?</p>
-    </div>
-
-    <div class="hidden md:block text-5xl text-gray-300 font-bold">➔</div>
-
-    <!-- Opções de Ferramenta (4 opções) -->
-    <div class="w-full md:w-2/3 grid grid-cols-2 gap-4">
-      <button *ngFor="let tool of currentOptions" (click)="checkTool(tool)"
-              class="bg-white p-4 md:p-6 rounded-2xl shadow-md border-2 border-gray-200 hover:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col items-center cursor-pointer">
-        <ng-container *ngIf="tool.icon.includes('/')">
-          <img [src]="tool.icon" class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-xl shadow-md mb-3 border-2 border-gray-100" alt="Ferramenta">
-        </ng-container>
-        <ng-container *ngIf="!tool.icon.includes('/')">
-          <span class="text-6xl md:text-7xl mb-3 drop-shadow">{{ tool.icon }}</span>
-        </ng-container>
-        <span class="font-bold text-gray-700 text-sm md:text-base text-center">{{ tool.name }}</span>
-      </button>
+  <div *ngIf="state.displayMode === 'finished'" class="bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center max-w-3xl mt-10">
+    <div class="text-9xl mb-6">🏆</div>
+    <h2 class="text-4xl md:text-5xl font-black text-indigo-900 mb-6">Parabéns, {{ studentName }}!</h2>
+    <p class="text-xl md:text-2xl text-gray-700 font-medium mb-8 leading-relaxed">
+      Você completou o treinamento e se formou na <br><span class="font-bold text-indigo-600">Academia de Talentos Digitais!</span>
+    </p>
+    <div class="inline-block bg-yellow-100 border-2 border-yellow-300 px-8 py-4 rounded-2xl shadow-inner">
+      <p class="text-yellow-800 font-bold text-lg md:text-xl uppercase tracking-widest">Sua Patente Atual:</p>
+      <p class="text-3xl md:text-4xl font-black text-yellow-600 mt-2">Mestre da Tecnologia 🏅</p>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  MISSÃO 1: DESAFIO HW/SW                   -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'gameplay' && currentMission.type === 'tool-match' && isHwSwChallenge && currentHwSwChallenge"
-       class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 border-4 border-yellow-200 flex flex-col items-center text-center">
-
-    <div class="bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-bold text-sm mb-4">⚡ Desafio Ada</div>
-
-    <ng-container *ngIf="currentHwSwChallenge.icon.includes('/')">
-      <img [src]="currentHwSwChallenge.icon" class="w-32 h-32 object-cover rounded-2xl shadow-md mb-4 border-4 border-yellow-100" alt="Item">
-    </ng-container>
-
-    <p class="text-xl md:text-2xl font-bold text-gray-800 mb-8">{{ currentHwSwChallenge.question }}</p>
-
-    <div class="flex w-full gap-4 md:gap-8">
-      <button (click)="checkHwSw('HARDWARE')"
-              class="flex-1 bg-gray-600 hover:bg-gray-700 text-white p-6 rounded-2xl shadow-lg border-b-4 border-gray-800 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center">
-        <span class="text-4xl mb-2">⚙️</span>
-        <span class="text-xl font-black uppercase">Hardware</span>
-        <span class="text-xs mt-1 opacity-80">Parte Física</span>
-      </button>
-      <button (click)="checkHwSw('SOFTWARE')"
-              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center">
-        <span class="text-4xl mb-2">💻</span>
-        <span class="text-xl font-black uppercase">Software</span>
-        <span class="text-xs mt-1 opacity-80">Parte Lógica</span>
-      </button>
-    </div>
-  </div>
 
   <!-- ═══════════════════════════════════════════ -->
-  <!--  MISSÃO 2: SOFTWARE IDENTIFY                -->
+  <!--  MODAL DE FEEDBACK (SOBREPOSTO)             -->
   <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'gameplay' && currentMission.type === 'software-identify'"
-       class="w-full max-w-3xl flex flex-col items-center gap-6">
-
-    <!-- Profissional -->
-    <div class="bg-white w-full p-8 rounded-3xl shadow-xl border-4 border-purple-100 flex flex-col md:flex-row items-center gap-6">
-      <ng-container *ngIf="softwareTasks[currentTaskIndex].professionIcon.includes('/')">
-        <img [src]="softwareTasks[currentTaskIndex].professionIcon" class="w-36 h-36 object-cover rounded-2xl shadow-md border-4 border-white" alt="Profissional">
-      </ng-container>
-      <div class="text-center md:text-left">
-        <h3 class="text-xl font-black text-gray-800 mb-2">{{ softwareTasks[currentTaskIndex].professionName }}</h3>
-        <p class="text-lg text-gray-600 font-medium">{{ softwareTasks[currentTaskIndex].question }}</p>
+  <div *ngIf="state.showFeedbackModal" class="fixed inset-0 bg-gray-900/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-100 transition-transform">
+      <div class="p-6 text-white text-center font-bold text-xl"
+           [ngClass]="state.isCorrectGuess ? 'bg-emerald-500' : 'bg-red-500'">
+        <span class="text-3xl mr-2">{{ state.isCorrectGuess ? '✅' : '❌' }}</span>
+        {{ state.isCorrectGuess ? 'EXCELENTE!' : 'Ainda não...' }}
       </div>
-    </div>
 
-    <!-- Opções de Software -->
-    <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-3">
-      <button *ngFor="let opt of currentSoftwareOptions" (click)="checkSoftwareAnswer(opt)"
-              class="bg-white p-5 rounded-2xl shadow-md border-2 border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all cursor-pointer text-left">
-        <span class="text-lg font-bold text-gray-700 flex items-center gap-3">
-          <span class="text-2xl">💿</span> {{ opt }}
-        </span>
-      </button>
-    </div>
-  </div>
+      <div class="p-8 text-center flex flex-col gap-4 relative">
+        <button *ngIf="!state.isCorrectGuess" (click)="engine.nextStep()"
+                class="absolute top-2 right-4 text-gray-400 hover:text-gray-700 font-bold text-2xl">&times;</button>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  MISSÃO 3: TRABALHO / ESTUDO / LAZER        -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'gameplay' && currentMission.type === 'category-sort'"
-       class="w-full max-w-3xl flex flex-col items-center gap-6">
+        <p class="text-xl font-medium text-gray-800 leading-relaxed mb-4">
+          {{ state.feedbackText }}
+        </p>
 
-    <!-- Barra de Energia -->
-    <div class="w-full bg-white rounded-2xl shadow p-4 flex items-center gap-3">
-      <span class="text-lg">⚡</span>
-      <div class="flex-1 bg-gray-200 rounded-full h-4">
-        <div class="bg-gradient-to-r from-yellow-400 to-green-400 h-4 rounded-full transition-all duration-500"
-             [style.width.%]="totalEnergyBlocks > 0 ? (energyBlocks / totalEnergyBlocks * 100) : 0"></div>
-      </div>
-      <span class="text-sm font-bold text-gray-600">{{ energyBlocks }}/{{ totalEnergyBlocks }}</span>
-    </div>
-
-    <!-- O Cenário -->
-    <div class="bg-white w-full p-8 rounded-3xl shadow-xl border-4 border-emerald-100 flex flex-col md:flex-row items-center text-center md:text-left gap-6">
-      <ng-container *ngIf="scenarios[currentTaskIndex].icon.includes('/')">
-        <img [src]="scenarios[currentTaskIndex].icon" class="w-36 h-36 object-cover rounded-2xl shadow-md border-4 border-white" alt="Cenário">
-      </ng-container>
-      <ng-container *ngIf="!scenarios[currentTaskIndex].icon.includes('/')">
-        <span class="text-7xl drop-shadow-md">{{ scenarios[currentTaskIndex].icon }}</span>
-      </ng-container>
-      <h3 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
-        {{ scenarios[currentTaskIndex].description }}
-      </h3>
-    </div>
-
-    <!-- 3 Botões Gigantes -->
-    <div class="flex w-full gap-3 md:gap-6">
-      <button (click)="checkScenario('TRABALHO')"
-              class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-2xl shadow-lg border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center">
-        <span class="text-4xl mb-1">💼</span>
-        <span class="text-lg md:text-xl font-black uppercase">Trabalho</span>
-      </button>
-      <button (click)="checkScenario('ESTUDO')"
-              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center">
-        <span class="text-4xl mb-1">📚</span>
-        <span class="text-lg md:text-xl font-black uppercase">Estudo</span>
-      </button>
-      <button (click)="checkScenario('LAZER')"
-              class="flex-1 bg-orange-500 hover:bg-orange-600 text-white p-6 rounded-2xl shadow-lg border-b-4 border-orange-700 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center">
-        <span class="text-4xl mb-1">🎮</span>
-        <span class="text-lg md:text-xl font-black uppercase">Lazer</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  MISSÃO 4: DRAG & DROP                     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'gameplay' && currentMission.type === 'drag-drop'"
-       class="w-full max-w-5xl flex flex-col gap-6">
-
-    <div class="text-center">
-      <span class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full font-bold text-sm">
-        Rodada {{ phase3Level }} de {{ phase3Data.length }}
-      </span>
-    </div>
-
-    <!-- Itens não classificados -->
-    <div class="bg-white rounded-2xl shadow-lg p-4 border-2 border-gray-200 min-h-[80px]"
-         cdkDropList [cdkDropListData]="unassignedItems" (cdkDropListDropped)="drop($event)"
-         id="unassigned-list"
-         [cdkDropListConnectedTo]="['work-list', 'study-list', 'leisure-list']">
-      <h4 class="font-bold text-gray-500 text-sm mb-3 uppercase tracking-wider">📦 Arraste para as colunas abaixo</h4>
-      <div class="flex flex-wrap gap-2">
-        <div *ngFor="let item of unassignedItems" cdkDrag
-             class="bg-indigo-50 border-2 border-indigo-200 rounded-xl px-4 py-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow flex items-center gap-2">
-          <span class="text-xl">{{ item.icon }}</span>
-          <span class="font-medium text-gray-700 text-sm">{{ item.name }}</span>
+        <!-- Explicação HW/SW (apenas na fase 1 se acertar) -->
+        <div *ngIf="state.isCorrectGuess && state.feedbackHardware" class="bg-gray-50 p-4 rounded-xl text-left border-l-4 border-indigo-500 text-sm mb-2">
+          <p class="font-bold text-indigo-700 mb-1">⚙️ Hardware (Físico):</p>
+          <p class="text-gray-700">{{ state.feedbackHardware }}</p>
         </div>
-      </div>
-    </div>
-
-    <!-- 3 Colunas de destino -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Trabalho -->
-      <div class="bg-emerald-50 rounded-2xl shadow-lg p-4 border-2 border-emerald-300 min-h-[200px]"
-           cdkDropList [cdkDropListData]="workColumn" (cdkDropListDropped)="drop($event)"
-           id="work-list"
-           [cdkDropListConnectedTo]="['unassigned-list', 'study-list', 'leisure-list']">
-        <h4 class="font-black text-emerald-700 text-center mb-3 flex items-center justify-center gap-2">
-          <span class="text-2xl">💼</span> TRABALHO
-        </h4>
-        <div class="flex flex-col gap-2">
-          <div *ngFor="let item of workColumn" cdkDrag
-               class="bg-white border-2 border-emerald-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
-            <span>{{ item.icon }}</span>
-            <span class="font-medium text-sm text-gray-700">{{ item.name }}</span>
-          </div>
+        <div *ngIf="state.isCorrectGuess && state.feedbackSoftware" class="bg-blue-50 p-4 rounded-xl text-left border-l-4 border-blue-500 text-sm">
+          <p class="font-bold text-blue-700 mb-1">💻 Software (Lógico):</p>
+          <p class="text-gray-700">{{ state.feedbackSoftware }}</p>
         </div>
+
+        <button (click)="engine.nextStep()"
+                class="w-full mt-4 py-4 rounded-xl font-bold text-lg text-white shadow-md transition-all active:scale-95"
+                [ngClass]="state.isCorrectGuess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'">
+          {{ state.isCorrectGuess ? 'Continuar Missão ➔' : 'Tentar Novamente ↺' }}
+        </button>
       </div>
-
-      <!-- Estudo -->
-      <div class="bg-blue-50 rounded-2xl shadow-lg p-4 border-2 border-blue-300 min-h-[200px]"
-           cdkDropList [cdkDropListData]="studyColumn" (cdkDropListDropped)="drop($event)"
-           id="study-list"
-           [cdkDropListConnectedTo]="['unassigned-list', 'work-list', 'leisure-list']">
-        <h4 class="font-black text-blue-700 text-center mb-3 flex items-center justify-center gap-2">
-          <span class="text-2xl">📚</span> ESTUDO
-        </h4>
-        <div class="flex flex-col gap-2">
-          <div *ngFor="let item of studyColumn" cdkDrag
-               class="bg-white border-2 border-blue-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
-            <span>{{ item.icon }}</span>
-            <span class="font-medium text-sm text-gray-700">{{ item.name }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lazer -->
-      <div class="bg-orange-50 rounded-2xl shadow-lg p-4 border-2 border-orange-300 min-h-[200px]"
-           cdkDropList [cdkDropListData]="leisureColumn" (cdkDropListDropped)="drop($event)"
-           id="leisure-list"
-           [cdkDropListConnectedTo]="['unassigned-list', 'work-list', 'study-list']">
-        <h4 class="font-black text-orange-700 text-center mb-3 flex items-center justify-center gap-2">
-          <span class="text-2xl">🎮</span> LAZER
-        </h4>
-        <div class="flex flex-col gap-2">
-          <div *ngFor="let item of leisureColumn" cdkDrag
-               class="bg-white border-2 border-orange-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
-            <span>{{ item.icon }}</span>
-            <span class="font-medium text-sm text-gray-700">{{ item.name }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Erro e botão de verificar -->
-    <div *ngIf="showDragError" class="bg-red-100 border-2 border-red-300 rounded-xl p-4 text-center">
-      <p class="text-red-700 font-bold">🤔 Ops! Alguns itens estão na coluna errada. Revise!</p>
-    </div>
-
-    <button (click)="checkPhase3Answers()"
-            [disabled]="unassignedItems.length > 0"
-            class="w-full py-4 rounded-xl font-bold text-lg shadow-md transition-colors"
-            [ngClass]="unassignedItems.length > 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'">
-      {{ unassignedItems.length > 0 ? 'Arraste todos os itens primeiro...' : '✓ Verificar Respostas' }}
-    </button>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  TELA DE DIPLOMA FINAL                     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="displayMode === 'finished'" class="w-full max-w-2xl bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center mt-6">
-    <div class="text-8xl mb-4">🏆</div>
-    <h2 class="text-3xl md:text-4xl font-black text-indigo-900 mb-4">Diploma de Formatura</h2>
-    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-8 border-2 border-yellow-200 mb-6">
-      <p class="text-lg text-gray-600 mb-2">A Academia de Talentos Digitais certifica que</p>
-      <p class="text-3xl font-black text-indigo-800 mb-2">{{ studentName }}</p>
-      <p class="text-lg text-gray-600">completou com sucesso todas as 4 missões e é agora um(a)</p>
-      <p class="text-2xl font-black text-amber-600 mt-2">🌟 Especialista em Tecnologia e Profissões 🌟</p>
-    </div>
-    <p class="text-gray-500 italic">Professora Ada • Academia de Talentos Digitais • 2026</p>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!--  MODAL DE FEEDBACK (Todas as Missões)       -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div *ngIf="showFeedbackModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl max-w-2xl w-full text-center transform transition-all flex flex-col items-center"
-         [ngClass]="isCorrectGuess ? 'border-4 border-green-500' : 'border-4 border-red-500'">
-
-      <div class="text-6xl md:text-7xl mb-2">
-        {{ isCorrectGuess ? '🌟' : '🤔' }}
-      </div>
-
-      <h3 class="text-2xl md:text-3xl font-black mb-2"
-          [ngClass]="isCorrectGuess ? 'text-green-600' : 'text-red-600'">
-        {{ isCorrectGuess ? 'Correto!' : 'Quase lá...' }}
-      </h3>
-
-      <p class="text-lg md:text-xl text-gray-700 font-medium mb-6">
-        {{ feedbackText }}
-      </p>
-
-      <!-- Destaque pedagógico HW/SW (Aparece apenas em missões 1 e 3) -->
-      <div *ngIf="isCorrectGuess && feedbackHardware && feedbackSoftware" class="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
-        <div class="bg-gray-100 border-l-8 border-gray-500 p-4 rounded-r-xl shadow-sm">
-          <h4 class="font-black text-gray-800 text-lg flex items-center gap-2 uppercase tracking-wide">
-            <span>⚙️</span> Hardware
-          </h4>
-          <p class="text-sm text-gray-600 font-medium mt-1 leading-relaxed">
-            A parte física que podemos tocar.
-            <br/><span class="text-gray-900 font-bold">{{ feedbackHardware }}</span>
-          </p>
-        </div>
-        <div class="bg-blue-50 border-l-8 border-blue-500 p-4 rounded-r-xl shadow-sm">
-          <h4 class="font-black text-blue-900 text-lg flex items-center gap-2 uppercase tracking-wide">
-            <span>💻</span> Software
-          </h4>
-          <p class="text-sm text-emerald-800 font-medium mt-1 leading-relaxed">
-            A parte lógica, o programa que roda dentro.
-            <br/><span class="text-blue-950 font-bold">{{ feedbackSoftware }}</span>
-          </p>
-        </div>
-      </div>
-
-      <button (click)="nextStep()"
-              class="w-full max-w-sm py-4 text-white font-bold text-xl rounded-xl shadow-md transition-colors"
-              [ngClass]="isCorrectGuess ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'">
-        {{ isCorrectGuess ? 'Continuar ➔' : 'Tentar Novamente' }}
-      </button>
     </div>
   </div>
 

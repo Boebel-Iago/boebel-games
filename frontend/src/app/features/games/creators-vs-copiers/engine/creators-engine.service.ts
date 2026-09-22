@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CreatorsContentService } from '../content/creators-content.service';
-import { CreatorsMission, LicenseTask, PlagiarismTask } from '../content/models';
+import { CreatorsMission, LicenseTask, PlagiarismTask, DragDropItem, AuditTask } from '../content/models';
 import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
 export interface GameState {
   currentMissionIndex: number;
-  currentTaskIndex: number;
+  currentTaskIndex: number; // Also acts as phase level for drag-drop
   displayMode: 'briefing' | 'gameplay' | 'mission-complete' | 'finished';
   currentDialogueIndex: number;
   gameFinished: boolean;
@@ -16,6 +16,13 @@ export interface GameState {
   isCorrectGuess: boolean;
 
   currentOptions: string[];
+
+  // Drag Drop State
+  showDragError: boolean;
+  unassignedItems: DragDropItem[];
+  freeCol: DragDropItem[];
+  creditsCol: DragDropItem[];
+  plagiarismCol: DragDropItem[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -34,7 +41,13 @@ export class CreatorsEngineService {
     feedbackText: '',
     isCorrectGuess: false,
 
-    currentOptions: []
+    currentOptions: [],
+
+    showDragError: false,
+    unassignedItems: [],
+    freeCol: [],
+    creditsCol: [],
+    plagiarismCol: []
   };
 
   private stateSubject = new BehaviorSubject<GameState>({ ...this.state });
@@ -63,6 +76,8 @@ export class CreatorsEngineService {
   get licenseTasks(): LicenseTask[] { return this.contentData.licenseTasks; }
   get plagiarismTasksModule2(): PlagiarismTask[] { return this.contentData.plagiarismTasksModule2; }
   get plagiarismTasksModule3(): PlagiarismTask[] { return this.contentData.plagiarismTasksModule3; }
+  get dragDropData(): DragDropItem[][] { return this.contentData.dragDropData; }
+  get auditTasks(): AuditTask[] { return this.contentData.auditTasks; }
 
   private updateState(updates: Partial<GameState>) {
     this.state = { ...this.state, ...updates };
@@ -110,6 +125,13 @@ export class CreatorsEngineService {
         const opts = [task.correctAnswer, ...task.wrongAnswers].sort(() => Math.random() - 0.5);
         this.updateState({ currentOptions: opts });
       }
+    } else if (this.currentMission.type === 'drag-drop') {
+      const lvl = Math.min(this.state.currentTaskIndex, this.dragDropData.length - 1);
+      const items = [...this.dragDropData[lvl]].sort(() => Math.random() - 0.5);
+      this.updateState({
+        freeCol: [], creditsCol: [], plagiarismCol: [],
+        showDragError: false, unassignedItems: items
+      });
     }
   }
 
@@ -161,6 +183,55 @@ export class CreatorsEngineService {
     }
   }
 
+  updateDragState(unassigned: DragDropItem[], free: DragDropItem[], credits: DragDropItem[], plagiarism: DragDropItem[]) {
+    this.updateState({
+      unassignedItems: unassigned,
+      freeCol: free,
+      creditsCol: credits,
+      plagiarismCol: plagiarism
+    });
+  }
+
+  checkDragDropAnswers() {
+    if (this.state.unassignedItems.length > 0) return;
+
+    const freeOk = this.state.freeCol.every(i => i.category === 'LIVRE');
+    const creditsOk = this.state.creditsCol.every(i => i.category === 'CREDITOS');
+    const plagioOk = this.state.plagiarismCol.every(i => i.category === 'PLAGIO');
+
+    if (freeOk && creditsOk && plagioOk) {
+      this.updateState({
+        isCorrectGuess: true,
+        feedbackText: 'Perfeito! Tudo classificado corretamente. A Delegacia agradece.',
+        showFeedbackModal: true
+      });
+    } else {
+      this.updateState({ showDragError: true });
+    }
+  }
+
+  voteAudit(voteForApproved: boolean) {
+    if (this.currentMission.type !== 'audit') return;
+
+    const task = this.auditTasks[this.state.currentTaskIndex];
+    
+    if (voteForApproved === task.isApproved) {
+      this.updateState({
+        isCorrectGuess: true,
+        feedbackText: task.feedback,
+        showFeedbackModal: true
+      });
+    } else {
+      this.updateState({
+        isCorrectGuess: false,
+        feedbackText: voteForApproved 
+          ? 'Auditoria Falhou! Você aprovou algo que pode render um processo para a escola!' 
+          : 'Calma, Auditor! Você reprovou um recurso que estava sendo usado de forma perfeitamente legal.',
+        showFeedbackModal: true
+      });
+    }
+  }
+
   nextStep() {
     this.updateState({ showFeedbackModal: false });
 
@@ -185,6 +256,19 @@ export class CreatorsEngineService {
       } else {
         isMissionComplete = true;
       }
+    } else if (this.currentMission.type === 'drag-drop') {
+      if (this.state.currentTaskIndex < this.dragDropData.length - 1) {
+        this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
+        this.loadCurrentTask();
+      } else {
+        isMissionComplete = true;
+      }
+    } else if (this.currentMission.type === 'audit') {
+      if (this.state.currentTaskIndex < this.auditTasks.length - 1) {
+        this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
+      } else {
+        isMissionComplete = true;
+      }
     }
 
     if (isMissionComplete) {
@@ -200,12 +284,16 @@ export class CreatorsEngineService {
   private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
     const m1 = this.licenseTasks.length;
     const m2 = this.plagiarismTasksModule2.length;
+    const m3 = this.plagiarismTasksModule3.length;
+    const m4 = this.dragDropData.length;
     let absoluteFase = 0;
     
     switch (this.state.currentMissionIndex) {
       case 0: absoluteFase = this.state.currentTaskIndex; break;
       case 1: absoluteFase = m1 + this.state.currentTaskIndex; break;
       case 2: absoluteFase = m1 + m2 + this.state.currentTaskIndex; break;
+      case 3: absoluteFase = m1 + m2 + m3 + this.state.currentTaskIndex; break;
+      case 4: absoluteFase = m1 + m2 + m3 + m4 + this.state.currentTaskIndex; break;
     }
     
     this.progressReporter.report({
@@ -221,15 +309,23 @@ export class CreatorsEngineService {
   getAbsoluteStage(): number {
     const m1 = this.licenseTasks.length;
     const m2 = this.plagiarismTasksModule2.length;
+    const m3 = this.plagiarismTasksModule3.length;
+    const m4 = this.dragDropData.length;
     switch (this.state.currentMissionIndex) {
       case 0: return this.state.currentTaskIndex;
       case 1: return m1 + this.state.currentTaskIndex;
       case 2: return m1 + m2 + this.state.currentTaskIndex;
+      case 3: return m1 + m2 + m3 + this.state.currentTaskIndex;
+      case 4: return m1 + m2 + m3 + m4 + this.state.currentTaskIndex;
       default: return 0;
     }
   }
 
   getTotalStages(): number {
-    return this.licenseTasks.length + this.plagiarismTasksModule2.length + this.plagiarismTasksModule3.length;
+    return this.licenseTasks.length + 
+           this.plagiarismTasksModule2.length + 
+           this.plagiarismTasksModule3.length + 
+           this.dragDropData.length + 
+           this.auditTasks.length;
   }
 }

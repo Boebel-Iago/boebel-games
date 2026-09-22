@@ -18,19 +18,21 @@
 
   <app-license-cards *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'license-cards'"></app-license-cards>
   <app-plagiarism-court *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'plagiarism-court'"></app-plagiarism-court>
+  <app-creators-drag-drop *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'drag-drop'"></app-creators-drag-drop>
+  <app-creators-audit *ngIf="state.displayMode === 'gameplay' && currentMission.type === 'audit'"></app-creators-audit>
 
   <!-- ═══════════════════════════════════════════ -->
   <!--  TELA FINAL                                 -->
   <!-- ═══════════════════════════════════════════ -->
   <div *ngIf="state.displayMode === 'finished'" class="bg-white p-12 rounded-3xl shadow-2xl border-4 border-yellow-400 text-center max-w-3xl mt-10">
     <div class="text-9xl mb-6">👩‍⚖️</div>
-    <h2 class="text-4xl md:text-5xl font-black text-forest-900 mb-6">Parabéns, Juiz {{ studentName }}!</h2>
+    <h2 class="text-4xl md:text-5xl font-black text-forest-900 mb-6">Parabéns, Auditor {{ studentName }}!</h2>
     <p class="text-xl md:text-2xl text-gray-700 font-medium mb-8 leading-relaxed">
-      Você concluiu todos os módulos do treinamento em <br>Direitos Autorais e Plágio.
+      Você concluiu todos os módulos do treinamento avançado em <br>Direitos Autorais e Plágio.
     </p>
     <div class="inline-block bg-yellow-100 border-2 border-yellow-300 px-8 py-4 rounded-2xl shadow-inner">
       <p class="text-yellow-800 font-bold text-lg md:text-xl uppercase tracking-widest">Sua Patente Atual:</p>
-      <p class="text-3xl md:text-4xl font-black text-yellow-600 mt-2">Defensor da Criatividade 🏅</p>
+      <p class="text-3xl md:text-4xl font-black text-yellow-600 mt-2">Auditor Mestre da Criatividade 🏅</p>
     </div>
   </div>
 
@@ -56,7 +58,7 @@
         <button (click)="engine.nextStep()"
                 class="w-full mt-4 py-4 rounded-xl font-bold text-lg text-white shadow-md transition-all active:scale-95"
                 [ngClass]="state.isCorrectGuess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'">
-          {{ state.isCorrectGuess ? 'Próximo Caso ➔' : 'Tentar Novamente ↺' }}
+          {{ state.isCorrectGuess ? 'Continuar ➔' : 'Tentar Novamente ↺' }}
         </button>
       </div>
     </div>

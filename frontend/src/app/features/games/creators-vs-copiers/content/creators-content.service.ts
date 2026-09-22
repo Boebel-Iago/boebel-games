@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CreatorsMission, LicenseTask, PlagiarismTask } from './models';
+import { CreatorsMission, LicenseTask, PlagiarismTask, DragDropItem, AuditTask } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class CreatorsContentService {
@@ -53,6 +53,39 @@ export class CreatorsContentService {
       debriefing: [
         { speaker: 'justino', text: 'Missão Cumprida, Juiz Cibernético! 🏆' },
         { speaker: 'justino', text: 'Você entende que a ética não muda só porque a tecnologia avançou. Criar dá trabalho, e todo criador merece respeito e crédito.' },
+        { speaker: 'justino', text: 'A seguir, a Delegacia Anti-Cópia precisa da sua ajuda com uma papelada que chegou misturada...' }
+      ]
+    },
+    {
+      id: 4,
+      title: 'A Grande Triagem',
+      subtitle: 'Classifique as atitudes nas pastas corretas',
+      type: 'drag-drop',
+      briefing: [
+        { speaker: 'justino', text: 'Alerta! 🚨 Ocorreu um vazamento no arquivo da Delegacia Anti-Cópia!' },
+        { speaker: 'justino', text: 'Temos várias atitudes misturadas em nossa mesa. Você precisará arrastar cada atitude para a sua respectiva caixa.' },
+        { speaker: 'justino', text: 'Caixa 1: Uso Livre (Domínio Público). Caixa 2: Permitido, mas EXIGE CRÉDITOS (CC BY). Caixa 3: Plágio / Pirataria (Totalmente Ilegal).' },
+        { speaker: 'justino', text: 'Seja minucioso! Se algo exige créditos e você colocar como Uso Livre, a triagem falhará.' }
+      ],
+      debriefing: [
+        { speaker: 'justino', text: 'Excelente organização! Os arquivos da delegacia estão em ordem novamente.' },
+        { speaker: 'justino', text: 'Agora, para a sua provação final. Você foi contratado como o Auditor Chefe de um projeto gigante...' }
+      ]
+    },
+    {
+      id: 5,
+      title: 'Auditoria Final do Projeto',
+      subtitle: 'Revise o site da escola antes que ele vá ao ar',
+      type: 'audit',
+      briefing: [
+        { speaker: 'justino', text: 'A Escola Estadual do Futuro está prestes a lançar seu novo site para o mundo inteiro ver! 🌐' },
+        { speaker: 'justino', text: 'Mas a diretora está preocupada... "E se os alunos usaram coisas protegidas por Copyright? A escola pode ser processada!"' },
+        { speaker: 'justino', text: 'Seu trabalho final é auditar 10 recursos que foram colocados no site. Olhe a licença original e veja como os alunos usaram.' },
+        { speaker: 'justino', text: 'Se estiver tudo certo, Aprove. Se tiver erro de licença, Reprove antes que o site vá para o ar!' }
+      ],
+      debriefing: [
+        { speaker: 'justino', text: 'Ufa! O site foi salvo graças à sua auditoria impecável!' },
+        { speaker: 'justino', text: 'Você provou que não apenas sabe a teoria, mas consegue aplicá-la em um grande projeto do mundo real.' },
         { speaker: 'justino', text: 'A partir de hoje, você é um protetor oficial da criatividade. Espalhe esse conhecimento!' }
       ]
     }
@@ -217,18 +250,94 @@ export class CreatorsContentService {
     }
   ];
 
+  dragDropData: DragDropItem[][] = [
+    // Fase 1
+    [
+      { id: 'i1', description: 'Usar música de um Mozart (falecido há mais de 100 anos)', category: 'LIVRE' },
+      { id: 'i2', description: 'Usar foto com selo "Domínio Público"', category: 'LIVRE' },
+      { id: 'i3', description: 'Usar texto da Wikipédia citando os autores', category: 'CREDITOS' },
+      { id: 'i4', description: 'Usar foto do Unsplash citando o fotógrafo', category: 'CREDITOS' },
+      { id: 'i5', description: 'Copiar o trabalho de Artes do colega', category: 'PLAGIO' }
+    ],
+    // Fase 2
+    [
+      { id: 'i6', description: 'Fazer o download de um filme pirata para vender', category: 'PLAGIO' },
+      { id: 'i7', description: 'Usar foto com selo ©️ Copyright sem autorização', category: 'PLAGIO' },
+      { id: 'i8', description: 'Pegar uma receita antiga de pão da vovó e modificar', category: 'LIVRE' },
+      { id: 'i9', description: 'Usar um vídeo CC BY e colocar o nome do criador original', category: 'CREDITOS' },
+      { id: 'i10', description: 'Clonar a dancinha de alguém sem dar "dc"', category: 'PLAGIO' }
+    ],
+    // Fase 3
+    [
+      { id: 'i11', description: 'Apagar a marca d\'água de uma foto para usar de graça', category: 'PLAGIO' },
+      { id: 'i12', description: 'Mudar duas palavras de um texto da web e assinar seu nome', category: 'PLAGIO' },
+      { id: 'i13', description: 'Baixar um modelo 3D do governo marcado como CC0', category: 'LIVRE' },
+      { id: 'i14', description: 'Apresentar dados do IBGE, colocando a fonte no rodapé', category: 'CREDITOS' },
+      { id: 'i15', description: 'Entregar texto feito 100% pelo ChatGPT como autoria própria', category: 'PLAGIO' }
+    ]
+  ];
+
+  auditTasks: AuditTask[] = [
+    {
+      assetName: 'Logo do Site',
+      originalLicense: '©️ Copyright (Nike Inc.)',
+      studentAction: 'O aluno pegou a logo da Nike no Google, pintou de azul e usou como a logo do projeto da escola.',
+      isApproved: false,
+      feedback: 'REPROVADO! O Copyright não permite derivações. Alterar a cor de uma marca registrada não tira os direitos autorais dela. É crime de pirataria de marca!'
+    },
+    {
+      assetName: 'Música de Fundo do Vídeo Institucional',
+      originalLicense: 'Domínio Público (Beethoven - Sinfonia nº 5)',
+      studentAction: 'O aluno usou uma gravação em Domínio Público como fundo musical e não colocou os créditos do compositor.',
+      isApproved: true,
+      feedback: 'APROVADO! Obras em Domínio Público não exigem legalmente atribuição de créditos (embora seja educado). O uso é 100% livre.'
+    },
+    {
+      assetName: 'Fotos da Página Inicial',
+      originalLicense: '👤 Atribuição (CC BY)',
+      studentAction: 'O aluno colocou várias fotos lindas, mas a página não tem nenhuma menção a quem tirou as fotos.',
+      isApproved: false,
+      feedback: 'REPROVADO! A licença CC BY permite o uso, MAS exige créditos. Sem o nome do autor, o uso vira uma violação de direitos autorais.'
+    },
+    {
+      assetName: 'Texto sobre a História da Escola',
+      originalLicense: 'Criação Própria',
+      studentAction: 'O aluno entrevistou os professores antigos, gravou o áudio e escreveu o texto todo com suas próprias palavras.',
+      isApproved: true,
+      feedback: 'APROVADO COM LOUVOR! Isso é criação original autêntica. O aluno é o detentor dos direitos autorais deste texto.'
+    },
+    {
+      assetName: 'Ícones dos Botões',
+      originalLicense: '🚫💲 Uso Não Comercial (CC NC)',
+      studentAction: 'O aluno usou os ícones para fazer uma página que vende camisetas para arrecadar dinheiro para a formatura.',
+      isApproved: false,
+      feedback: 'REPROVADO! O uso é proibido. A licença "Non-Commercial" proíbe ganhar dinheiro, não importa se é para doação ou formatura. Apenas uso estritamente não-comercial é permitido.'
+    },
+    {
+      assetName: 'Gráficos de Pesquisa',
+      originalLicense: '👤 Atribuição (CC BY)',
+      studentAction: 'O aluno redesenhou os gráficos no Canva usando as mesmas cores, e colocou abaixo: "Dados obtidos do Instituto Nacional (CC BY)".',
+      isApproved: true,
+      feedback: 'APROVADO! Ele deu a atribuição exigida pela licença CC BY. Tudo feito dentro da lei e da ética.'
+    }
+  ];
+
   getFilteredData(isDemoMode: boolean) {
     if (isDemoMode) {
       return {
         licenseTasks: this.licenseTasks.slice(0, 2),
         plagiarismTasksModule2: this.plagiarismTasksModule2.slice(0, 2),
-        plagiarismTasksModule3: this.plagiarismTasksModule3.slice(0, 2)
+        plagiarismTasksModule3: this.plagiarismTasksModule3.slice(0, 2),
+        dragDropData: this.dragDropData.slice(0, 1),
+        auditTasks: this.auditTasks.slice(0, 2)
       };
     }
     return {
       licenseTasks: this.licenseTasks,
       plagiarismTasksModule2: this.plagiarismTasksModule2,
-      plagiarismTasksModule3: this.plagiarismTasksModule3
+      plagiarismTasksModule3: this.plagiarismTasksModule3,
+      dragDropData: this.dragDropData,
+      auditTasks: this.auditTasks
     };
   }
 }

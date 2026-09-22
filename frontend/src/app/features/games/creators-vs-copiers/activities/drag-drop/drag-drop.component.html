@@ -1,0 +1,93 @@
+<div class="w-full max-w-5xl flex flex-col gap-6 mx-auto">
+  <div class="text-center">
+    <span class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full font-bold text-sm">
+      Rodada {{ state.currentTaskIndex + 1 }} de {{ dragDropData.length }}
+    </span>
+  </div>
+
+  <!-- Itens não classificados -->
+  <div class="bg-white rounded-2xl shadow-lg p-4 border-2 border-gray-200 min-h-[80px]"
+       cdkDropList [cdkDropListData]="state.unassignedItems" (cdkDropListDropped)="drop($event)"
+       id="unassigned-list"
+       [cdkDropListConnectedTo]="['free-list', 'credits-list', 'plagiarism-list']">
+    <h4 class="font-bold text-gray-500 text-sm mb-3 uppercase tracking-wider">📦 Arraste as atitudes para a pasta correta</h4>
+    <div class="flex flex-wrap gap-2">
+      <div *ngFor="let item of state.unassignedItems" cdkDrag
+           class="bg-indigo-50 border-2 border-indigo-200 rounded-xl px-4 py-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow flex items-center gap-2">
+        <span class="text-xl">📄</span>
+        <span class="font-medium text-gray-700 text-sm">{{ item.description }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Colunas de destino -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Livre -->
+    <div class="bg-blue-50 rounded-2xl shadow-lg p-4 border-2 border-blue-300 min-h-[250px]"
+         cdkDropList [cdkDropListData]="state.freeCol" (cdkDropListDropped)="drop($event)"
+         id="free-list"
+         [cdkDropListConnectedTo]="['unassigned-list', 'credits-list', 'plagiarism-list']">
+      <h4 class="font-black text-blue-700 text-center mb-3 flex items-center justify-center gap-2">
+        <span class="text-2xl">🔓</span> USO LIVRE
+      </h4>
+      <p class="text-xs text-blue-600 text-center mb-2">Domínio Público ou CC0</p>
+      <div class="flex flex-col gap-2">
+        <div *ngFor="let item of state.freeCol" cdkDrag
+             class="bg-white border-2 border-blue-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
+          <span>📄</span>
+          <span class="font-medium text-sm text-gray-700">{{ item.description }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Créditos -->
+    <div class="bg-emerald-50 rounded-2xl shadow-lg p-4 border-2 border-emerald-300 min-h-[250px]"
+         cdkDropList [cdkDropListData]="state.creditsCol" (cdkDropListDropped)="drop($event)"
+         id="credits-list"
+         [cdkDropListConnectedTo]="['unassigned-list', 'free-list', 'plagiarism-list']">
+      <h4 class="font-black text-emerald-700 text-center mb-3 flex items-center justify-center gap-2">
+        <span class="text-2xl">👤</span> COM CRÉDITOS
+      </h4>
+      <p class="text-xs text-emerald-600 text-center mb-2">Exige Atribuição ao Autor</p>
+      <div class="flex flex-col gap-2">
+        <div *ngFor="let item of state.creditsCol" cdkDrag
+             class="bg-white border-2 border-emerald-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
+          <span>📄</span>
+          <span class="font-medium text-sm text-gray-700">{{ item.description }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plágio -->
+    <div class="bg-red-50 rounded-2xl shadow-lg p-4 border-2 border-red-300 min-h-[250px]"
+         cdkDropList [cdkDropListData]="state.plagiarismCol" (cdkDropListDropped)="drop($event)"
+         id="plagiarism-list"
+         [cdkDropListConnectedTo]="['unassigned-list', 'free-list', 'credits-list']">
+      <h4 class="font-black text-red-700 text-center mb-3 flex items-center justify-center gap-2">
+        <span class="text-2xl">🚫</span> PLÁGIO / ILEGAL
+      </h4>
+      <p class="text-xs text-red-600 text-center mb-2">Crime ou uso indevido</p>
+      <div class="flex flex-col gap-2">
+        <div *ngFor="let item of state.plagiarismCol" cdkDrag
+             class="bg-white border-2 border-red-200 rounded-xl px-3 py-2 cursor-grab active:cursor-grabbing shadow-sm flex items-center gap-2">
+          <span>📄</span>
+          <span class="font-medium text-sm text-gray-700">{{ item.description }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Erro e botão de verificar -->
+  <div *ngIf="state.showDragError" class="bg-red-100 border-2 border-red-300 rounded-xl p-4 text-center">
+    <p class="text-red-700 font-bold">🤔 Ops! Alguns arquivos estão na pasta errada. Revise!</p>
+  </div>
+
+  <button (click)="engine.checkDragDropAnswers()"
+          [disabled]="state.unassignedItems.length > 0"
+          class="w-full py-4 rounded-xl font-bold text-lg shadow-md transition-colors"
+          [ngClass]="state.unassignedItems.length > 0
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'">
+    {{ state.unassignedItems.length > 0 ? 'Arquive todos os documentos primeiro...' : '✓ Verificar Classificação' }}
+  </button>
+</div>

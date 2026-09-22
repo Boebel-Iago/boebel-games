@@ -48,6 +48,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Tabs: 'monitor' | 'demo' | 'unplugged'
   activeTab: 'monitor' | 'demo' | 'unplugged' = 'monitor';
 
+  // Sorting
+  sortField: 'studentName' | 'currentStage' | 'totalMistakes' | 'completed' | 'startedAt' = 'studentName';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   // Demo mode
   isDemoFullscreen = false;
 
@@ -61,6 +65,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get totalMistakesCount(): number {
     return this.sessions.reduce((sum, s) => sum + s.totalMistakes, 0);
+  }
+
+  get sortedSessions(): StudentSession[] {
+    return [...this.sessions].sort((a, b) => {
+      let valA: any, valB: any;
+      switch (this.sortField) {
+        case 'studentName': valA = a.studentName.toLowerCase(); valB = b.studentName.toLowerCase(); break;
+        case 'currentStage': valA = a.currentStage; valB = b.currentStage; break;
+        case 'totalMistakes': valA = a.totalMistakes; valB = b.totalMistakes; break;
+        case 'completed': valA = a.completed ? 1 : 0; valB = b.completed ? 1 : 0; break;
+        case 'startedAt': valA = new Date(a.startedAt).getTime(); valB = new Date(b.startedAt).getTime(); break;
+      }
+      const cmp = valA < valB ? -1 : valA > valB ? 1 : 0;
+      return this.sortDirection === 'asc' ? cmp : -cmp;
+    });
+  }
+
+  toggleSort(field: 'studentName' | 'currentStage' | 'totalMistakes' | 'completed' | 'startedAt') {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField !== field) return '↕';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   get demoUrl(): string {
@@ -258,7 +291,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     autoTable(doc, {
       startY: 63,
       head: [['Nome do Aluno', 'Fase Atual', 'Total de Erros', 'Status', 'Hora de Início']],
-      body: this.sessions.map(s => [
+      body: this.sortedSessions.map(s => [
         s.studentName,
         s.currentStage.toString(),
         s.totalMistakes.toString(),

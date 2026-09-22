@@ -212,15 +212,25 @@
           <table *ngIf="sessions.length > 0" class="w-full">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fase</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Erros</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Início</th>
+                <th (click)="toggleSort('studentName')" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 select-none">
+                  Nome <span class="text-gray-400">{{ getSortIcon('studentName') }}</span>
+                </th>
+                <th (click)="toggleSort('currentStage')" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 select-none">
+                  Fase <span class="text-gray-400">{{ getSortIcon('currentStage') }}</span>
+                </th>
+                <th (click)="toggleSort('totalMistakes')" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 select-none">
+                  Erros <span class="text-gray-400">{{ getSortIcon('totalMistakes') }}</span>
+                </th>
+                <th (click)="toggleSort('completed')" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 select-none">
+                  Status <span class="text-gray-400">{{ getSortIcon('completed') }}</span>
+                </th>
+                <th (click)="toggleSort('startedAt')" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-800 select-none">
+                  Início <span class="text-gray-400">{{ getSortIcon('startedAt') }}</span>
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr *ngFor="let s of sessions" class="hover:bg-gray-50 transition-colors">
+              <tr *ngFor="let s of sortedSessions" class="hover:bg-gray-50 transition-colors">
                 <td class="px-6 py-4 font-medium text-gray-900">{{ s.studentName }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ s.completed ? s.currentStage : (s.currentStage + 1) }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ s.totalMistakes }}</td>

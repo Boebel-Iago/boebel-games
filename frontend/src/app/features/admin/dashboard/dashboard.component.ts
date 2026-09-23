@@ -180,6 +180,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadTickets(); // Recarrega a lista para pegar possíveis status atualizados
   }
 
+  alerts: { id: number, message: string, type: 'success' | 'info' }[] = [];
+  alertIdCounter = 0;
+
+  addAlert(message: string, type: 'success' | 'info' = 'info') {
+    const id = ++this.alertIdCounter;
+    this.alerts.push({ id, message, type });
+    setTimeout(() => {
+      this.alerts = this.alerts.filter(a => a.id !== id);
+    }, 5000);
+  }
+
   // ==== Restante da Lógica ====
   loadSessions() {
     if (!this.selectedTicket) return;
@@ -202,7 +213,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
       onConnect: () => {
         this.stompClient!.subscribe(`/topic/sessions/${ticketCode}`, (message) => {
           this.ngZone.run(() => {
-            this.sessions = JSON.parse(message.body);
+            const newSessions = JSON.parse(message.body);
+            
+            // Logic to trigger toasts
+            if (this.sessions && this.sessions.length > 0) {
+              newSessions.forEach((newS: StudentSession) => {
+                const oldS = this.sessions.find(s => s.id === newS.id);
+                
+                // Tratar nomes compostos
+                const displayNames = newS.studentName.split(', ')
+                  .map(n => this.formatNameTitleCase(n))
+                  .join(' e ');
+                  
+                if (!oldS) {
+                  this.addAlert(`${displayNames} ${newS.studentName.includes(',') ? 'entraram' : 'entrou'} na sala!`, 'info');
+                } else if (!oldS.completed && newS.completed) {
+                  this.addAlert(`${displayNames} finalizou o jogo! 🏆`, 'success');
+                }
+              });
+            }
+            
+            this.sessions = newSessions;
           });
         });
       },

@@ -1,4 +1,14 @@
-<div class="min-h-screen bg-gray-50 font-sans">
+<div class="min-h-screen bg-gray-50 font-sans relative">
+  <!-- TOASTS CONTAINER -->
+  <div class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
+    <div *ngFor="let alert of alerts" 
+         class="px-6 py-4 rounded-lg shadow-xl text-sm font-bold flex items-center gap-3 w-80 transform transition-all duration-300 pointer-events-auto border-l-4"
+         [ngClass]="alert.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-500' : 'bg-blue-50 text-blue-800 border-blue-500'">
+      <span class="text-xl">{{ alert.type === 'success' ? '✅' : '👋' }}</span>
+      <p class="flex-1">{{ alert.message }}</p>
+    </div>
+  </div>
+
   <header class="bg-forest-900 text-white px-8 py-4 flex justify-between items-center shadow-md">
     <h2 class="text-lg font-bold">Boebel Games - Painel Administrativo</h2>
     <button (click)="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer">Sair</button>

@@ -72,6 +72,13 @@ public class AccessTicket {
     @Column(name = "grade", nullable = false, length = 50)
     private String grade;
 
+    /**
+     * Define o número máximo de jogadores que podem compartilhar a mesma sessão simultaneamente no mesmo dispositivo.
+     */
+    @Column(name = "max_players_per_session", nullable = false)
+    @Builder.Default
+    private Integer maxPlayersPerSession = 1;
+
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;

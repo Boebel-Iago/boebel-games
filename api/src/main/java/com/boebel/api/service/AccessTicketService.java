@@ -52,6 +52,7 @@ public class AccessTicketService {
                 .ticketName(request.ticketName())
                 .notes(request.notes())
                 .maxUses(request.maxUses())
+                .maxPlayersPerSession(request.maxPlayersPerSession() != null ? request.maxPlayersPerSession() : 1)
                 .grade(request.grade())
                 .game(game)
                 .expirationDate(LocalDateTime.now().plusHours(request.expirationHours()))
@@ -208,7 +209,8 @@ public class AccessTicketService {
                 ticket.getMaxUses() - ticket.getCurrentUses(),
                 null,
                 effectiveExp.toString(),
-                ticket.getIsActive()
+                ticket.getIsActive(),
+                ticket.getMaxPlayersPerSession()
         );
     }
 

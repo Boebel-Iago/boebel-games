@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 
 export interface JoinGamePayload {
   ticketCode: string;
-  studentName: string;
+  studentNames: string[];
 }
 
 export interface JoinGameResponse {

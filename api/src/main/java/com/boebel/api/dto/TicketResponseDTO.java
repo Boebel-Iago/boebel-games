@@ -18,5 +18,6 @@ public record TicketResponseDTO(
         Integer remainingUses,
         Integer expirationHours,
         String expirationDate,
-        Boolean isActive
+        Boolean isActive,
+        Integer maxPlayersPerSession
 ) {}

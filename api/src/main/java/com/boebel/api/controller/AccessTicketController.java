@@ -167,16 +167,35 @@ public class AccessTicketController {
                     .body(Map.of("error", "Este ingresso já expirou!"));
         }
 
-        // Normaliza o nome para evitar problemas de maiúsculas/minúsculas na busca
-        String normalizedName = request.studentName().trim().toLowerCase();
+        // Validate group size limit
+        List<String> validNames = request.studentNames() != null ? request.studentNames().stream()
+                .filter(n -> n != null && !n.trim().isEmpty())
+                .toList() : List.of();
 
-        // Check if session already exists for this student + ticket (allows resume)
+        if (validNames.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Você precisa informar pelo menos um nome!"));
+        }
+
+        if (validNames.size() > ticket.getMaxPlayersPerSession()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Este ticket permite no máximo " + ticket.getMaxPlayersPerSession() + " aluno(s) por dispositivo."));
+        }
+
+        // Normaliza os nomes e cria uma string canônica ordenada (ex: "aluno1, aluno2")
+        String normalizedNames = validNames.stream()
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .sorted()
+                .collect(java.util.stream.Collectors.joining(", "));
+
+        // Check if session already exists for this group + ticket (allows resume)
         StudentSession session = studentSessionRepository
-                .findByStudentNameAndTicketCode(normalizedName, ticket.getCode())
+                .findByStudentNameAndTicketCode(normalizedNames, ticket.getCode())
                 .orElse(null);
 
         if (session != null) {
-            // Returning student — reuse existing session without consuming a slot
+            // Returning group — reuse existing session without consuming a slot
             broadcastSessions(ticket.getCode());
 
             Map<String, Object> response = new HashMap<>();
@@ -186,19 +205,19 @@ public class AccessTicketController {
             return ResponseEntity.ok(response);
         }
 
-        // New student — validate slot limit
+        // New group — validate slot limit (consumes only 1 slot per device/group)
         if (ticket.getCurrentUses() >= ticket.getMaxUses()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error", "A sala está cheia! Número máximo de alunos atingido."));
+                    .body(Map.of("error", "A sala está cheia! Número máximo de acessos atingido."));
         }
 
         // Consume a slot
         ticket.setCurrentUses(ticket.getCurrentUses() + 1);
         accessTicketRepository.save(ticket);
 
-        // Create new session
+        // Create new session for the group
         session = new StudentSession();
-        session.setStudentName(normalizedName);
+        session.setStudentName(normalizedNames);
         session.setTicketCode(ticket.getCode());
         session.setGameRoute(ticket.getGame().getRoute());
         session = studentSessionRepository.save(session);

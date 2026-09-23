@@ -38,6 +38,7 @@ CREATE TABLE access_tickets (
     grade VARCHAR(50) NOT NULL,
     game_id BIGINT NOT NULL,
     teacher_uuid UUID NOT NULL,
+    max_players_per_session INTEGER NOT NULL DEFAULT 1,
     
     -- Constraints amarrando as chaves estrangeiras
     CONSTRAINT fk_ticket_game FOREIGN KEY (game_id) REFERENCES games (id),

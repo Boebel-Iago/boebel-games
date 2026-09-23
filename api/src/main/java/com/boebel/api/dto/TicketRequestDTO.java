@@ -10,5 +10,6 @@ public record TicketRequestDTO(
         Integer maxUses,
         Integer expirationHours,
         String grade,
-        Long gameId
+        Long gameId,
+        Integer maxPlayersPerSession
 ) {}

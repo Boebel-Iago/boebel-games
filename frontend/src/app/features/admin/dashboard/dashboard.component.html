@@ -55,6 +55,17 @@
           </div>
 
           <div>
+            <label class="block mb-1 text-sm font-semibold">Alunos por Dispositivo (Grupo)</label>
+            <select formControlName="maxPlayersPerSession" class="w-full px-4 py-2 border rounded-lg">
+              <option value="1">1 Aluno (Individual)</option>
+              <option value="2">2 Alunos (Dupla)</option>
+              <option value="3">3 Alunos (Trio)</option>
+              <option value="4">4 Alunos (Quarteto)</option>
+              <option value="5">5 Alunos (Quinteto)</option>
+            </select>
+          </div>
+
+          <div>
             <label class="block mb-1 text-sm font-semibold">Nome da Sala (Opcional)</label>
             <input type="text" formControlName="ticketName" placeholder="Ex: Aula da Terça" class="w-full px-4 py-2 border rounded-lg">
           </div>

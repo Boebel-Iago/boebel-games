@@ -30,6 +30,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     gameId: [null, Validators.required],
     maxUses: [1, [Validators.required, Validators.min(1)]],
     expirationHours: [24, [Validators.required, Validators.min(1)]],
+    maxPlayersPerSession: [1, [Validators.required, Validators.min(1), Validators.max(5)]],
     ticketName: ['', [Validators.maxLength(100)]],
     notes: ['', [Validators.maxLength(500)]]
   });
@@ -57,20 +58,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Demo mode
   isDemoFullscreen = false;
 
+  get flattenedSessions(): StudentSession[] {
+    const flattened: StudentSession[] = [];
+    for (const session of this.sessions) {
+      if (session.studentName && session.studentName.includes(', ')) {
+        const names = session.studentName.split(', ');
+        for (const n of names) {
+          flattened.push({ ...session, studentName: n });
+        }
+      } else {
+        flattened.push(session);
+      }
+    }
+    return flattened;
+  }
+
   get playingCount(): number {
-    return this.sessions.filter(s => !s.completed).length;
+    return this.flattenedSessions.filter(s => !s.completed).length;
   }
 
   get completedCount(): number {
-    return this.sessions.filter(s => s.completed).length;
+    return this.flattenedSessions.filter(s => s.completed).length;
   }
 
   get totalMistakesCount(): number {
-    return this.sessions.reduce((sum, s) => sum + s.totalMistakes, 0);
+    // Erros da sessão são duplicados visualmente para cada aluno do grupo,
+    // o que reflete o esforço coletivo.
+    return this.flattenedSessions.reduce((sum, s) => sum + s.totalMistakes, 0);
   }
 
   get sortedSessions(): StudentSession[] {
-    return [...this.sessions].sort((a, b) => {
+    return this.flattenedSessions.sort((a, b) => {
       let valA: any, valB: any;
       switch (this.sortField) {
         case 'studentName': valA = a.studentName.toLowerCase(); valB = b.studentName.toLowerCase(); break;
@@ -208,6 +226,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const payload = {
         maxUses: Number(this.ticketForm.value.maxUses),
         expirationHours: Number(this.ticketForm.value.expirationHours),
+        maxPlayersPerSession: Number(this.ticketForm.value.maxPlayersPerSession),
         grade: String(this.ticketForm.value.grade),
         gameId: Number(this.ticketForm.value.gameId)
       };
@@ -215,7 +234,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.ticketService.generateTicket(payload).subscribe({
         next: (response) => {
           this.errorMessage = '';
-          this.ticketForm.reset({ maxUses: 1, expirationHours: 24, grade: '', gameId: null });
+          this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null });
           this.loadTickets(); // Atualiza a lista
         },
         error: (err) => {
@@ -311,7 +330,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     doc.text('Resumo da Sessão', 14, finalY);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
-    doc.text(`Total de Alunos: ${this.sessions.length}`, 14, finalY + 10);
+    doc.text(`Total de Alunos: ${this.flattenedSessions.length}`, 14, finalY + 10);
     doc.text(`Alunos Jogando: ${this.playingCount}`, 14, finalY + 17);
     doc.text(`Alunos Finalizados: ${this.completedCount}`, 14, finalY + 24);
     doc.text(`Total de Erros da Turma: ${this.totalMistakesCount}`, 14, finalY + 31);

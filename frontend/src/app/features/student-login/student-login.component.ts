@@ -12,7 +12,7 @@ import { TicketService, JoinGamePayload, JoinGameResponse } from '../../core/ser
   styleUrl: './student-login.component.scss'
 })
 export class StudentLoginComponent {
-  studentName: string = '';
+  studentNames: string[] = ['']; // Começa com um campo de nome
   ticketCode: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -22,9 +22,29 @@ export class StudentLoginComponent {
     private router: Router
   ) {}
 
+  addPlayer() {
+    if (this.studentNames.length < 5) {
+      this.studentNames.push('');
+    }
+  }
+
+  removePlayer(index: number) {
+    if (this.studentNames.length > 1) {
+      this.studentNames.splice(index, 1);
+    }
+  }
+
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
+
   onEnterGame() {
-    if (!this.studentName.trim() || !this.ticketCode.trim()) {
-      this.errorMessage = "Preencha seu nome e o código do jogo!";
+    const validNames = this.studentNames
+      .map(n => n.trim().toLowerCase())
+      .filter(n => n.length > 0);
+
+    if (validNames.length === 0 || !this.ticketCode.trim()) {
+      this.errorMessage = "Preencha o nome de pelo menos um aluno e o código do jogo!";
       return;
     }
 
@@ -32,7 +52,7 @@ export class StudentLoginComponent {
     this.errorMessage = '';
 
     const payload: JoinGamePayload = {
-      studentName: this.studentName.trim().toLowerCase(),
+      studentNames: validNames,
       ticketCode: this.ticketCode.trim().toUpperCase()
     };
 
@@ -44,9 +64,9 @@ export class StudentLoginComponent {
         sessionStorage.setItem('activeGameRoute', response.gameRoute);
         sessionStorage.removeItem('isDemoMode'); // Garante que aluno joga o jogo inteiro
         
-        // Salva o ID da sessão, nome normalizado e a fase atual
+        // Salva o ID da sessão, os nomes combinados e a fase atual
         sessionStorage.setItem('sessionId', response.sessionId);
-        sessionStorage.setItem('studentName', this.studentName.trim().toLowerCase());
+        sessionStorage.setItem('studentName', validNames.sort().join(', '));
         sessionStorage.setItem('currentStage', response.currentStage.toString());
         
         this.router.navigate([`/games/${response.gameRoute}`]);

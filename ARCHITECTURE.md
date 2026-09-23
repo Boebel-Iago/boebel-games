@@ -851,3 +851,11 @@ Ao gerar imagens de personagens:
 
 > **Este documento deve ser atualizado sempre que houver mudanças arquiteturais significativas.**
 > Última revisão: 2026-09-21 por Iago + Antigravity AI
+
+### Multiplayer e Dispositivos Compartilhados (Co-play)
+Visando a realidade das escolas, onde frequentemente os tablets e computadores são divididos entre vários alunos, o Boebel Games suporta um modelo de **Co-play (Dispositivos Compartilhados)**:
+1. **Configuração**: O professor define, ao criar o ingresso, o `maxPlayersPerSession` (de 1 a 5).
+2. **Registro**: Ao logar, os alunos digitam seus nomes separadamente no mesmo dispositivo.
+3. **Persistência**: O backend agrupa esses nomes em uma única string canônica e ordenada (ex: `"alunoA, alunoB"`) dentro de uma única `StudentSession`. Isso garante que o estado do jogo se mantenha unificado e eles continuem jogando o mesmo save.
+4. **Visualização (Dashboard)**: O painel de monitoramento do professor realiza o *flattening* (desmembramento) dessa `StudentSession` para fins de UI, separando a string pela vírgula e renderizando uma linha independente na tabela para cada aluno. Eles compartilham a mesma pontuação, fase e erros no dashboard.
+

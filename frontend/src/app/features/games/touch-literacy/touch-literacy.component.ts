@@ -12,6 +12,11 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./touch-literacy.component.scss'],
   providers: [TouchLiteracyEngineService]
 })
+/**
+ * TouchLiteracyComponent
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TouchLiteracyComponent implements OnInit, OnDestroy {
   state: any;
   sub!: Subscription;

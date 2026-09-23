@@ -10,6 +10,11 @@ import { ProgressReporter } from '../../../core/services/progress-reporter.servi
   templateUrl: './text-shapes.component.html',
   styleUrls: ['./text-shapes.component.scss']
 })
+/**
+ * TextShapesComponent
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TextShapesComponent {
   @ViewChild('editor') editor!: ElementRef;
   

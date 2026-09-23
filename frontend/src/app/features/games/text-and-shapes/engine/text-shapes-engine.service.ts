@@ -16,6 +16,11 @@ export interface GameState {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * TextShapesEngineService
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TextShapesEngineService {
   state: GameState = {
     fase: 0,

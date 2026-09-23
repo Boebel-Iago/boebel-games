@@ -12,6 +12,11 @@ export interface TouchLiteracyState {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * TouchLiteracyEngineService
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TouchLiteracyEngineService {
   private initialState: TouchLiteracyState = {
     fase: 0,

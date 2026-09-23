@@ -823,6 +823,42 @@ Ao gerar imagens de personagens:
 | **Estado** | `screen: 'briefing' \| 'playing'` |
 | **Especial** | Fisher-Yates shuffle balanceado com proteção anti-resolvido |
 
+### 13.8 Texto e Formas (`text-and-shapes`) — 3º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Formatação de texto (Negrito, Cor, Tamanho) e formas SVG |
+| **Model** | `text-shapes-engine.service.ts` controlando `fase` |
+| **Estado** | 4 fases (3 guiadas, 1 livre) |
+| **Especial** | Usa WYSIWYG `contenteditable` nativo e SVG manipulável |
+
+### 13.9 Mini-Cartaz (`mini-poster`) — 3º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Diagramação de cartazes, layout visual |
+| **Model** | `mini-poster-engine.service.ts` |
+| **Estado** | 4 fases focadas em Drag & Drop e redimensionamento |
+| **Especial** | Interface com posicionamento absoluto e caixas delimitadoras |
+
+### 13.10 Letramento e Toque (`touch-literacy`) — 1º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Prática de coordenação viso-motora (Clique, Arraste) |
+| **Model** | `touch-literacy-engine.service.ts` |
+| **Estado** | 4 fases (bolhas, formas lógicas, baterias rápidas) |
+| **Especial** | Sem textos, UI 100% focada em emojis, SVG e feedbacks visuais em tempo real |
+
+### 13.11 Investigadores da Tecnologia (`tech-investigators`) — 1º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | O que é tecnologia? Hardware x Software |
+| **Model** | `tech-investigators-engine.service.ts` |
+| **Estado** | 4 fases (associação de finalidade, separação de caixas) |
+| **Especial** | Foco na validação motora e cognitiva rápida para alunos não alfabetizados |
+
 ---
 
 ## 14. Erros Conhecidos e Lições Aprendidas

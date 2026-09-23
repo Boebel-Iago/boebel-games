@@ -11,6 +11,11 @@ import { Subscription } from 'rxjs';
   templateUrl: './mini-poster.component.html',
   styleUrls: ['./mini-poster.component.scss']
 })
+/**
+ * MiniPosterComponent
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class MiniPosterComponent implements OnInit, OnDestroy {
   fase = 0;
   private sub!: Subscription;

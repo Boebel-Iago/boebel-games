@@ -9,6 +9,11 @@ export interface MiniPosterState {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * MiniPosterEngineService
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class MiniPosterEngineService {
   private state: MiniPosterState = { fase: 0 };
   state$ = new BehaviorSubject<MiniPosterState>(this.state);

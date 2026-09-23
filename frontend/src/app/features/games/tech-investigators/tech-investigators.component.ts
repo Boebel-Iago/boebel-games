@@ -10,6 +10,11 @@ import { ProgressReporter } from '../../../core/services/progress-reporter.servi
   templateUrl: './tech-investigators.component.html',
   styleUrls: ['./tech-investigators.component.scss']
 })
+/**
+ * TechInvestigatorsComponent
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TechInvestigatorsComponent implements OnInit {
   draggedDeviceId: string | null = null;
   draggedHsId: string | null = null;

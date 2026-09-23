@@ -25,6 +25,11 @@ export interface HardSoftItem {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * TechInvestigatorsEngineService
+ * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
+ * Integrado com a plataforma via ProgressReporter.
+ */
 export class TechInvestigatorsEngineService {
   fase: number = 0;
 

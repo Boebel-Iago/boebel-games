@@ -182,6 +182,63 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <!-- HARDWARE CARE (2º ANO) -->
+        <div *ngSwitchCase="'hardware-care'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-amber-700 mb-2">🧼 Cuidando do Nosso Hardware</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Aprender o manuseio correto, transporte seguro e cuidados físicos com os equipamentos.</p>
+          <div class="bg-amber-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>O professor debate regras básicas: mãos limpas, usar as duas mãos, não comer nem beber água perto do equipamento.</li>
+              <li>Os alunos rascunham no caderno a sequência correta de uso (1. Pegar, 2. Usar sentado, 3. Transportar com as duas mãos, 4. Guardar).</li>
+              <li>Em seguida, realizam uma simulação prática em sala utilizando o próprio caderno fechado ou um livro pesado para treinar a postura física correta e o transporte seguro, sem usar telas reais.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- PASSWORD MYSTERY (2º ANO) -->
+        <div *ngSwitchCase="'password-mystery'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-blue-700 mb-2">📜 Nosso Código de Convivência Digital</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Reforçar o planejamento de regras éticas de convivência através de desenho visual.</p>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>O professor e a turma debatem regras de ouro para o uso ético e seguro da tecnologia (ex: não compartilhar senhas, não estragar o equipamento).</li>
+              <li>No caderno, os alunos dividem a página para criar o "esqueleto" visual do código da turma.</li>
+              <li>Eles devem desenhar ícones simples que representem as regras de zelo (ex: um copo d'água com um traço de proibido, um cadeado fechado simbolizando uma senha forte), organizando as ideias visualmente.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DATA ANONYMITY (4º ANO) -->
+        <div *ngSwitchCase="'data-anonymity'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-indigo-700 mb-2">🛡️ O Segredo dos Meus Dados</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Compreender dados pessoais e praticar a cultura do sigilo e proteção da própria identidade.</p>
+          <div class="bg-indigo-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>Debata o que são dados pessoais (nome completo, endereço, foto, escola onde estuda).</li>
+              <li>Peça para os alunos escreverem essas informações no caderno e, imediatamente, cobrirem a folha com o estojo para simular o sigilo.</li>
+              <li>Discuta com eles quem tem o direito de ler aquelas informações (Pais? Professores? Desconhecidos na internet?).</li>
+              <li>Eles desenham um "Escudo de Privacidade" no próprio caderno simbolizando a segurança dos próprios dados.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETHICAL DILEMMAS (4º ANO) -->
+        <div *ngSwitchCase="'ethical-dilemmas'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-red-700 mb-2">✍️ O Dilema do Copiar e Colar</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Entender o conceito de plágio e praticar a citação correta de autoria.</p>
+          <div class="bg-red-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>O professor desenha algo legal no quadro e assina seu nome. Em seguida, finge apagar o nome, escreve "Autor: [Nome de um aluno]" e pergunta se isso é justo.</li>
+              <li>Inicie um debate sobre respeito ao criador e direitos autorais. Explique que na internet copiar textos sem dar crédito é "roubo de ideia".</li>
+              <li>Peça para copiarem um pequeno trecho de um livro ou da lousa e praticarem a regra de ouro: escrever a FONTE e o AUTOR entre parênteses logo abaixo do texto no caderno.</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- DEFAULT / NÃO ENCONTRADO -->
         <div *ngSwitchDefault class="text-center py-8">
           <p class="text-gray-500 font-bold text-lg">Atividade desplugada não cadastrada para este jogo.</p>

@@ -20,6 +20,10 @@ import { TextShapesComponent } from './features/games/text-and-shapes/text-shape
 import { MiniPosterComponent } from './features/games/mini-poster/mini-poster.component';
 import { TouchLiteracyComponent } from './features/games/touch-literacy/touch-literacy.component';
 import { TechInvestigatorsComponent } from './features/games/tech-investigators/tech-investigators.component';
+import { PasswordMysteryComponent } from './features/games/password-mystery/password-mystery.component';
+import { HardwareCareComponent } from './features/games/hardware-care/hardware-care.component';
+import { DataAnonymityComponent } from './features/games/data-anonymity/data-anonymity.component';
+import { EthicalDilemmasComponent } from './features/games/ethical-dilemmas/ethical-dilemmas.component';
 
 // Repórter falso para bloquear 100% o contato com o servidor e BD nas rotas /free
 class MockProgressReporter {
@@ -62,6 +66,34 @@ export const routes: Routes = [
     { 
         path: 'free/tech-investigators', 
         component: TechInvestigatorsComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/password-mystery', 
+        component: PasswordMysteryComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/hardware-care', 
+        component: HardwareCareComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/data-anonymity', 
+        component: DataAnonymityComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/ethical-dilemmas', 
+        component: EthicalDilemmasComponent,
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
@@ -113,6 +145,38 @@ export const routes: Routes = [
     { 
         path: 'games/tech-investigators', 
         component: TechInvestigatorsComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/password-mystery', 
+        component: PasswordMysteryComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/hardware-care', 
+        component: HardwareCareComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/data-anonymity', 
+        component: DataAnonymityComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/ethical-dilemmas', 
+        component: EthicalDilemmasComponent,
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }

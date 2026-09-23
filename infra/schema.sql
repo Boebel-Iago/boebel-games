@@ -132,3 +132,27 @@ CREATE TABLE access_tickets (
     VALUES ('Investigadores da Tecnologia', 'Descubra o que é tecnologia e aprenda a cuidar dos nossos equipamentos.', 'tech-investigators');
 
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (11, 'ELEMENTARY_1');
+
+    -- Inserindo jogo: Mistério da Senha Secreta (ID = 12)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Mistério da Senha', 'Proteja o seu cofre classificando atitudes seguras e descobrindo senhas fortes.', 'password-mystery');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (12, 'ELEMENTARY_2');
+
+    -- Inserindo jogo: Segurança e Zelo (ID = 13)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Segurança e Zelo Físico', 'Aprenda a manusear equipamentos com cuidado e avalie os riscos do dia a dia.', 'hardware-care');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (13, 'ELEMENTARY_2');
+
+    -- Inserindo jogo: Coleta e Anonimato na Escola (ID = 14)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Coleta e Anonimato', 'Aprenda a coletar dados para uma pesquisa protegendo a privacidade dos participantes.', 'data-anonymity');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (14, 'ELEMENTARY_4');
+
+    -- Inserindo jogo: Dilemas Éticos e Autoria (ID = 15)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Dilemas Éticos', 'Tome decisões éticas sobre privacidade, senhas e direitos autorais no dia a dia.', 'ethical-dilemmas');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (15, 'ELEMENTARY_4');

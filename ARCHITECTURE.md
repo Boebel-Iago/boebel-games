@@ -859,6 +859,42 @@ Ao gerar imagens de personagens:
 | **Estado** | 4 fases (associação de finalidade, separação de caixas) |
 | **Especial** | Foco na validação motora e cognitiva rápida para alunos não alfabetizados |
 
+### 13.12 Mistério da Senha (`password-mystery`) — 2º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Senhas como chaves e privacidade |
+| **Model** | `password-mystery-engine.service.ts` |
+| **Estado** | 4 fases (cofre virtual, classificação de atitudes, senha forte/fraca) |
+| **Especial** | Interface de cofre/teclado com separação em zonas verde e vermelha |
+
+### 13.13 Segurança e Zelo Físico (`hardware-care`) — 2º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Manuseio correto de hardware e proteção de dados |
+| **Model** | `hardware-care-engine.service.ts` |
+| **Estado** | 4 fases (regras, separação de comida/água, timeline de ações) |
+| **Especial** | Mecânica de "Linha do Tempo" e agrupamento seguro vs perigo |
+
+### 13.14 Coleta e Anonimato (`data-anonymity`) — 4º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Anonimização de dados em pesquisas |
+| **Model** | `data-anonymity-engine.service.ts` |
+| **Estado** | 4 fases (crachá vs pesquisa, censura de nomes vazados) |
+| **Especial** | Interface com drag-and-drop para caixa trituradora (Privacy Box) |
+
+### 13.15 Dilemas Éticos (`ethical-dilemmas`) — 4º Ano
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Tema** | Plágio, senhas e exposição na internet |
+| **Model** | `ethical-dilemmas-engine.service.ts` |
+| **Estado** | 4 fases (plágio, foto whatsapp, proteção de senha) |
+| **Especial** | Estruturado via cenários descritivos interativos (decision-making) |
+
 ---
 
 ## 14. Erros Conhecidos e Lições Aprendidas

@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-blue-50 text-slate-800 p-8 flex flex-col items-center">
+  <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
+    
+    <div class="bg-blue-500 text-white p-6 text-center">
+      <h1 class="text-4xl font-extrabold tracking-wider">Dilemas Éticos e Autoria</h1>
+      <p class="text-xl mt-2">Nível {{ state.fase + 1 }} de 4</p>
+    </div>
+
+    <div class="p-8 min-h-[400px] flex flex-col justify-center items-center relative">
+      
+      <!-- Phase 0 -->
+      <div *ngIf="state.fase === 0" class="w-full flex flex-col items-center text-center animate-fade-in">
+        <h2 class="text-3xl font-bold mb-6 text-purple-600">O Desenho Copiado</h2>
+        <p class="text-2xl mb-8">Um colega apresenta um desenho muito bonito para a turma. Mas você percebe que ele apagou o nome do verdadeiro autor e disse que foi ele quem fez. O que você faz?</p>
+        
+        <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
+          <button (click)="selectOption(false)" class="flex-1 bg-red-100 hover:bg-red-200 border-4 border-red-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Elogiar o colega pelo desenho
+          </button>
+          <button (click)="selectOption(true)" class="flex-1 bg-green-100 hover:bg-green-200 border-4 border-green-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Avisar que é errado apagar o nome do autor
+          </button>
+        </div>
+      </div>
+
+      <!-- Phase 1 -->
+      <div *ngIf="state.fase === 1" class="w-full flex flex-col items-center text-center animate-fade-in">
+        <h2 class="text-3xl font-bold mb-6 text-pink-600">A Foto Engraçada?</h2>
+        <p class="text-2xl mb-8">Um amigo te envia uma foto constrangedora de outro estudante que tiraram escondido na escola. O que você faz?</p>
+        
+        <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
+          <button (click)="selectOption(false)" class="flex-1 bg-red-100 hover:bg-red-200 border-4 border-red-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Encaminhar para rir junto
+          </button>
+          <button (click)="selectOption(true)" class="flex-1 bg-green-100 hover:bg-green-200 border-4 border-green-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Apagar e não repassar
+          </button>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div *ngIf="state.fase === 2" class="w-full flex flex-col items-center text-center animate-fade-in">
+        <h2 class="text-3xl font-bold mb-6 text-orange-600">A Conta Aberta</h2>
+        <p class="text-2xl mb-8">Um amigo deixa a conta do jogo dele aberta no seu computador ou celular. Você vê que ele tem muitos itens raros. O que você faz?</p>
+        
+        <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
+          <button (click)="selectOption(false)" class="flex-1 bg-red-100 hover:bg-red-200 border-4 border-red-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Roubar itens da conta
+          </button>
+          <button (click)="selectOption(true)" class="flex-1 bg-green-100 hover:bg-green-200 border-4 border-green-400 p-6 rounded-2xl text-2xl font-bold transition-transform hover:scale-105">
+            Fechar o jogo para proteger
+          </button>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div *ngIf="state.fase === 3" class="w-full flex flex-col items-center text-center animate-fade-in">
+        <h2 class="text-3xl font-bold mb-6 text-teal-600">Desafio Final: O Bom Cidadão Digital</h2>
+        <p class="text-xl mb-4">Separe as atitudes abaixo! Clique nos botões de cada carta para colocá-la na coluna correta.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-4">
+          <!-- Coluna Atitude Ruim -->
+          <div class="bg-red-50 border-4 border-red-300 rounded-2xl p-4 flex flex-col min-h-[300px]">
+            <h3 class="text-2xl font-bold text-red-600 mb-4 border-b-2 border-red-300 pb-2">Atitude Ruim</h3>
+            <div class="flex flex-col gap-3 flex-grow">
+              <ng-container *ngFor="let card of state.cards">
+                <div *ngIf="card.category === 'bad'" class="bg-white p-3 rounded-xl shadow-md border-2 border-gray-200 flex justify-between items-center text-left cursor-pointer hover:bg-gray-50" (click)="selectCard(card.id, null)">
+                  <span class="font-semibold text-lg">{{ card.text }}</span>
+                  <i class="fas fa-times text-gray-400 hover:text-red-500"></i>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Coluna Cidadão Digital -->
+          <div class="bg-green-50 border-4 border-green-300 rounded-2xl p-4 flex flex-col min-h-[300px]">
+            <h3 class="text-2xl font-bold text-green-600 mb-4 border-b-2 border-green-300 pb-2">Cidadão Digital</h3>
+            <div class="flex flex-col gap-3 flex-grow">
+              <ng-container *ngFor="let card of state.cards">
+                <div *ngIf="card.category === 'good'" class="bg-white p-3 rounded-xl shadow-md border-2 border-gray-200 flex justify-between items-center text-left cursor-pointer hover:bg-gray-50" (click)="selectCard(card.id, null)">
+                  <span class="font-semibold text-lg">{{ card.text }}</span>
+                  <i class="fas fa-times text-gray-400 hover:text-red-500"></i>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 w-full p-4 bg-gray-100 rounded-xl border-2 border-gray-300">
+          <h4 class="text-lg font-bold text-gray-600 mb-2">Cartas não sorteadas:</h4>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <ng-container *ngFor="let card of state.cards">
+              <div *ngIf="card.category === null" class="bg-white p-4 rounded-xl shadow border-2 border-blue-200 w-64 flex flex-col">
+                <p class="font-semibold text-lg mb-3 flex-grow">{{ card.text }}</p>
+                <div class="flex gap-2">
+                  <button (click)="selectCard(card.id, 'bad')" class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 rounded-lg font-bold text-sm">Ruim</button>
+                  <button (click)="selectCard(card.id, 'good')" class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 py-2 rounded-lg font-bold text-sm">Bom</button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <button (click)="checkPhase3()" class="mt-8 bg-blue-500 hover:bg-blue-600 text-white py-4 px-10 rounded-full text-2xl font-bold shadow-lg transition-transform hover:scale-105">
+          Verificar Respostas
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

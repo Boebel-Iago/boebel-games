@@ -1,0 +1,154 @@
+<div class="min-h-screen bg-blue-50 p-8 font-sans" *ngIf="state$ | async as state">
+  <header class="text-center mb-8">
+    <h1 class="text-4xl font-extrabold text-blue-800 drop-shadow-sm flex items-center justify-center gap-3">
+      <i class="fas fa-user-secret text-indigo-600"></i>
+      Coleta e Anonimato na Escola
+    </h1>
+    <p class="text-lg text-blue-600 mt-2 font-medium">Fase {{ state.fase + 1 }}:
+      <span *ngIf="state.fase === 0">O que é um dado?</span>
+      <span *ngIf="state.fase === 1">O Recrutador de Lanches</span>
+      <span *ngIf="state.fase === 2">Vazamento de Dados!</span>
+      <span *ngIf="state.fase === 3">Pesquisa Rápida</span>
+    </p>
+  </header>
+
+  <!-- Feedback Message -->
+  <div *ngIf="feedbackMessage" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-yellow-300 text-yellow-900 px-6 py-3 rounded-full font-bold shadow-lg z-50 animate-bounce">
+     {{ feedbackMessage }}
+  </div>
+
+  <!-- Phase 0 -->
+  <div *ngIf="state.fase === 0" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 border-4 border-indigo-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Arraste cada informação para o lugar certo!</h2>
+
+    <div class="flex flex-col md:flex-row justify-around items-center md:items-start gap-8">
+      <!-- Itens para arrastar -->
+      <div class="flex flex-col gap-4 w-full md:w-1/3">
+         <div *ngFor="let item of state.phase0Items"
+              [draggable]="!item.droppedIn"
+              (dragstart)="onDragStart($event, item.id, item.type)"
+              [ngClass]="{'opacity-50 cursor-not-allowed': item.droppedIn, 'cursor-grab hover:scale-105 bg-indigo-100 border-indigo-300': !item.droppedIn}"
+              class="p-4 border-2 rounded-xl shadow text-center font-bold text-indigo-800 transition-transform">
+            {{ item.name }}
+         </div>
+      </div>
+
+      <!-- Zonas de Drop -->
+      <div class="flex flex-col gap-8 w-full md:w-2/3">
+         <div class="border-4 border-dashed border-green-400 bg-green-50 rounded-2xl p-6 min-h-[120px] flex flex-col items-center justify-center transition-colors hover:bg-green-100"
+              (dragover)="onDragOver($event)"
+              (drop)="onDropPhase0($event, 'research')">
+            <i class="fas fa-chart-pie text-4xl text-green-500 mb-2"></i>
+            <h3 class="text-xl font-bold text-green-700">Caixa de Pesquisa</h3>
+            <p class="text-sm text-green-600">Para dados úteis à estatística</p>
+            <div class="mt-4 flex gap-2 flex-wrap justify-center">
+              <span *ngFor="let item of state.phase0Items" class="px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm" [class.hidden]="item.droppedIn !== 'research'">
+                {{ item.name }}
+              </span>
+            </div>
+         </div>
+
+         <div class="border-4 border-dashed border-red-400 bg-red-50 rounded-2xl p-6 min-h-[120px] flex flex-col items-center justify-center transition-colors hover:bg-red-100"
+              (dragover)="onDragOver($event)"
+              (drop)="onDropPhase0($event, 'private')">
+            <i class="fas fa-lock text-4xl text-red-500 mb-2"></i>
+            <h3 class="text-xl font-bold text-red-700">Dado Pessoal (Proteger)</h3>
+            <p class="text-sm text-red-600">Para dados que identificam a pessoa</p>
+            <div class="mt-4 flex gap-2 flex-wrap justify-center">
+              <span *ngFor="let item of state.phase0Items" class="px-3 py-1 bg-red-200 text-red-800 rounded-full text-sm" [class.hidden]="item.droppedIn !== 'private'">
+                {{ item.name }}
+              </span>
+            </div>
+         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 1 & 3 -->
+  <div *ngIf="state.fase === 1 || state.fase === 3" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 border-4 border-blue-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
+      Colete o lanche para a pesquisa e proteja a identidade (Crachá)!
+    </h2>
+    <p class="text-center text-gray-600 mb-8 font-medium">
+      1. Clique no Lanche para enviar para o gráfico.<br/>
+      2. Arraste o Crachá para a "Caixa de Privacidade".
+    </p>
+
+    <div class="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 mb-12">
+      <!-- Gráfico -->
+      <div class="w-full md:w-1/4 bg-blue-50 border-2 border-blue-300 rounded-xl p-4 flex flex-col items-center order-2 md:order-1">
+        <h3 class="font-bold text-blue-800 mb-2">Gráfico de Lanches</h3>
+        <i class="fas fa-chart-bar text-4xl text-blue-500 mb-2"></i>
+        <span class="text-2xl font-black text-blue-700">{{ state.snackChartCount }} / {{ state.characters.length }}</span>
+      </div>
+
+      <!-- Characters -->
+      <div class="w-full md:flex-1 flex justify-center gap-4 flex-wrap order-1 md:order-2">
+        <div *ngFor="let char of state.characters" class="relative w-32 bg-gray-100 border-2 border-gray-300 rounded-lg p-4 flex flex-col items-center mt-6">
+           <!-- Crachá (ID) -->
+           <div *ngIf="!char.idDropped"
+                draggable="true"
+                (dragstart)="onDragStart($event, char.id.toString(), 'badge')"
+                class="absolute -top-6 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded cursor-grab shadow-sm border border-red-700 z-10 hover:scale-110">
+             Crachá: {{ char.name }}
+           </div>
+           <!-- Lanche -->
+           <button *ngIf="!char.snackClicked"
+                   (click)="clickSnack(char.id)"
+                   class="text-4xl hover:scale-125 transition-transform drop-shadow-md mb-2 mt-2 cursor-pointer focus:outline-none">
+             {{ char.snack }}
+           </button>
+           <div *ngIf="char.snackClicked" class="text-sm text-green-600 font-bold mb-2 mt-2"><i class="fas fa-check"></i> Coletado</div>
+           <!-- Avatar Genérico -->
+           <i class="fas fa-user-graduate text-3xl text-gray-400 mt-2"></i>
+        </div>
+      </div>
+
+      <!-- Caixa de Privacidade -->
+      <div class="w-full md:w-1/4 border-4 border-dashed border-purple-400 bg-purple-50 rounded-xl p-4 flex flex-col items-center justify-center transition-colors hover:bg-purple-100 order-3 md:order-3"
+           (dragover)="onDragOver($event)"
+           (drop)="onDropId($event)">
+        <i class="fas fa-box-open text-4xl text-purple-500 mb-2"></i>
+        <h3 class="font-bold text-purple-800 text-center">Caixa de Privacidade</h3>
+        <span class="text-xl font-black text-purple-700">{{ state.privacyBoxCount }} / {{ state.characters.length }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div *ngIf="state.fase === 2" class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 border-4 border-red-200">
+    <h2 class="text-2xl font-bold text-red-600 mb-4 text-center">
+      <i class="fas fa-exclamation-triangle"></i> Alerta de Vazamento!
+    </h2>
+    <p class="text-center text-gray-700 mb-6 font-medium text-lg">
+      Um nome foi revelado na tabela de resultados da pesquisa!
+      <br/>Clique no nome para censurá-lo (transformar em asteriscos) e proteger a identidade!
+    </p>
+
+    <div class="overflow-x-auto bg-gray-50 rounded-lg border border-gray-200 shadow-inner p-4">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="p-3 border-b-2 border-gray-300">Estudante (ID)</th>
+            <th class="p-3 border-b-2 border-gray-300">Lanche</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of state.tableData" class="border-b border-gray-200 hover:bg-gray-100">
+            <td class="p-3 font-mono">
+              <span *ngIf="row.censored" class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded">
+                <i class="fas fa-shield-alt"></i> Estudante Anonimizado
+              </span>
+              <button *ngIf="!row.censored"
+                      (click)="censorRow(row.id)"
+                      class="text-red-600 font-bold bg-red-100 px-3 py-1 rounded hover:bg-red-200 border border-red-300 transition-colors shadow-sm animate-pulse flex items-center gap-2">
+                {{ row.name }} <i class="fas fa-eye-slash"></i> (Clique para censurar!)
+              </button>
+            </td>
+            <td class="p-3 text-xl">{{ row.snack }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

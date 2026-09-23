@@ -58,16 +58,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Demo mode
   isDemoFullscreen = false;
 
+  formatNameTitleCase(name: string): string {
+    if (!name) return '';
+    return name.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   get flattenedSessions(): StudentSession[] {
     const flattened: StudentSession[] = [];
     for (const session of this.sessions) {
       if (session.studentName && session.studentName.includes(', ')) {
         const names = session.studentName.split(', ');
         for (const n of names) {
-          flattened.push({ ...session, studentName: n });
+          flattened.push({ ...session, studentName: this.formatNameTitleCase(n) });
         }
       } else {
-        flattened.push(session);
+        flattened.push({ ...session, studentName: this.formatNameTitleCase(session.studentName) });
       }
     }
     return flattened;
@@ -309,10 +316,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     doc.text(`Código do Ingresso: ${this.selectedTicket.code}`, 14, 46);
     doc.text(`Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}`, 14, 53);
 
+    const sessionsForPdf = [...this.flattenedSessions].sort((a, b) => 
+      a.studentName.localeCompare(b.studentName)
+    );
+
     autoTable(doc, {
       startY: 63,
       head: [['Nome do Aluno', 'Fase Atual', 'Total de Erros', 'Status', 'Hora de Início']],
-      body: this.sortedSessions.map(s => [
+      body: sessionsForPdf.map(s => [
         s.studentName,
         s.currentStage.toString(),
         s.totalMistakes.toString(),

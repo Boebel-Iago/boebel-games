@@ -210,7 +210,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.stompClient = new Client({
       brokerURL: `${wsBase}/ws`,
       reconnectDelay: 5000,
+      debug: (str) => {
+        console.log('STOMP: ' + str);
+      },
       onConnect: () => {
+        console.log('STOMP Conectado com sucesso ao backend!');
         this.stompClient!.subscribe(`/topic/sessions/${ticketCode}`, (message) => {
           this.ngZone.run(() => {
             const newSessions = JSON.parse(message.body);

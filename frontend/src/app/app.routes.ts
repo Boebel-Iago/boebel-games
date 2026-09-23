@@ -19,11 +19,6 @@ import { FreeGamesComponent } from './features/public/free-games/free-games.comp
 import { TextShapesComponent } from './features/games/text-and-shapes/text-shapes.component';
 import { MiniPosterComponent } from './features/games/mini-poster/mini-poster.component';
 import { TouchLiteracyComponent } from './features/games/touch-literacy/touch-literacy.component';
-import { TechInvestigatorsComponent } from './features/games/tech-investigators/tech-investigators.component';
-import { PasswordMysteryComponent } from './features/games/password-mystery/password-mystery.component';
-import { HardwareCareComponent } from './features/games/hardware-care/hardware-care.component';
-import { DataAnonymityComponent } from './features/games/data-anonymity/data-anonymity.component';
-import { EthicalDilemmasComponent } from './features/games/ethical-dilemmas/ethical-dilemmas.component';
 
 // Repórter falso para bloquear 100% o contato com o servidor e BD nas rotas /free
 class MockProgressReporter {
@@ -65,35 +60,49 @@ export const routes: Routes = [
     },
     { 
         path: 'free/tech-investigators', 
-        component: TechInvestigatorsComponent,
+        loadComponent: () => import('./features/games/tech-investigators/tech-investigators.component').then(m => m.TechInvestigatorsComponent),
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
     },
     { 
         path: 'free/password-mystery', 
-        component: PasswordMysteryComponent,
+        loadComponent: () => import('./features/games/password-mystery/password-mystery.component').then(m => m.PasswordMysteryComponent),
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
     },
     { 
         path: 'free/hardware-care', 
-        component: HardwareCareComponent,
+        loadComponent: () => import('./features/games/hardware-care/hardware-care.component').then(m => m.HardwareCareComponent),
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
     },
     { 
         path: 'free/data-anonymity', 
-        component: DataAnonymityComponent,
+        loadComponent: () => import('./features/games/data-anonymity/data-anonymity.component').then(m => m.DataAnonymityComponent),
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
     },
     { 
         path: 'free/ethical-dilemmas', 
-        component: EthicalDilemmasComponent,
+        loadComponent: () => import('./features/games/ethical-dilemmas/ethical-dilemmas.component').then(m => m.EthicalDilemmasComponent),
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/automation-robotics', 
+        loadComponent: () => import('./features/games/automation-robotics/automation-robotics.component').then(m => m.AutomationRoboticsComponent),
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/future-fair', 
+        loadComponent: () => import('./features/games/future-fair/future-fair.component').then(m => m.FutureFairComponent),
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
@@ -144,7 +153,7 @@ export const routes: Routes = [
     },
     { 
         path: 'games/tech-investigators', 
-        component: TechInvestigatorsComponent,
+        loadComponent: () => import('./features/games/tech-investigators/tech-investigators.component').then(m => m.TechInvestigatorsComponent),
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }
@@ -152,7 +161,7 @@ export const routes: Routes = [
     },
     { 
         path: 'games/password-mystery', 
-        component: PasswordMysteryComponent,
+        loadComponent: () => import('./features/games/password-mystery/password-mystery.component').then(m => m.PasswordMysteryComponent),
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }
@@ -160,7 +169,7 @@ export const routes: Routes = [
     },
     { 
         path: 'games/hardware-care', 
-        component: HardwareCareComponent,
+        loadComponent: () => import('./features/games/hardware-care/hardware-care.component').then(m => m.HardwareCareComponent),
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }
@@ -168,7 +177,7 @@ export const routes: Routes = [
     },
     { 
         path: 'games/data-anonymity', 
-        component: DataAnonymityComponent,
+        loadComponent: () => import('./features/games/data-anonymity/data-anonymity.component').then(m => m.DataAnonymityComponent),
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }
@@ -176,7 +185,23 @@ export const routes: Routes = [
     },
     { 
         path: 'games/ethical-dilemmas', 
-        component: EthicalDilemmasComponent,
+        loadComponent: () => import('./features/games/ethical-dilemmas/ethical-dilemmas.component').then(m => m.EthicalDilemmasComponent),
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/automation-robotics', 
+        loadComponent: () => import('./features/games/automation-robotics/automation-robotics.component').then(m => m.AutomationRoboticsComponent),
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/future-fair', 
+        loadComponent: () => import('./features/games/future-fair/future-fair.component').then(m => m.FutureFairComponent),
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }

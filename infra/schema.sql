@@ -156,3 +156,15 @@ CREATE TABLE access_tickets (
     VALUES ('Dilemas Éticos', 'Tome decisões éticas sobre privacidade, senhas e direitos autorais no dia a dia.', 'ethical-dilemmas');
 
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (15, 'ELEMENTARY_4');
+
+    -- Inserindo jogo: Automação e Robótica (ID = 16)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Automação e Robótica', 'Aprenda os limites da Inteligência Artificial separando tarefas repetitivas de atitudes humanas.', 'automation-robotics');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (16, 'ELEMENTARY_5');
+
+    -- Inserindo jogo: Feira do Futuro (ID = 17)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Feira do Futuro (HQ)', 'Crie uma História em Quadrinhos digital e invente a sua profissão do amanhã!', 'future-fair');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (17, 'ELEMENTARY_5');

@@ -239,6 +239,34 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <!-- AUTOMATION ROBOTICS (5º ANO) -->
+        <div *ngSwitchCase="'automation-robotics'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-slate-700 mb-2">⏳ A Linha do Tempo do Trabalho</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Compreender a evolução do trabalho manual até o automatizado e o digital.</p>
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>No quadro, o professor apresenta profissões do passado que desapareceram com a tecnologia (ex: acendedor de lampião, telefonista, despertador humano).</li>
+              <li>No caderno, os estudantes desenham uma linha do tempo simples de três quadros, mostrando a evolução de uma ferramenta. Exemplo: Vassoura (Humano) -> Aspirador de pó (Humano + Máquina) -> Robô Aspirador (Autônomo).</li>
+              <li>Debata com eles: o que a vassoura tem que o robô não tem? (A capacidade de limpar cantos específicos que o robô não enxerga).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- FUTURE FAIR (5º ANO) -->
+        <div *ngSwitchCase="'future-fair'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-fuchsia-700 mb-2">🚀 Desenhando as Profissões do Amanhã</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Rascunhar uma história em quadrinhos focada em planejamento, autoria criativa e resolução de problemas do futuro.</p>
+          <div class="bg-fuchsia-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>O professor debate com a turma sobre os desafios do mundo em 2050 (aquecimento global, exploração espacial, superpopulação).</li>
+              <li>Os alunos dividem uma folha em branco do caderno em quatro blocos (quadrinhos).</li>
+              <li>Eles devem inventar uma profissão do futuro que resolva um desses problemas e desenhar um esqueleto simples da história, posicionando onde ficarão os personagens e os balões de fala, preparando o roteiro para o jogo digital.</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- DEFAULT / NÃO ENCONTRADO -->
         <div *ngSwitchDefault class="text-center py-8">
           <p class="text-gray-500 font-bold text-lg">Atividade desplugada não cadastrada para este jogo.</p>

@@ -92,7 +92,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/tickets/validate/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/tickets/validate").permitAll()
                         .requestMatchers("/api/tickets/sessions/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/ws/**").permitAll()
                         // Swagger UI e OpenAPI docs — acesso público para documentação interativa
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())

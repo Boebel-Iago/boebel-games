@@ -208,7 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
 
     this.stompClient = new Client({
-      brokerURL: `${wsBase}/ws`,
+      brokerURL: `${wsBase}/api/ws`,
       reconnectDelay: 5000,
       debug: (str) => {
         console.log('STOMP: ' + str);

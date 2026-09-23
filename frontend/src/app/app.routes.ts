@@ -16,6 +16,8 @@ import { ApiProgressReporterService } from './features/games/emergency-escape/pr
 import { SeaTurtlesComponent } from './features/games/sea-turtles/sea-turtles.component';
 import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/sea-turtles/content/phase-repository.service';
 import { FreeGamesComponent } from './features/public/free-games/free-games.component';
+import { TextShapesComponent } from './features/games/text-and-shapes/text-shapes.component';
+import { MiniPosterComponent } from './features/games/mini-poster/mini-poster.component';
 
 // Repórter falso para bloquear 100% o contato com o servidor e BD nas rotas /free
 class MockProgressReporter {
@@ -33,6 +35,20 @@ export const routes: Routes = [
     { 
         path: 'free', 
         component: FreeGamesComponent 
+    },
+    { 
+        path: 'free/text-and-shapes', 
+        component: TextShapesComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/mini-poster', 
+        component: MiniPosterComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
     },
     { 
         path: 'free/sea-turtles', 
@@ -54,6 +70,22 @@ export const routes: Routes = [
     // ==========================================
     // JOGOS PROTEGIDOS (COM INGRESSO E BANCO)
     // ==========================================
+    { 
+        path: 'games/text-and-shapes', 
+        component: TextShapesComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/mini-poster', 
+        component: MiniPosterComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
     { 
         path: 'games/sea-turtles', 
         component: SeaTurtlesComponent,

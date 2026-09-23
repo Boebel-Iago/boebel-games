@@ -2,161 +2,239 @@
   
   <!-- Phase 0 -->
   <div *ngIf="state.fase === 0" class="flex flex-col items-center justify-center w-full h-full space-y-16">
-    <div class="text-6xl text-center mb-8 animate-bounce">👆 🎈</div>
-    <div class="flex gap-12">
+    <div class="text-5xl font-bold text-blue-800 text-center mb-4">Estoure os Balões Coloridos!</div>
+    <div class="grid grid-cols-3 gap-12">
       <div 
-        *ngFor="let b of [0, 1, 2]; let i = index" 
+        *ngFor="let b of state.bubbles; let i = index" 
         (click)="onBubbleClick(i)"
         class="w-48 h-48 rounded-full cursor-pointer transition-transform duration-300 transform shadow-xl flex flex-col items-center justify-center text-white font-bold text-2xl border-4 border-white"
         [ngClass]="{
           'bg-red-400': i === 0, 
-          'bg-yellow-400': i === 1, 
+          'bg-yellow-400 text-gray-800': i === 1, 
           'bg-green-400 text-gray-800': i === 2, 
+          'bg-blue-400': i === 3,
+          'bg-purple-400': i === 4,
+          'bg-orange-400': i === 5,
           'scale-0 opacity-0': state.bubbles[i], 
           'scale-100 opacity-100 active:scale-90': !state.bubbles[i]
         }">
         <span *ngIf="i === 0">VERMELHO</span>
         <span *ngIf="i === 1">AMARELO</span>
         <span *ngIf="i === 2">VERDE</span>
+        <span *ngIf="i === 3">AZUL</span>
+        <span *ngIf="i === 4">ROXO</span>
+        <span *ngIf="i === 5">LARANJA</span>
       </div>
     </div>
   </div>
 
   <!-- Phase 1 -->
-  <div *ngIf="state.fase === 1" class="flex flex-col items-center justify-center w-full h-full space-y-16">
-    <div class="text-6xl text-center mb-8 animate-pulse">🍎 ➡️ 🧺</div>
-    <div class="flex items-center justify-around w-full max-w-4xl mt-16">
-      <div class="flex flex-col items-center gap-4">
-        <div 
-          class="text-9xl cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
-          [class.invisible]="state.appleDropped"
-          draggable="true" 
-          (dragstart)="onDragStart($event, 'apple')">
-          🍎
+  <div *ngIf="state.fase === 1" class="flex flex-col items-center justify-center w-full h-full space-y-8">
+    <div class="text-5xl font-bold text-blue-800 text-center mb-4">Guarde as Frutas na Cesta!</div>
+    
+    <!-- Fruits -->
+    <div class="flex gap-8 mb-8">
+      <div *ngFor="let fruit of state.fruitsToDrop; let i = index" class="flex flex-col items-center gap-4">
+        <div class="text-7xl cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
+             [class.invisible]="state.fruitsDropped > i"
+             draggable="true" 
+             (dragstart)="onDragStart($event, fruit.id)">
+          {{ fruit.emoji }}
         </div>
-        <div class="text-3xl font-bold text-red-600" [class.invisible]="state.appleDropped">MAÇÃ</div>
+        <div class="text-2xl font-bold text-red-600" [class.invisible]="state.fruitsDropped > i">{{ fruit.word }}</div>
       </div>
-      <div class="flex flex-col items-center gap-4">
-        <div 
-          class="text-9xl relative w-64 h-64 flex items-center justify-center border-8 border-dashed border-gray-400 rounded-3xl bg-white"
-          [class.bg-green-100]="state.appleDropped"
-          (dragover)="onDragOver($event)" 
-          (drop)="onDrop($event, 'basket')">
-          <span *ngIf="!state.appleDropped">🧺</span>
-          <span *ngIf="state.appleDropped" class="absolute text-8xl flex items-center justify-center">
-            <span class="absolute z-0">🧺</span>
-            <span class="absolute z-10 -mt-8">🍎</span>
-          </span>
-        </div>
-        <div class="text-3xl font-bold text-gray-700">CESTA</div>
+    </div>
+
+    <!-- Basket -->
+    <div class="flex flex-col items-center gap-4 mt-8">
+      <div 
+        class="text-9xl relative w-64 h-64 flex flex-col items-center justify-center border-8 border-dashed border-gray-400 rounded-3xl bg-white shadow-xl"
+        [class.bg-green-100]="state.fruitsDropped === state.fruitsToDrop.length"
+        (dragover)="onDragOver($event)" 
+        (drop)="onDrop($event, 'basket')">
+        <span *ngIf="state.fruitsDropped < state.fruitsToDrop.length">🧺</span>
+        <span *ngIf="state.fruitsDropped === state.fruitsToDrop.length" class="text-8xl">✅</span>
+        <div class="text-xl font-bold text-green-700 mt-4">{{ state.fruitsDropped }} / {{ state.fruitsToDrop.length }}</div>
       </div>
+      <div class="text-4xl font-bold text-gray-700">CESTA DE FRUTAS</div>
     </div>
   </div>
 
   <!-- Phase 2 -->
-  <div *ngIf="state.fase === 2" class="flex flex-col items-center justify-center w-full h-full space-y-12">
-    <div class="text-6xl text-center mb-8">🟦 ➡️ ⬜</div>
-    <div class="flex justify-around w-full max-w-4xl mt-8">
-      <!-- Draggable Shapes -->
-      <div class="flex flex-col gap-12">
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-32 h-32 bg-blue-500 shadow-xl cursor-grab active:cursor-grabbing hover:scale-105 transition-transform"
-            [class.invisible]="state.shapes['square']"
-            draggable="true" (dragstart)="onDragStart($event, 'square')"></div>
-          <span class="text-3xl font-bold text-blue-600" [class.invisible]="state.shapes['square']">QUADRADO</span>
-        </div>
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-0 h-0 border-l-[64px] border-l-transparent border-r-[64px] border-r-transparent border-b-[128px] border-b-yellow-500 cursor-grab active:cursor-grabbing hover:scale-105 transition-transform drop-shadow-xl"
-            [class.invisible]="state.shapes['triangle']"
-            draggable="true" (dragstart)="onDragStart($event, 'triangle')"></div>
-          <span class="text-3xl font-bold text-yellow-600" [class.invisible]="state.shapes['triangle']">TRIÂNGULO</span>
-        </div>
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-32 h-32 bg-red-500 rounded-full shadow-xl cursor-grab active:cursor-grabbing hover:scale-105 transition-transform"
-            [class.invisible]="state.shapes['circle']"
-            draggable="true" (dragstart)="onDragStart($event, 'circle')"></div>
-          <span class="text-3xl font-bold text-red-600" [class.invisible]="state.shapes['circle']">CÍRCULO</span>
-        </div>
+  <div *ngIf="state.fase === 2" class="flex flex-col items-center w-full h-full max-w-6xl mx-auto space-y-12">
+    <div class="text-5xl font-bold text-blue-800 text-center mb-4 mt-10">Associe as Formas Geométricas!</div>
+    
+    <div class="grid grid-cols-2 gap-x-32 gap-y-8 w-full justify-items-center">
+      <!-- Row 1: Square & Target -->
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 bg-blue-500 shadow-xl cursor-grab hover:scale-105" [class.invisible]="state.shapes['square']" draggable="true" (dragstart)="onDragStart($event, 'square')"></div>
+        <span class="text-2xl font-bold text-blue-600" [class.invisible]="state.shapes['square']">QUADRADO</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 border-4 border-dashed bg-white" [ngClass]="state.shapes['square'] ? 'bg-blue-500 border-blue-500 shadow-xl' : 'border-gray-400'" (dragover)="onDragOver($event)" (drop)="onDrop($event, 'square')"></div>
+        <span class="text-xl font-bold text-gray-400">ESPAÇO</span>
       </div>
 
-      <!-- Drop Targets -->
-      <div class="flex flex-col gap-12">
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-32 h-32 border-8 border-dashed flex items-center justify-center transition-colors bg-white"
-            [ngClass]="state.shapes['square'] ? 'bg-blue-500 border-blue-500 shadow-xl' : 'border-gray-400'"
-            (dragover)="onDragOver($event)" (drop)="onDrop($event, 'square')">
-          </div>
-          <span class="text-2xl font-bold text-gray-400">ESPAÇO</span>
+      <!-- Row 2: Triangle & Target -->
+      <div class="flex items-center gap-4">
+        <div class="w-0 h-0 border-l-[48px] border-l-transparent border-r-[48px] border-r-transparent border-b-[96px] border-b-yellow-500 cursor-grab hover:scale-105" [class.invisible]="state.shapes['triangle']" draggable="true" (dragstart)="onDragStart($event, 'triangle')"></div>
+        <span class="text-2xl font-bold text-yellow-600" [class.invisible]="state.shapes['triangle']">TRIÂNGULO</span>
+      </div>
+      <div class="flex items-center gap-4 relative">
+        <div class="w-24 h-24 flex items-center justify-center relative" (dragover)="onDragOver($event)" (drop)="onDrop($event, 'triangle')">
+            <div class="w-0 h-0 border-l-[48px] border-l-transparent border-r-[48px] border-r-transparent border-b-[96px] absolute" [ngClass]="state.shapes['triangle'] ? 'border-b-yellow-500 filter drop-shadow-xl' : 'border-b-gray-300'"></div>
         </div>
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-32 h-32 flex items-center justify-center relative"
-            (dragover)="onDragOver($event)" (drop)="onDrop($event, 'triangle')">
-            <div class="w-0 h-0 border-l-[64px] border-l-transparent border-r-[64px] border-r-transparent border-b-[128px] absolute transition-colors"
-                 [ngClass]="state.shapes['triangle'] ? 'border-b-yellow-500 filter drop-shadow-xl' : 'border-b-gray-300'"></div>
-          </div>
-          <span class="text-2xl font-bold text-gray-400">ESPAÇO</span>
+        <span class="text-xl font-bold text-gray-400">ESPAÇO</span>
+      </div>
+
+      <!-- Row 3: Circle & Target -->
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 bg-red-500 rounded-full shadow-xl cursor-grab hover:scale-105" [class.invisible]="state.shapes['circle']" draggable="true" (dragstart)="onDragStart($event, 'circle')"></div>
+        <span class="text-2xl font-bold text-red-600" [class.invisible]="state.shapes['circle']">CÍRCULO</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 rounded-full border-4 border-dashed bg-white" [ngClass]="state.shapes['circle'] ? 'bg-red-500 border-red-500 shadow-xl' : 'border-gray-400'" (dragover)="onDragOver($event)" (drop)="onDrop($event, 'circle')"></div>
+        <span class="text-xl font-bold text-gray-400">ESPAÇO</span>
+      </div>
+      
+      <!-- Row 4: Star & Target -->
+      <div class="flex items-center gap-4">
+        <div class="text-7xl cursor-grab hover:scale-105" [class.invisible]="state.shapes['star']" draggable="true" (dragstart)="onDragStart($event, 'star')">⭐</div>
+        <span class="text-2xl font-bold text-yellow-600" [class.invisible]="state.shapes['star']">ESTRELA</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 rounded-full border-4 border-dashed flex justify-center items-center bg-white" [ngClass]="state.shapes['star'] ? 'border-yellow-500 shadow-xl' : 'border-gray-400'" (dragover)="onDragOver($event)" (drop)="onDrop($event, 'star')">
+           <span *ngIf="state.shapes['star']" class="text-6xl">⭐</span>
         </div>
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-32 h-32 rounded-full border-8 border-dashed flex items-center justify-center transition-colors bg-white"
-            [ngClass]="state.shapes['circle'] ? 'bg-red-500 border-red-500 shadow-xl' : 'border-gray-400'"
-            (dragover)="onDragOver($event)" (drop)="onDrop($event, 'circle')">
-          </div>
-          <span class="text-2xl font-bold text-gray-400">ESPAÇO</span>
+        <span class="text-xl font-bold text-gray-400">ESPAÇO</span>
+      </div>
+      
+      <!-- Row 5: Heart & Target -->
+      <div class="flex items-center gap-4">
+        <div class="text-7xl cursor-grab hover:scale-105" [class.invisible]="state.shapes['heart']" draggable="true" (dragstart)="onDragStart($event, 'heart')">💛</div>
+        <span class="text-2xl font-bold text-pink-600" [class.invisible]="state.shapes['heart']">CORAÇÃO</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="w-24 h-24 rounded-full border-4 border-dashed flex justify-center items-center bg-white" [ngClass]="state.shapes['heart'] ? 'border-pink-500 shadow-xl' : 'border-gray-400'" (dragover)="onDragOver($event)" (drop)="onDrop($event, 'heart')">
+           <span *ngIf="state.shapes['heart']" class="text-6xl">💛</span>
         </div>
+        <span class="text-xl font-bold text-gray-400">ESPAÇO</span>
       </div>
     </div>
   </div>
 
   <!-- Phase 3 -->
-  <div *ngIf="state.fase === 3" class="flex flex-col items-center justify-center w-full h-full space-y-16">
-    <div class="text-6xl text-center mb-8">🔋 ➡️ 📱</div>
+  <div *ngIf="state.fase === 3" class="flex flex-col items-center justify-center w-full h-full space-y-12">
+    <div class="text-5xl font-bold text-blue-800 text-center mb-4">Ligue os Eletrônicos!</div>
     
     <!-- Batteries -->
-    <div class="flex gap-12 mb-12">
-      <div *ngFor="let b of [1, 2, 3]; let i = index" class="flex flex-col items-center gap-4">
-        <div class="text-8xl cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
+    <div class="flex gap-8 mb-8 flex-wrap justify-center">
+      <div *ngFor="let b of [1, 2, 3, 4, 5]; let i = index" class="flex flex-col items-center gap-2">
+        <div class="text-7xl cursor-grab active:cursor-grabbing transition-transform hover:scale-110"
              draggable="true" 
              (dragstart)="onDragStart($event, 'battery')">
           🔋
         </div>
-        <div class="text-2xl font-bold text-green-700">BATERIA</div>
+        <div class="text-xl font-bold text-green-700">BATERIA</div>
       </div>
     </div>
 
     <!-- Devices -->
-    <div class="flex gap-16 mt-8">
-      <div class="flex flex-col items-center gap-6">
-        <div class="text-8xl w-40 h-40 flex items-center justify-center border-8 border-dashed rounded-3xl bg-white"
+    <div class="flex gap-8 mt-4 flex-wrap justify-center max-w-5xl">
+      <div class="flex flex-col items-center gap-4">
+        <div class="text-7xl w-32 h-32 flex items-center justify-center border-4 border-dashed rounded-2xl bg-white relative"
              [ngClass]="state.devices['phone'] ? 'border-green-500 bg-green-100 shadow-lg' : 'border-gray-300'"
              (dragover)="onDragOver($event)" (drop)="onDrop($event, 'phone')">
-          📱
+          📱<span *ngIf="state.devices['phone']" class="text-4xl absolute -top-4 -right-4 animate-bounce">✅</span>
         </div>
-        <span *ngIf="state.devices['phone']" class="text-5xl animate-bounce absolute -mt-4">✅</span>
-        <div class="text-2xl font-bold text-gray-700">CELULAR</div>
+        <div class="text-xl font-bold text-gray-700">CELULAR</div>
       </div>
-      <div class="flex flex-col items-center gap-6">
-        <div class="text-8xl w-40 h-40 flex items-center justify-center border-8 border-dashed rounded-3xl bg-white"
+      <div class="flex flex-col items-center gap-4">
+        <div class="text-7xl w-32 h-32 flex items-center justify-center border-4 border-dashed rounded-2xl bg-white relative"
              [ngClass]="state.devices['laptop'] ? 'border-green-500 bg-green-100 shadow-lg' : 'border-gray-300'"
              (dragover)="onDragOver($event)" (drop)="onDrop($event, 'laptop')">
-          💻
+          💻<span *ngIf="state.devices['laptop']" class="text-4xl absolute -top-4 -right-4 animate-bounce">✅</span>
         </div>
-        <span *ngIf="state.devices['laptop']" class="text-5xl animate-bounce absolute -mt-4">✅</span>
-        <div class="text-2xl font-bold text-gray-700">COMPUTADOR</div>
+        <div class="text-xl font-bold text-gray-700">COMPUTADOR</div>
       </div>
-      <div class="flex flex-col items-center gap-6">
-        <div class="text-8xl w-40 h-40 flex items-center justify-center border-8 border-dashed rounded-3xl bg-white"
+      <div class="flex flex-col items-center gap-4">
+        <div class="text-7xl w-32 h-32 flex items-center justify-center border-4 border-dashed rounded-2xl bg-white relative"
              [ngClass]="state.devices['flashlight'] ? 'border-green-500 bg-green-100 shadow-lg' : 'border-gray-300'"
              (dragover)="onDragOver($event)" (drop)="onDrop($event, 'flashlight')">
-          🔦
+          🔦<span *ngIf="state.devices['flashlight']" class="text-4xl absolute -top-4 -right-4 animate-bounce">✅</span>
         </div>
-        <span *ngIf="state.devices['flashlight']" class="text-5xl animate-bounce absolute -mt-4">✅</span>
-        <div class="text-2xl font-bold text-gray-700">LANTERNA</div>
+        <div class="text-xl font-bold text-gray-700">LANTERNA</div>
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <div class="text-7xl w-32 h-32 flex items-center justify-center border-4 border-dashed rounded-2xl bg-white relative"
+             [ngClass]="state.devices['tablet'] ? 'border-green-500 bg-green-100 shadow-lg' : 'border-gray-300'"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'tablet')">
+          📱<span *ngIf="state.devices['tablet']" class="text-4xl absolute -top-4 -right-4 animate-bounce">✅</span>
+        </div>
+        <div class="text-xl font-bold text-gray-700">TABLET</div>
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <div class="text-7xl w-32 h-32 flex items-center justify-center border-4 border-dashed rounded-2xl bg-white relative"
+             [ngClass]="state.devices['camera'] ? 'border-green-500 bg-green-100 shadow-lg' : 'border-gray-300'"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'camera')">
+          📸<span *ngIf="state.devices['camera']" class="text-4xl absolute -top-4 -right-4 animate-bounce">✅</span>
+        </div>
+        <div class="text-xl font-bold text-gray-700">CÂMERA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 (Challenge) -->
+  <div *ngIf="state.fase === 4" class="flex flex-col items-center w-full h-full max-w-5xl mx-auto space-y-8">
+    <div class="flex justify-between w-full items-center px-8 pt-8">
+      <div class="text-4xl font-bold text-blue-800">O GRANDE DESAFIO!</div>
+      <div class="text-3xl font-bold bg-white px-6 py-3 rounded-full shadow-lg text-purple-600 border-4 border-purple-200">
+        Pontos: {{ state.score }} / {{ state.challengeTargetScore }}
+      </div>
+    </div>
+    
+    <div class="text-xl text-gray-600 font-semibold mb-8 text-center">
+      Arraste o item que apareceu para a caixa certa e alcance 100 pontos!
+    </div>
+
+    <!-- Active Item -->
+    <div class="h-64 flex items-center justify-center w-full">
+      <div *ngIf="state.challengeItem" class="flex flex-col items-center gap-4 animate-pulse">
+        <div class="text-9xl cursor-grab active:cursor-grabbing drop-shadow-2xl hover:scale-110 transition-transform"
+             draggable="true" 
+             (dragstart)="onDragStart($event, 'challengeItem')">
+          {{ state.challengeItem.emoji }}
+        </div>
+        <div class="text-4xl font-black text-gray-800 bg-white px-6 py-2 rounded-xl shadow-md border-2 border-gray-100 tracking-widest">
+          {{ state.challengeItem.word }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Drop Zones -->
+    <div class="flex justify-between w-full mt-12 gap-8 px-4">
+      <div class="flex flex-col items-center gap-4 flex-1">
+        <div class="w-full h-48 border-8 border-dashed border-red-300 rounded-3xl bg-red-50 flex items-center justify-center text-6xl shadow-inner"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'food')">
+          🧺
+        </div>
+        <div class="text-3xl font-bold text-red-600 bg-red-100 px-6 py-2 rounded-full w-full text-center">COMIDA</div>
+      </div>
+
+      <div class="flex flex-col items-center gap-4 flex-1">
+        <div class="w-full h-48 border-8 border-dashed border-blue-300 rounded-3xl bg-blue-50 flex items-center justify-center text-6xl shadow-inner"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'shape')">
+          🟦
+        </div>
+        <div class="text-3xl font-bold text-blue-600 bg-blue-100 px-6 py-2 rounded-full w-full text-center">FORMA</div>
+      </div>
+
+      <div class="flex flex-col items-center gap-4 flex-1">
+        <div class="w-full h-48 border-8 border-dashed border-green-300 rounded-3xl bg-green-50 flex items-center justify-center text-6xl shadow-inner"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'tech')">
+          🔋
+        </div>
+        <div class="text-3xl font-bold text-green-600 bg-green-100 px-6 py-2 rounded-full w-full text-center">ELETRÔNICO</div>
       </div>
     </div>
   </div>

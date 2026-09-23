@@ -45,15 +45,19 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
         this.completePhase(false);
       }
     } else if (this.state.fase === 1) {
-      if (this.state.appleDropped) {
+      if (this.state.fruitsDropped >= this.state.fruitsToDrop.length) {
         this.completePhase(false);
       }
     } else if (this.state.fase === 2) {
-      if (this.state.shapes['square'] && this.state.shapes['triangle'] && this.state.shapes['circle']) {
+      if (Object.values(this.state.shapes).every(v => v)) {
         this.completePhase(false);
       }
     } else if (this.state.fase === 3) {
-      if (this.state.devices['phone'] && this.state.devices['laptop'] && this.state.devices['flashlight']) {
+      if (Object.values(this.state.devices).every(v => v)) {
+        this.completePhase(false);
+      }
+    } else if (this.state.fase === 4) {
+      if (this.state.score >= this.state.challengeTargetScore) {
         this.completePhase(true);
       }
     }
@@ -71,7 +75,7 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
     if (!isLastLevel) {
       setTimeout(() => this.engine.nextPhase(), 1000);
     } else {
-      setTimeout(() => alert('🎉 Parabéns! Você completou tudo! 🎉'), 1000);
+      setTimeout(() => alert('🎉 Parabéns! Você completou O GRANDE DESAFIO e venceu o jogo! 🎉'), 1000);
     }
   }
 
@@ -106,8 +110,8 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
     if (!this.draggedItem) return;
 
     if (this.state.fase === 1) {
-      if (this.draggedItem === 'apple' && target === 'basket') {
-        this.engine.dropApple();
+      if (this.draggedItem.startsWith('fruit_') && target === 'basket') {
+        this.engine.dropFruit();
       } else {
         this.reportMistake();
       }
@@ -124,6 +128,13 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
         }
       } else {
         this.reportMistake();
+      }
+    } else if (this.state.fase === 4) {
+      if (this.draggedItem === 'challengeItem') {
+        const isCorrect = this.engine.processChallengeDrop(target);
+        if (!isCorrect) {
+          this.reportMistake();
+        }
       }
     }
     

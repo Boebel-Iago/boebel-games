@@ -124,6 +124,64 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <!-- TEXT AND SHAPES (3º ANO) -->
+        <div *ngSwitchCase="'text-and-shapes'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-teal-700 mb-2">📝 Formatação no Caderno Comum</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Compreender os atributos visuais de um texto usando materiais escolares físicos.</p>
+          <div class="bg-teal-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>Os alunos escrevem um texto autoral sobre suas brincadeiras favoritas no caderno.</li>
+              <li>Oriente-os a simular o "Negrito" passando o lápis grafite bem forte por cima de palavras importantes.</li>
+              <li>Peça para alterarem o "Tamanho da Fonte" escrevendo algumas palavras fisicamente maiores.</li>
+              <li>Utilizem lápis de cor por cima de outras letras para mudar a "Cor da Fonte", entendendo a analogia com os editores de texto digitais.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- MINI POSTER (3º ANO) -->
+        <div *ngSwitchCase="'mini-poster'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-cyan-700 mb-2">📐 Esqueleto Visual (Wireframe)</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Planejar o layout de uma interface ou documento de forma estruturada no papel.</p>
+          <div class="bg-cyan-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>Desenhe no quadro algumas opções de como organizar um folheto (ex: um quadrado na esquerda para imagem, linhas na direita para texto).</li>
+              <li>No caderno, os alunos desenham o "esqueleto" (wireframe) de como querem que o trabalho final fique.</li>
+              <li>Eles fazem um quadrado demarcando onde vão inserir a imagem, e riscam linhas horizontais onde o texto vai ficar.</li>
+              <li>Isso os ensina sobre arranjo espacial e planejamento de diagramação antes da execução no software.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- TOUCH LITERACY (1º ANO) -->
+        <div *ngSwitchCase="'touch-literacy'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-green-700 mb-2">🔎 Caça aos Artefatos na Sala</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Diferenciar objetos de uso comum de artefatos computacionais que necessitam de energia.</p>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>Apresente imagens de diferentes objetos e artefatos (computador, roteador, bebedouro automático, lápis, caderno).</li>
+              <li>Os alunos devem identificar quais deles são artefatos computacionais e explicar para que servem em roda de conversa.</li>
+              <li>Em seguida, promova uma "Caçada" onde eles observam os objetos da própria sala de aula e desenham apenas aqueles que utilizam energia, programação ou processamento de informações.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- TECH INVESTIGATORS (1º ANO) -->
+        <div *ngSwitchCase="'tech-investigators'" class="animate-fadeIn">
+          <h3 class="text-xl font-bold text-purple-700 mb-2">🃏 O que está por trás do botão?</h3>
+          <p class="text-gray-700 mb-4"><strong>Objetivo:</strong> Diferenciar conceitos básicos de Hardware (físico) e Software (instruções/jogos).</p>
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Como aplicar:</h4>
+            <ul class="list-disc list-inside space-y-2 text-gray-800">
+              <li>Prepare cartões impressos divididos em duas categorias: Hardware (botões físicos, tela de tablet, câmera) e Software (regras de jogo, códigos, imagem de um app na tela).</li>
+              <li>Divida a turma em grupos. O desafio é classificar os cartões nas colunas "Físico (Dá para tocar)" e "Invisível/Instruções".</li>
+              <li>Isso ajuda as crianças menores a entenderem que o tablet não faz mágica, mas sim recebe comandos (Software) através do corpo físico (Hardware).</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- DEFAULT / NÃO ENCONTRADO -->
         <div *ngSwitchDefault class="text-center py-8">
           <p class="text-gray-500 font-bold text-lg">Atividade desplugada não cadastrada para este jogo.</p>

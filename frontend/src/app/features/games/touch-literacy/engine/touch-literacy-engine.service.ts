@@ -43,9 +43,16 @@ export class TouchLiteracyEngineService {
     fruitsDropped: 0,
     shapes: { square: false, triangle: false, circle: false, star: false, heart: false },
     devices: { phone: false, laptop: false, flashlight: false, tablet: false, camera: false },
+    
     score: 0,
     challengeItem: null as ChallengeItem | null,
-    challengeTargetScore: 100
+    challengeTargetScore: 100,
+    // Phase 5 (Balloons)
+    balloons: [] as any[],
+    phase5Score: 0,
+    phase5Target: 50,
+    phase5CategoryTarget: 'food'
+
   };
 
   private stateSubject = new BehaviorSubject<any>(this.clone(this.initialState));
@@ -110,10 +117,57 @@ export class TouchLiteracyEngineService {
     
     if (s.score < s.challengeTargetScore) {
       this.generateChallengeItem(s);
+    } else {
+      // Finished Phase 4, automatically wait for component to transition to Phase 5
     }
     this.stateSubject.next(s);
     return isCorrect;
   }
+
+  // Phase 5 Logic
+  spawnBalloon() {
+    const s = this.state();
+    if (s.fase !== 5) return;
+
+    const randomIndex = Math.floor(Math.random() * CHALLENGE_ITEMS.length);
+    const item = CHALLENGE_ITEMS[randomIndex];
+    
+    const balloon = {
+      id: 'b_' + new Date().getTime() + '_' + Math.random(),
+      x: Math.floor(Math.random() * 80) + 10, // 10% to 90%
+      item: item,
+      active: true,
+      color: ['bg-red-400', 'bg-blue-400', 'bg-green-400', 'bg-yellow-400', 'bg-purple-400'][Math.floor(Math.random()*5)]
+    };
+    
+    s.balloons.push(balloon);
+    
+    // Cleanup old balloons
+    if (s.balloons.length > 15) {
+      s.balloons.shift();
+    }
+    
+    this.stateSubject.next(s);
+  }
+
+  popMovingBalloon(id: string): boolean {
+    const s = this.state();
+    const balloon = s.balloons.find((b: any) => b.id === id);
+    if (!balloon || !balloon.active) return false;
+
+    balloon.active = false;
+    const isCorrect = balloon.item.category === s.phase5CategoryTarget;
+    
+    if (isCorrect) {
+      s.phase5Score += 10;
+    } else {
+      s.phase5Score = Math.max(0, s.phase5Score - 5);
+    }
+    
+    this.stateSubject.next(s);
+    return isCorrect;
+  }
+
 
   private clone(obj: any) {
     return JSON.parse(JSON.stringify(obj));

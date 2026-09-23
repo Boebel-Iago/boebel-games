@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 export class TouchLiteracyComponent implements OnInit, OnDestroy {
   state: any;
   sub!: Subscription;
+  balloonInterval: any;
 
   draggedItem: string | null = null;
 
@@ -37,6 +38,7 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.sub) this.sub.unsubscribe();
+    if (this.balloonInterval) clearInterval(this.balloonInterval);
   }
 
   checkCompletion() {
@@ -58,8 +60,27 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
       }
     } else if (this.state.fase === 4) {
       if (this.state.score >= this.state.challengeTargetScore) {
+        this.completePhase(false);
+        this.startBalloons();
+      }
+    } else if (this.state.fase === 5) {
+      if (this.state.phase5Score >= this.state.phase5Target) {
+        if (this.balloonInterval) clearInterval(this.balloonInterval);
         this.completePhase(true);
       }
+    }
+  }
+
+  startBalloons() {
+    this.balloonInterval = setInterval(() => {
+      this.engine.spawnBalloon();
+    }, 1500);
+  }
+
+  onBalloonClick(id: string) {
+    const isCorrect = this.engine.popMovingBalloon(id);
+    if (!isCorrect) {
+      this.reportMistake();
     }
   }
 
@@ -75,7 +96,7 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
     if (!isLastLevel) {
       setTimeout(() => this.engine.nextPhase(), 1000);
     } else {
-      setTimeout(() => alert('🎉 Parabéns! Você completou O GRANDE DESAFIO e venceu o jogo! 🎉'), 1000);
+      setTimeout(() => alert('🎉 Parabéns! Você completou O GRANDE DESAFIO e venceu todos os jogos! 🎉'), 1000);
     }
   }
 

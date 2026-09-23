@@ -1,5 +1,18 @@
-:host {
-  display: block;
-  user-select: none;
-  -webkit-user-select: none;
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh); opacity: 1; }
+  100% { transform: translateY(-30vh); opacity: 0; }
+}
+.animate-floatUp {
+  animation: floatUp 7s linear forwards;
+}
+.balloon-tail {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  width: 2px;
+  height: 30px;
+  background-color: #cbd5e1;
+  transform: translateX(-50%);
 }

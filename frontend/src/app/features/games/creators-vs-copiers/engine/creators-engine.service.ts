@@ -240,6 +240,7 @@ export class CreatorsEngineService {
       return;
     }
 
+    const oldStage = this.getAbsoluteStage();
     let isMissionComplete = false;
 
     if (this.currentMission.type === 'license-cards') {
@@ -278,27 +279,15 @@ export class CreatorsEngineService {
       });
     }
 
-    this.reportProgress('success', this.state.gameFinished);
+    this.reportProgress('success', this.state.gameFinished, oldStage);
   }
 
-  private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
-    const m1 = this.licenseTasks.length;
-    const m2 = this.plagiarismTasksModule2.length;
-    const m3 = this.plagiarismTasksModule3.length;
-    const m4 = this.dragDropData.length;
-    let absoluteFase = 0;
-    
-    switch (this.state.currentMissionIndex) {
-      case 0: absoluteFase = this.state.currentTaskIndex; break;
-      case 1: absoluteFase = m1 + this.state.currentTaskIndex; break;
-      case 2: absoluteFase = m1 + m2 + this.state.currentTaskIndex; break;
-      case 3: absoluteFase = m1 + m2 + m3 + this.state.currentTaskIndex; break;
-      case 4: absoluteFase = m1 + m2 + m3 + m4 + this.state.currentTaskIndex; break;
-    }
+  private reportProgress(result: 'success' | 'failure', isFinished: boolean, overrideFase?: number) {
+    const fase = overrideFase !== undefined ? overrideFase : this.getAbsoluteStage();
     
     this.progressReporter.report({
       levelId: `creators-vs-copiers-m${this.state.currentMissionIndex}-t${this.state.currentTaskIndex}`,
-      fase: absoluteFase,
+      fase: fase,
       result: result,
       attempts: 0,
       timestamp: new Date().toISOString(),

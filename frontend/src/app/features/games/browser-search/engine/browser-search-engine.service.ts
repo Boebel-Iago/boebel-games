@@ -101,6 +101,8 @@ export class BrowserSearchEngineService {
       return;
     }
 
+    const oldStage = (this.state.currentMissionIndex * 10) + this.state.currentTaskIndex;
+
     if (this.state.currentTaskIndex < this.activeMission.tasks.length - 1) {
       this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
       this.setupTask();
@@ -117,15 +119,15 @@ export class BrowserSearchEngineService {
       }
     }
     
-    this.reportProgress('success', this.state.gameFinished);
+    this.reportProgress('success', this.state.gameFinished, oldStage);
   }
 
-  private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
-    const absoluteFase = (this.state.currentMissionIndex * 10) + this.state.currentTaskIndex;
+  private reportProgress(result: 'success' | 'failure', isFinished: boolean, overrideFase?: number) {
+    const fase = overrideFase !== undefined ? overrideFase : (this.state.currentMissionIndex * 10) + this.state.currentTaskIndex;
     
     this.progressReporter.report({
       levelId: `browser-search-m${this.state.currentMissionIndex}-t${this.state.currentTaskIndex}`,
-      fase: absoluteFase,
+      fase: fase,
       result: result,
       attempts: 0,
       timestamp: new Date().toISOString(),

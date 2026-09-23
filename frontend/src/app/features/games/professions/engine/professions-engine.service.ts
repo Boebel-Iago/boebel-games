@@ -282,6 +282,8 @@ export class ProfessionsEngineService {
     }
 
     // Logic to advance tasks depending on mission type
+    const oldStage = this.getAbsoluteStage();
+
     if (this.currentMission.type === 'tool-match') {
       if (!this.state.isHwSwChallenge && this.state.hwSwChallengeIndex < this.hwSwChallenges.length && (this.state.currentTaskIndex % 2 === 0)) {
         this.updateState({ isHwSwChallenge: true, currentHwSwChallenge: this.hwSwChallenges[this.state.hwSwChallengeIndex] });
@@ -319,7 +321,7 @@ export class ProfessionsEngineService {
       }
     }
 
-    this.reportProgress('success', this.state.gameFinished);
+    this.reportProgress('success', this.state.gameFinished, oldStage);
   }
 
   private completeMission() {
@@ -338,22 +340,12 @@ export class ProfessionsEngineService {
     });
   }
 
-  private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
-    const m1 = this.professions.length + this.hwSwChallenges.length;
-    const m2 = this.softwareTasks.length;
-    const m3 = this.scenarios.length;
-    let absoluteFase = 0;
-    
-    switch (this.state.currentMissionIndex) {
-      case 0: absoluteFase = this.state.currentTaskIndex; break;
-      case 1: absoluteFase = m1 + this.state.currentTaskIndex; break;
-      case 2: absoluteFase = m1 + m2 + this.state.currentTaskIndex; break;
-      case 3: absoluteFase = m1 + m2 + m3 + (this.state.phase3Level - 1); break;
-    }
+  private reportProgress(result: 'success' | 'failure', isFinished: boolean, overrideFase?: number) {
+    const fase = overrideFase !== undefined ? overrideFase : this.getAbsoluteStage();
     
     this.progressReporter.report({
       levelId: `professions-m${this.state.currentMissionIndex}-t${this.state.currentTaskIndex}`,
-      fase: absoluteFase,
+      fase: fase,
       result: result,
       attempts: 0,
       timestamp: new Date().toISOString(),

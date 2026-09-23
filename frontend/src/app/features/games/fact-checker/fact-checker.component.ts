@@ -133,6 +133,8 @@ export class FactCheckerComponent implements OnInit {
       return;
     }
 
+    const oldStage = (this.currentCaseIndex * 10) + this.currentStageIndex;
+
     // Avançar estágio ou caso
     if (this.currentStageIndex < this.activeCase.stages.length - 1) {
       this.currentStageIndex++;
@@ -149,7 +151,7 @@ export class FactCheckerComponent implements OnInit {
     }
     
     this.saveLocalProgress();
-    this.reportProgress('success', this.gameFinished);
+    this.reportProgress('success', this.gameFinished, oldStage);
   }
 
   // ==== MECÂNICAS DE JOGO ====
@@ -202,8 +204,8 @@ export class FactCheckerComponent implements OnInit {
 
   // ==== PROGRESSO E TELEMETRIA ====
 
-  private reportProgress(result: 'success' | 'failure', isFinished: boolean) {
-    const absoluteFase = (this.currentCaseIndex * 10) + this.currentStageIndex; // Apenas um ID unico
+  private reportProgress(result: 'success' | 'failure', isFinished: boolean, overrideFase?: number) {
+    const absoluteFase = overrideFase !== undefined ? overrideFase : (this.currentCaseIndex * 10) + this.currentStageIndex; // Apenas um ID unico
     
     this.progressReporter.report({
       levelId: `fact-checker-case${this.currentCaseIndex}-stage${this.currentStageIndex}`,

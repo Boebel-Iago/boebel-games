@@ -18,6 +18,8 @@ import { PhaseRepository, LocalPhaseRepositoryService } from './features/games/s
 import { FreeGamesComponent } from './features/public/free-games/free-games.component';
 import { TextShapesComponent } from './features/games/text-and-shapes/text-shapes.component';
 import { MiniPosterComponent } from './features/games/mini-poster/mini-poster.component';
+import { TouchLiteracyComponent } from './features/games/touch-literacy/touch-literacy.component';
+import { TechInvestigatorsComponent } from './features/games/tech-investigators/tech-investigators.component';
 
 // Repórter falso para bloquear 100% o contato com o servidor e BD nas rotas /free
 class MockProgressReporter {
@@ -46,6 +48,20 @@ export const routes: Routes = [
     { 
         path: 'free/mini-poster', 
         component: MiniPosterComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/touch-literacy', 
+        component: TouchLiteracyComponent,
+        providers: [
+            { provide: ProgressReporter, useClass: MockProgressReporter }
+        ]
+    },
+    { 
+        path: 'free/tech-investigators', 
+        component: TechInvestigatorsComponent,
         providers: [
             { provide: ProgressReporter, useClass: MockProgressReporter }
         ]
@@ -81,6 +97,22 @@ export const routes: Routes = [
     { 
         path: 'games/mini-poster', 
         component: MiniPosterComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/touch-literacy', 
+        component: TouchLiteracyComponent,
+        canActivate: [ticketGuard],
+        providers: [
+            { provide: ProgressReporter, useClass: ApiProgressReporterService }
+        ]
+    },
+    { 
+        path: 'games/tech-investigators', 
+        component: TechInvestigatorsComponent,
         canActivate: [ticketGuard],
         providers: [
             { provide: ProgressReporter, useClass: ApiProgressReporterService }

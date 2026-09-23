@@ -120,3 +120,15 @@ CREATE TABLE access_tickets (
     VALUES ('Mini-Cartaz', 'Organize o layout do seu mini-cartaz digital usando textos e redimensionando imagens.', 'mini-poster');
 
     INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (9, 'ELEMENTARY_3');
+
+    -- Inserindo jogo: Letramento e Toque (ID = 10)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Letramento e Toque', 'Pratique clicar e arrastar objetos pela tela enquanto treina a coordenação motora.', 'touch-literacy');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (10, 'ELEMENTARY_1');
+
+    -- Inserindo jogo: Investigadores da Tecnologia (ID = 11)
+    INSERT INTO games (title, description, route) 
+    VALUES ('Investigadores da Tecnologia', 'Descubra o que é tecnologia e aprenda a cuidar dos nossos equipamentos.', 'tech-investigators');
+
+    INSERT INTO game_allowed_grades (game_id, grade_name) VALUES (11, 'ELEMENTARY_1');

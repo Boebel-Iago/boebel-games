@@ -1,0 +1,130 @@
+<div class="game-container p-4 max-w-4xl mx-auto min-h-screen flex flex-col items-center justify-center">
+  
+  <h1 class="text-4xl font-bold text-blue-800 mb-8 mt-4 text-center">Investigadores da Tecnologia</h1>
+
+  <!-- Phase 0: Identify Tech -->
+  <div *ngIf="engine.fase === 0" class="phase-container w-full max-w-2xl text-center flex flex-col items-center">
+    <h2 class="text-2xl font-semibold mb-6">Toque APENAS nas Tecnologias (Aparelhos)!</h2>
+    <div class="grid grid-cols-3 gap-6">
+      <div *ngFor="let item of engine.items" 
+           (click)="selectItem(item)"
+           class="card text-6xl p-8 bg-white rounded-xl shadow-lg cursor-pointer transform transition hover:scale-105 flex items-center justify-center relative select-none"
+           [ngClass]="{'border-4 border-green-500 bg-green-100': item.selected, 'border-4 border-red-500 bg-red-100': item.isWrong, 'border-4 border-transparent': !item.selected && !item.isWrong}">
+        {{item.icon}}
+        <div *ngIf="item.isWrong" class="absolute inset-0 flex items-center justify-center text-red-600 text-7xl font-bold bg-white/80 rounded-lg">
+          ❌
+        </div>
+        <div *ngIf="item.selected" class="absolute inset-0 flex items-center justify-center text-green-600 text-7xl font-bold bg-white/40 rounded-lg">
+          ✅
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 1: Purpose Matching -->
+  <div *ngIf="engine.fase === 1" class="phase-container w-full max-w-2xl text-center">
+    <h2 class="text-2xl font-semibold mb-6">Arraste o aparelho para o que ele faz!</h2>
+    <div class="flex justify-between w-full mt-10">
+      <div class="devices flex flex-col gap-8 w-1/3">
+        <div *ngFor="let dev of engine.purposeDevices" 
+             draggable="true" 
+             (dragstart)="onDragStartDevice($event, dev.id)"
+             class="text-6xl p-6 bg-white rounded-xl shadow-lg cursor-grab hover:bg-gray-50 flex justify-center border-2 border-gray-200 select-none"
+             [ngClass]="{'opacity-50 pointer-events-none border-green-500': engine.matches[dev.id]}">
+          {{dev.icon}}
+        </div>
+      </div>
+      
+      <div class="scenes flex flex-col gap-8 w-1/3">
+        <div *ngFor="let scene of engine.purposeScenes"
+             (dragover)="onDragOver($event)"
+             (drop)="onDropScene($event, scene.id)"
+             class="text-6xl p-6 bg-blue-100 rounded-xl shadow-inner border-4 border-dashed border-blue-400 flex justify-center items-center min-h-[120px] select-none">
+          {{scene.icon}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2: Hardware vs Software -->
+  <div *ngIf="engine.fase === 2" class="phase-container w-full max-w-3xl text-center">
+    <h2 class="text-2xl font-semibold mb-6">O que podemos TOCAR e o que fica DENTRO da tela?</h2>
+    
+    <div class="flex justify-center gap-4 mb-8">
+      <div *ngFor="let item of engine.hsItems"
+           [hidden]="item.box !== 'none'"
+           draggable="true"
+           (dragstart)="onDragStartHs($event, item.id)"
+           class="text-5xl p-4 bg-white rounded-lg shadow cursor-grab border-2 border-gray-200 select-none hover:scale-105 transform transition">
+        {{item.icon}}
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-around mt-8 gap-8">
+      <div class="box w-full md:w-1/2 p-6 bg-orange-100 border-4 border-orange-400 rounded-2xl min-h-[250px]"
+           (dragover)="onDragOver($event)"
+           (drop)="onDropBox($event, 'hardware')">
+        <h3 class="text-xl font-bold text-orange-800 mb-4 uppercase">FÍSICO (Tocar)</h3>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <div *ngFor="let item of engine.hsItems" [hidden]="item.box !== 'hardware'" class="text-4xl p-2 bg-white rounded shadow">
+            {{item.icon}}
+          </div>
+        </div>
+      </div>
+
+      <div class="box w-full md:w-1/2 p-6 bg-purple-100 border-4 border-purple-400 rounded-2xl min-h-[250px]"
+           (dragover)="onDragOver($event)"
+           (drop)="onDropBox($event, 'software')">
+        <h3 class="text-xl font-bold text-purple-800 mb-4 uppercase">INVISÍVEL (Dentro da tela)</h3>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <div *ngFor="let item of engine.hsItems" [hidden]="item.box !== 'software'" class="text-4xl p-2 bg-white rounded shadow">
+            {{item.icon}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3: Good Care -->
+  <div *ngIf="engine.fase === 3" class="phase-container w-full max-w-3xl text-center">
+    <h2 class="text-2xl font-semibold mb-6">Qual é a forma CORRETA de cuidar da tecnologia?</h2>
+    <div class="flex flex-col md:flex-row justify-around gap-8 mt-10">
+      
+      <!-- Messy choice -->
+      <div class="choice w-full md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-105 border-4 border-transparent hover:border-blue-400"
+           (click)="selectCare(engine.goodCareChoices[0])">
+        <div class="h-64 bg-yellow-200 flex flex-col items-center justify-center p-4">
+          <div class="text-8xl mb-2">🍔📱</div>
+          <div class="text-6xl">🥤</div>
+        </div>
+        <div class="p-4 bg-gray-50 font-bold text-lg">
+          Comendo e sujando
+        </div>
+      </div>
+
+      <!-- Clean choice -->
+      <div class="choice w-full md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-105 border-4 border-transparent hover:border-blue-400"
+           (click)="selectCare(engine.goodCareChoices[1])">
+        <div class="h-64 bg-green-200 flex flex-col items-center justify-center p-4">
+          <div class="text-8xl mb-2">🧼👐</div>
+          <div class="text-6xl">💻</div>
+        </div>
+        <div class="p-4 bg-gray-50 font-bold text-lg">
+          Mãos limpas na mesa
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Completed -->
+  <div *ngIf="engine.fase >= 4" class="phase-container text-center mt-20 fade-in">
+    <div class="text-8xl mb-6">🏆</div>
+    <h2 class="text-4xl font-bold text-green-600 mb-4">Parabéns, Investigador!</h2>
+    <p class="text-xl text-gray-700">Você concluiu sua missão com sucesso!</p>
+    <button (click)="engine.reset()" class="mt-8 px-6 py-3 bg-blue-600 text-white rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg transform transition hover:scale-105">
+      Jogar Novamente
+    </button>
+  </div>
+
+</div>

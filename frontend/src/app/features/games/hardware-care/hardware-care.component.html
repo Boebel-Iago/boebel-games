@@ -1,0 +1,205 @@
+<div class="min-h-screen bg-blue-50 p-6 font-sans text-gray-800">
+  <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8 border-4 border-blue-400">
+    
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-blue-600 mb-2">
+        <i class="fas fa-shield-alt mr-3"></i>Segurança e Zelo Físico
+      </h1>
+      <p class="text-xl text-gray-600 font-medium">Aprenda a cuidar bem dos seus equipamentos!</p>
+      
+      <!-- Progress Bar -->
+      <div class="mt-6 flex justify-center items-center gap-4">
+        <div *ngFor="let i of [0,1,2,3]" 
+             class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border-4"
+             [ngClass]="{
+               'bg-blue-500 text-white border-blue-700': engine.state.fase === i,
+               'bg-green-400 text-white border-green-600': engine.state.fase > i,
+               'bg-gray-200 text-gray-400 border-gray-300': engine.state.fase < i
+             }">
+          {{i + 1}}
+        </div>
+      </div>
+    </header>
+
+    <!-- Fase 0 -->
+    <section *ngIf="engine.state.fase === 0" class="fade-in">
+      <h2 class="text-3xl font-bold text-center text-orange-500 mb-6">Regra de Ouro 🌟</h2>
+      <p class="text-center text-xl mb-8">Qual é a maneira mais segura de segurar o seu tablet?</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Errado -->
+        <button (click)="selectPhase0(false)" 
+                class="transform transition hover:scale-105 bg-red-100 hover:bg-red-200 border-4 border-red-300 rounded-3xl p-8 flex flex-col items-center gap-4 cursor-pointer focus:outline-none">
+          <div class="text-6xl text-red-500 flex items-center justify-center">
+            <i class="fas fa-running mr-4"></i>
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <span class="text-2xl font-bold text-red-700 text-center">Correr com uma mão só</span>
+        </button>
+
+        <!-- Correto -->
+        <button (click)="selectPhase0(true)" 
+                class="transform transition hover:scale-105 bg-green-100 hover:bg-green-200 border-4 border-green-300 rounded-3xl p-8 flex flex-col items-center gap-4 cursor-pointer focus:outline-none">
+          <div class="text-6xl text-green-500 flex items-center justify-center">
+            <i class="fas fa-walking mr-4"></i>
+            <i class="fas fa-hands"></i>
+          </div>
+          <span class="text-2xl font-bold text-green-700 text-center">Andar e segurar com as duas mãos</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Fase 1 -->
+    <section *ngIf="engine.state.fase === 1" class="fade-in">
+      <h2 class="text-3xl font-bold text-center text-orange-500 mb-6">Comida e Água 🍎💧</h2>
+      <p class="text-center text-xl mb-4">Clique em um item e depois clique para onde ele deve ir!</p>
+      
+      <div class="flex justify-center gap-4 mb-8 min-h-[100px]">
+        <ng-container *ngFor="let item of phase1Items">
+          <button *ngIf="!item.placed"
+                  (click)="selectP1Item(item)"
+                  class="transform transition text-4xl p-4 rounded-xl border-4 focus:outline-none"
+                  [ngClass]="selectedPhase1Item === item ? 'border-blue-500 bg-blue-100 scale-110' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'">
+            <i [class]="item.icon" class="text-blue-500"></i>
+            <div class="text-sm font-bold mt-2 text-gray-700">{{item.name}}</div>
+          </button>
+        </ng-container>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Proibido -->
+        <div (click)="placeP1Item('proibido')" 
+             class="border-4 border-red-400 bg-red-50 rounded-3xl p-6 min-h-[200px] cursor-pointer hover:bg-red-100 transition flex flex-col items-center">
+          <h3 class="text-2xl font-bold text-red-600 mb-4 text-center"><i class="fas fa-ban mr-2"></i>Proibido (Longe do Tablet)</h3>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <div *ngFor="let item of phase1Items">
+              <div *ngIf="item.placed === 'proibido'" class="text-4xl text-red-500 bg-white p-3 rounded-xl shadow fade-in">
+                <i [class]="item.icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permitido -->
+        <div (click)="placeP1Item('permitido')" 
+             class="border-4 border-green-400 bg-green-50 rounded-3xl p-6 min-h-[200px] cursor-pointer hover:bg-green-100 transition flex flex-col items-center">
+          <h3 class="text-2xl font-bold text-green-600 mb-4 text-center"><i class="fas fa-check-circle mr-2"></i>Permitido (Perto do Tablet)</h3>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <div *ngFor="let item of phase1Items">
+              <div *ngIf="item.placed === 'permitido'" class="text-4xl text-green-500 bg-white p-3 rounded-xl shadow fade-in">
+                <i [class]="item.icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fase 2 -->
+    <section *ngIf="engine.state.fase === 2" class="fade-in">
+      <h2 class="text-3xl font-bold text-center text-orange-500 mb-6">Linha do Tempo ⏱️</h2>
+      <p class="text-center text-xl mb-6">Qual é a ordem correta para usar o tablet? Clique nas ações na ordem certa!</p>
+      
+      <!-- Disponíveis -->
+      <div class="flex flex-wrap justify-center gap-4 mb-8 min-h-[120px]">
+        <button *ngFor="let item of phase2Available"
+                (click)="selectP2Item(item)"
+                class="transform transition hover:scale-105 bg-white border-4 border-purple-300 rounded-2xl p-4 w-36 md:w-40 flex flex-col items-center shadow-sm focus:outline-none">
+          <i [class]="item.icon" class="text-4xl text-purple-500 mb-2"></i>
+          <span class="font-bold text-sm text-center text-gray-700">{{item.name}}</span>
+        </button>
+      </div>
+
+      <!-- Sequência -->
+      <div class="bg-purple-100 border-4 border-purple-300 rounded-3xl p-6 relative">
+        <div class="absolute top-[40%] left-10 right-10 h-2 bg-purple-300 -z-10 transform -translate-y-1/2 hidden md:block"></div>
+        
+        <div class="flex flex-wrap md:flex-nowrap justify-between gap-4 relative z-10">
+          <div *ngFor="let i of [0,1,2,3]" class="w-[45%] md:w-1/4 flex flex-col items-center">
+            <div class="w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold mb-4 border-4 border-white shadow">
+              {{i + 1}}º
+            </div>
+            <div *ngIf="phase2Sequence[i]" 
+                 (click)="undoP2Item(phase2Sequence[i])"
+                 class="bg-white border-4 border-green-400 rounded-2xl p-4 w-full flex flex-col items-center cursor-pointer hover:bg-red-50 fade-in">
+              <i [class]="phase2Sequence[i].icon" class="text-3xl text-green-500 mb-2"></i>
+              <span class="font-bold text-xs md:text-sm text-center text-gray-700">{{phase2Sequence[i].name}}</span>
+            </div>
+            <div *ngIf="!phase2Sequence[i]" 
+                 class="bg-purple-50 border-4 border-dashed border-purple-300 rounded-2xl p-4 w-full h-28 flex flex-col items-center justify-center">
+              <span class="text-purple-300 text-sm font-bold">Vazio</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fase 3 -->
+    <section *ngIf="engine.state.fase === 3" class="fade-in">
+      <h2 class="text-3xl font-bold text-center text-orange-500 mb-6">Avaliação Final 🏆</h2>
+      <p class="text-center text-xl mb-4">Separe as atitudes seguras e perigosas!</p>
+      
+      <div class="flex flex-wrap justify-center gap-4 mb-8 min-h-[100px]">
+        <ng-container *ngFor="let item of phase3Items">
+          <button *ngIf="!item.placed"
+                  (click)="selectP3Item(item)"
+                  class="transform transition text-3xl p-4 rounded-xl border-4 focus:outline-none"
+                  [ngClass]="selectedPhase3Item === item ? 'border-blue-500 bg-blue-100 scale-110' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'">
+            <i [class]="item.icon" class="text-blue-500"></i>
+            <div class="text-sm font-bold mt-2 text-gray-700">{{item.name}}</div>
+          </button>
+        </ng-container>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Danger (Lixo Vermelho) -->
+        <div (click)="placeP3Item('danger')" 
+             class="border-4 border-red-500 bg-red-100 rounded-3xl p-6 min-h-[250px] cursor-pointer hover:bg-red-200 transition flex flex-col items-center">
+          <div class="text-6xl text-red-600 mb-4"><i class="fas fa-trash-alt"></i></div>
+          <h3 class="text-2xl font-bold text-red-700 mb-4 text-center">Lixeira do Perigo</h3>
+          <div class="flex flex-col gap-2 w-full">
+            <div *ngFor="let item of phase3Items">
+              <div *ngIf="item.placed === 'danger'" class="flex items-center gap-3 text-red-700 bg-white p-3 rounded-xl shadow font-bold text-sm fade-in">
+                <i [class]="item.icon" class="text-xl"></i>
+                {{item.name}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Safe (Cofre Verde) -->
+        <div (click)="placeP3Item('safe')" 
+             class="border-4 border-green-500 bg-green-100 rounded-3xl p-6 min-h-[250px] cursor-pointer hover:bg-green-200 transition flex flex-col items-center">
+          <div class="text-6xl text-green-600 mb-4"><i class="fas fa-shield-alt"></i></div>
+          <h3 class="text-2xl font-bold text-green-700 mb-4 text-center">Cofre Seguro</h3>
+          <div class="flex flex-col gap-2 w-full">
+            <div *ngFor="let item of phase3Items">
+              <div *ngIf="item.placed === 'safe'" class="flex items-center gap-3 text-green-700 bg-white p-3 rounded-xl shadow font-bold text-sm fade-in">
+                <i [class]="item.icon" class="text-xl"></i>
+                {{item.name}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fim do Jogo -->
+    <section *ngIf="engine.state.fase > 3" class="fade-in text-center py-12">
+      <div class="text-8xl text-yellow-400 mb-6">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-trophy mx-4 text-9xl"></i>
+        <i class="fas fa-star"></i>
+      </div>
+      <h2 class="text-5xl font-bold text-green-500 mb-4">Você é um Especialista!</h2>
+      <p class="text-2xl text-gray-600 mb-8">Parabéns! Agora você sabe tudo sobre como cuidar do seu equipamento e dos seus dados.</p>
+      
+      <button (click)="restart()" 
+              class="bg-blue-500 hover:bg-blue-600 text-white font-bold text-2xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 focus:outline-none">
+        Jogar Novamente <i class="fas fa-redo ml-2"></i>
+      </button>
+    </section>
+
+  </div>
+</div>

@@ -110,8 +110,8 @@
                 <span class="text-xs uppercase font-bold" [ngClass]="ticket.isActive ? 'text-emerald-700' : 'text-yellow-700'">
                   {{ ticket.isActive ? 'Ativo' : 'Pausado' }}
                 </span>
-                <h4 class="font-bold text-lg text-gray-900">{{ ticket.gameTitle }}</h4>
-                <p *ngIf="ticket.ticketName" class="text-sm font-medium text-indigo-700 mt-1">{{ ticket.ticketName }}</p>
+                <h4 class="font-bold text-lg text-gray-900">{{ ticket.ticketName || ticket.gameTitle }}</h4>
+                <p *ngIf="ticket.ticketName" class="text-sm font-medium text-emerald-700 mt-1">{{ ticket.gameTitle }}</p>
               </div>
               <code class="font-bold bg-gray-100 px-2 py-1 border rounded text-sm">{{ ticket.code }}</code>
             </div>
@@ -149,7 +149,7 @@
         <div class="flex justify-between items-center mb-2">
           <span class="text-xs uppercase font-bold" 
                 [ngClass]="selectedTicket.isActive ? 'text-emerald-700' : 'text-yellow-700'">
-            Ingresso {{ selectedTicket.isActive ? 'Ativo' : 'Pausado' }} ({{ selectedTicket.gameTitle }})
+            Ingresso {{ selectedTicket.isActive ? 'Ativo' : 'Pausado' }} ({{ selectedTicket.ticketName || selectedTicket.gameTitle }})
           </span>
           <button (click)="onToggleTicketStatus(selectedTicket.id)"
                   class="text-xs px-3 py-1 rounded-full font-bold transition-colors shadow-sm"
@@ -161,7 +161,7 @@
         <code class="text-xl font-bold bg-white px-3 py-2 border rounded block text-center mt-2">{{ selectedTicket.code }}</code>
         
         <div *ngIf="selectedTicket.ticketName" class="text-center mt-3 mb-1">
-          <span class="inline-block bg-indigo-100 text-indigo-800 text-sm font-bold px-3 py-1 rounded-full">{{ selectedTicket.ticketName }}</span>
+          <span class="inline-block bg-emerald-100 text-emerald-800 text-sm font-bold px-3 py-1 rounded-full">{{ selectedTicket.gameTitle }}</span>
         </div>
 
         <p class="text-xs text-center mt-2" [ngClass]="selectedTicket.isActive ? 'text-gray-700' : 'text-yellow-800'">

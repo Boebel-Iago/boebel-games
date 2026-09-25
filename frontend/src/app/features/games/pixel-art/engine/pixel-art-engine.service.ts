@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
 export interface GameTask {
   id: number;
@@ -13,35 +14,35 @@ export interface PixelArtState {
   taskIndex: number;
   hearts: number;
   completed: boolean;
+  deathCount: number;
 }
-
-const LOCAL_STORAGE_KEY = 'boebel_pixel_art_state';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PixelArtEngineService {
-  private state: PixelArtState = this.loadState();
+  private state: PixelArtState = { module: 0, taskIndex: 0, hearts: 3, completed: false, deathCount: 0 };
   public state$ = new BehaviorSubject<PixelArtState>(this.state);
   
   public tasks: GameTask[][] = [];
 
-  constructor() {
+  constructor(private progress: ProgressReporter) {
     this.generateTasks();
+    this.progress.fetchSessionState()?.subscribe(stateStr => {
+      if (stateStr) {
+        try {
+          this.state = JSON.parse(stateStr);
+          this.state$.next(this.state);
+        } catch (e) {}
+      }
+    });
   }
 
-  private loadState(): PixelArtState {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return { module: 0, taskIndex: 0, hearts: 3, completed: false };
+  get score(): number {
+    return Math.max(0, (this.state.module * 200) + (this.state.taskIndex * 20) - (this.state.deathCount * 20));
   }
 
   public saveState() {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.state));
     this.state$.next(this.state);
   }
 
@@ -52,7 +53,7 @@ export class PixelArtEngineService {
   }
 
   public resetGame() {
-    this.state = { module: 0, taskIndex: 0, hearts: 3, completed: false };
+    this.state = { module: 0, taskIndex: 0, hearts: 3, completed: false, deathCount: 0 };
     this.saveState();
   }
 
@@ -80,6 +81,7 @@ export class PixelArtEngineService {
   public loseHeart(): boolean {
     this.state.hearts--;
     if (this.state.hearts <= 0) {
+      this.state.deathCount++;
       this.resetModule();
       return true; // module restarted
     }

@@ -6,6 +6,7 @@ export interface GameState {
   fase: number;   // 0 to 9
   vidas: number;  // starts at 3
   completed: boolean;
+  deathCount: number;
 }
 
 export interface TaskConfig {
@@ -19,9 +20,8 @@ export interface TaskConfig {
 
 @Injectable({ providedIn: 'root' })
 export class TextShapesEngineService {
-  state: GameState = { modulo: 1, fase: 0, vidas: 3, completed: false };
+  state: GameState = { modulo: 1, fase: 0, vidas: 3, completed: false, deathCount: 0 };
   currentTask: TaskConfig | null = null;
-  STORAGE_KEY = 'boebel_text_shapes_state';
 
   private m1Words = ['Computador', 'Mouse', 'Teclado', 'Tela', 'Livro', 'Lápis', 'Borracha', 'Mochila', 'Escola', 'Caderno', 'Caneta', 'Papel', 'Amigo', 'Brincar', 'Estudar'];
   private m2Colors = [
@@ -51,43 +51,34 @@ export class TextShapesEngineService {
     { label: 'Triângulo Azul', icon: 'fa-play', class: 'text-blue-500', shape: 'Triângulo', color: 'Azul' }
   ];
 
-  constructor(private progress: ProgressReporter) {
-    this.loadState();
-    if (!this.state.completed) {
-      this.generateTask();
-    }
+  get score(): number {
+    return Math.max(0, (this.state.modulo * 200) + (this.state.fase * 20) - (this.state.deathCount * 20));
   }
 
-  loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      try {
-        this.state = JSON.parse(saved);
-      } catch (e) {
+  constructor(private progress: ProgressReporter) {
+    this.progress.fetchSessionState()?.subscribe((saved: string | null) => {
+      if (saved) {
+        try {
+          this.state = JSON.parse(saved);
+        } catch (e) {
+          this.resetState();
+        }
+      } else {
         this.resetState();
       }
-    } else {
-      this.resetState();
-    }
-  }
-
-  saveState() {
-    if (this.state.completed) {
-      localStorage.removeItem(this.STORAGE_KEY);
-    } else {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
-    }
+      if (!this.state.completed) {
+        this.generateTask();
+      }
+    });
   }
 
   resetState() {
-    this.state = { modulo: 1, fase: 0, vidas: 3, completed: false };
-    this.saveState();
+    this.state = { modulo: 1, fase: 0, vidas: 3, completed: false, deathCount: 0 };
   }
 
   restartModule() {
     this.state.fase = 0;
     this.state.vidas = 3;
-    this.saveState();
     this.generateTask();
   }
 
@@ -169,7 +160,9 @@ export class TextShapesEngineService {
         result: 'success',
         attempts: 1,
         timestamp: new Date().toISOString(),
-        isLastLevel: this.state.modulo === 5 && this.state.fase === 9
+        isLastLevel: this.state.modulo === 5 && this.state.fase === 9,
+        score: this.score,
+        gameState: JSON.stringify(this.state)
       });
 
       this.state.fase++;
@@ -181,7 +174,6 @@ export class TextShapesEngineService {
           this.state.completed = true;
         }
       }
-      this.saveState();
       if (!this.state.completed) {
         this.generateTask();
       }
@@ -192,11 +184,13 @@ export class TextShapesEngineService {
         result: 'failure',
         attempts: 1,
         timestamp: new Date().toISOString(),
-        isLastLevel: false
+        isLastLevel: false,
+        score: this.score,
+        gameState: JSON.stringify(this.state)
       });
       this.state.vidas--;
-      this.saveState();
       if (this.state.vidas <= 0) {
+        this.state.deathCount++;
         // game over for this module, restart module handled by component or here
       }
     }

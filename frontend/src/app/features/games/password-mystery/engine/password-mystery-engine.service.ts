@@ -5,6 +5,7 @@ export interface GameState {
   module: number;
   task: number;
   hearts: number;
+  deathCount: number;
 }
 
 export interface CodeTask {
@@ -22,7 +23,6 @@ export interface TapTask {
 
 @Injectable({ providedIn: 'root' })
 export class PasswordMysteryEngineService {
-  private readonly STORAGE_KEY = 'boebel_password_mystery_state';
   private readonly MAX_MODULES = 5;
   private readonly TASKS_PER_MODULE = 10;
   private readonly MAX_HEARTS = 3;
@@ -31,10 +31,26 @@ export class PasswordMysteryEngineService {
     module: 0, // 0 to 4
     task: 0,   // 0 to 9
     hearts: this.MAX_HEARTS,
+    deathCount: 0,
   };
 
   constructor(private progress: ProgressReporter) {
-    this.loadState();
+    const sessionState$ = this.progress.fetchSessionState();
+    if (sessionState$) {
+      sessionState$.subscribe((res: any) => {
+        if (res && res.gameState) {
+          try {
+            this.state = JSON.parse(res.gameState);
+          } catch (e) {
+            console.error('Failed to parse remote game state', e);
+          }
+        }
+      });
+    }
+  }
+
+  get score(): number {
+    return Math.max(0, (this.state.module * 200) + (this.state.task * 20) - (this.state.deathCount * 20));
   }
 
   // --- Content Generators ---
@@ -130,7 +146,6 @@ export class PasswordMysteryEngineService {
       this.reportMistake();
       this.loseHeart();
     }
-    this.saveState();
   }
 
   private completeTask() {
@@ -143,7 +158,9 @@ export class PasswordMysteryEngineService {
       result: 'success',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: isLastTaskOverall
+      isLastLevel: isLastTaskOverall,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (isLastTaskOverall) {
@@ -167,7 +184,9 @@ export class PasswordMysteryEngineService {
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
   }
 
@@ -176,38 +195,16 @@ export class PasswordMysteryEngineService {
     if (this.state.hearts <= 0) {
       this.state.task = 0; // Restart current module
       this.state.hearts = this.MAX_HEARTS;
-    }
-  }
-
-  // --- Persistence ---
-
-  private saveState() {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
-    }
-  }
-
-  private loadState() {
-    if (typeof localStorage !== 'undefined') {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
-      if (saved) {
-        try {
-          this.state = JSON.parse(saved);
-        } catch (e) {
-          console.error('Failed to parse game state', e);
-        }
-      }
+      this.state.deathCount++;
     }
   }
 
   clearState() {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(this.STORAGE_KEY);
-    }
     this.state = {
       module: 0,
       task: 0,
-      hearts: this.MAX_HEARTS
+      hearts: this.MAX_HEARTS,
+      deathCount: 0
     };
   }
 }

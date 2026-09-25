@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
 export interface Task {
   type: 'drag' | 'tap' | 'drag-3';
@@ -18,20 +19,36 @@ export interface GameState {
   fase: number;
   taskId: number;
   hearts: number;
-  score: number;
+  deathCount: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfessionsEngineService {
-  private readonly STORAGE_KEY = 'boebel_professions_state';
-  public state: GameState = { fase: 0, taskId: 0, hearts: 3, score: 0 };
+  public state: GameState = { fase: 0, taskId: 0, hearts: 3, deathCount: 0 };
   public modules: GameModule[] = [];
 
-  constructor() {
+  constructor(private progress: ProgressReporter) {
     this.initModules();
-    this.loadState();
+    this.progress.fetchSessionState()?.subscribe(saved => {
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed) {
+            this.state = parsed;
+            if (this.state.fase > 4) this.state.fase = 4;
+            if (this.state.deathCount === undefined) this.state.deathCount = 0;
+          }
+        } catch (e) {
+          // keep initial state
+        }
+      }
+    });
+  }
+
+  get score(): number {
+    return Math.max(0, (this.state.fase * 200) + (this.state.taskId * 20) - (this.state.deathCount * 20));
   }
 
   private shuffle(array: any[]) {
@@ -117,22 +134,6 @@ export class ProfessionsEngineService {
     ];
   }
 
-  loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      try {
-        this.state = JSON.parse(saved);
-        if (this.state.fase > 4) this.state.fase = 4;
-      } catch (e) {
-        this.saveState();
-      }
-    }
-  }
-
-  saveState() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
-  }
-
   getCurrentTask(): Task | null {
     if (this.state.fase >= this.modules.length) return null;
     const mod = this.modules[this.state.fase];
@@ -145,12 +146,12 @@ export class ProfessionsEngineService {
     if (!task) return false;
     
     if (task.correct === answer) {
-      this.state.score += 10;
-      this.saveState();
+      this.reportState();
       return true;
     } else {
       this.state.hearts--;
-      this.saveState();
+      this.reportMistake();
+      this.reportState();
       return false;
     }
   }
@@ -160,20 +161,58 @@ export class ProfessionsEngineService {
     const mod = this.modules[this.state.fase];
     
     if (this.state.taskId >= mod.tasks.length) {
-      this.state.fase++;
-      this.state.taskId = 0;
-      this.state.hearts = 3; 
-      this.saveState();
-      return this.state.fase >= this.modules.length ? 'finished' : 'next-module';
+      const isLast = this.state.fase >= this.modules.length - 1;
+      this.completePhase(isLast);
+      
+      if (isLast) {
+        return 'finished';
+      } else {
+        this.state.fase++;
+        this.state.taskId = 0;
+        this.state.hearts = 3; 
+        this.reportState();
+        return 'next-module';
+      }
     }
     
-    this.saveState();
+    this.reportState();
     return 'next-task';
   }
 
   restartModule() {
+    this.state.deathCount++;
     this.state.taskId = 0;
     this.state.hearts = 3;
-    this.saveState();
+    this.reportState();
+  }
+
+  private reportState() {
+    // Intentionally left blank or use if continuous syncing is required
+  }
+
+  completePhase(isLastLevel: boolean) {
+    this.progress.report({
+      levelId: `fase-${this.state.fase}`,
+      fase: this.state.fase,
+      result: 'success',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isLastLevel,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
+    } as any);
+  }
+
+  reportMistake() {
+    this.progress.report({
+      levelId: `fase-${this.state.fase}`,
+      fase: this.state.fase,
+      result: 'failure',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
+    } as any);
   }
 }

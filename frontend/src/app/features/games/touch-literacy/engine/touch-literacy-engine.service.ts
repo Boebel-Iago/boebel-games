@@ -46,9 +46,9 @@ export interface GameState {
   taskData: any; // Dynamic data for the current module/task
   balloons: Balloon[];
   foodsPopped: number;
+  deathCount: number;
 }
 
-const STORAGE_KEY = 'boebel_touch_literacy_state';
 
 @Injectable({ providedIn: 'root' })
 export class TouchLiteracyEngineService {
@@ -58,46 +58,44 @@ export class TouchLiteracyEngineService {
     lives: 3,
     taskData: null,
     balloons: [],
-    foodsPopped: 0
+    foodsPopped: 0,
+    deathCount: 0
   };
 
   private stateSubject = new BehaviorSubject<GameState>(this.clone(this.initialState));
   state$ = this.stateSubject.asObservable();
 
   constructor(private progress: ProgressReporter) {
-    this.loadState();
+    const obs = this.progress.fetchSessionState();
+    if (obs) {
+      obs.subscribe(session => {
+        if (session && session.gameState && session.gameState !== '{}') {
+          try {
+            const parsed = JSON.parse(session.gameState);
+            this.stateSubject.next(parsed);
+          } catch (e) {
+            this.generateNextTask();
+          }
+        } else {
+          this.generateNextTask();
+        }
+      });
+    } else {
+      this.generateNextTask();
+    }
   }
 
   get state(): GameState {
     return this.stateSubject.value;
   }
 
+  get score(): number {
+    return Math.max(0, (this.state.currentModuleIndex * 200) + (this.state.currentTaskIndex * 20) - (this.state.deathCount * 20));
+  }
+
   private updateState(newState: Partial<GameState>) {
     const nextState = { ...this.state, ...newState };
     this.stateSubject.next(nextState);
-    this.saveState(nextState);
-  }
-
-  private saveState(state: GameState) {
-    if (state.currentModuleIndex >= 5) {
-      localStorage.removeItem(STORAGE_KEY);
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-  }
-
-  private loadState() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        this.stateSubject.next(parsed);
-      } catch (e) {
-        this.generateNextTask();
-      }
-    } else {
-      this.generateNextTask();
-    }
   }
 
   private clone<T>(obj: T): T {
@@ -183,7 +181,9 @@ export class TouchLiteracyEngineService {
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (newLives <= 0) {
@@ -192,7 +192,8 @@ export class TouchLiteracyEngineService {
         currentTaskIndex: 0,
         lives: 3,
         foodsPopped: 0,
-        balloons: []
+        balloons: [],
+        deathCount: s.deathCount + 1
       });
       this.generateNextTask();
     } else {
@@ -232,7 +233,9 @@ export class TouchLiteracyEngineService {
       result: 'success',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: isLast
+      isLastLevel: isLast,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (isLast) {
@@ -240,7 +243,6 @@ export class TouchLiteracyEngineService {
         currentModuleIndex: 5,
         currentTaskIndex: 0
       });
-      localStorage.removeItem(STORAGE_KEY);
     } else {
       this.updateState({
         currentModuleIndex: modIndex + 1,

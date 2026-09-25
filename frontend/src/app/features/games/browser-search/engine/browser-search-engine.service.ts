@@ -30,21 +30,21 @@ export interface GameState {
   isGameOver: boolean;
   gameWon: boolean;
   currentTask: SearchTask | null;
+  deathCount: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class BrowserSearchEngineService {
-  private readonly STORAGE_KEY = 'boebel_browser_search_state';
-
   private defaultState: GameState = {
     module: 0,
     taskIndex: 0,
     hearts: 3,
     isGameOver: false,
     gameWon: false,
-    currentTask: null
+    currentTask: null,
+    deathCount: 0
   };
 
   private state = new BehaviorSubject<GameState>({ ...this.defaultState });
@@ -57,27 +57,49 @@ export class BrowserSearchEngineService {
     this.loadState();
   }
 
+  get score(): number {
+    const st = this.state.value;
+    return Math.max(0, (st.module * 200) + (st.taskIndex * 20) - (st.deathCount * 20));
+  }
+
   private loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    let st = this.defaultState;
-    if (saved) {
-      try {
-        st = JSON.parse(saved);
-      } catch (e) {
-        console.error('Error parsing saved state', e);
-      }
+    const ob = this.progress.fetchSessionState();
+    if (ob) {
+      ob.subscribe({
+        next: (res) => {
+          if (res && res.gameState) {
+             try {
+               const parsed = JSON.parse(res.gameState);
+               let st = { ...this.defaultState, ...parsed };
+               if (!st.gameWon && !st.isGameOver) {
+                 st.currentTask = this.tasksByModule[st.module][st.taskIndex];
+               }
+               this.state.next(st);
+             } catch(e) {
+               console.error('Error parsing saved state', e);
+               this.initDefault();
+             }
+          } else {
+             this.initDefault();
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching state', err);
+          this.initDefault();
+        }
+      });
+    } else {
+       this.initDefault();
     }
-    
-    // Ensure we have a valid task
-    if (!st.gameWon && !st.isGameOver) {
-      st.currentTask = this.tasksByModule[st.module][st.taskIndex];
-    }
-    
+  }
+
+  private initDefault() {
+    let st = { ...this.defaultState };
+    st.currentTask = this.tasksByModule[st.module][st.taskIndex];
     this.state.next(st);
   }
 
   private saveState(st: GameState) {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(st));
     this.state.next(st);
   }
 
@@ -91,14 +113,10 @@ export class BrowserSearchEngineService {
     const st = { ...this.state.value };
 
     if (isCorrect) {
-      this.progress.report({
-        levelId: `browser-search-m${st.module}-t${st.taskIndex}`,
-        fase: st.module,
-        result: 'success',
-        attempts: 4 - st.hearts,
-        timestamp: new Date().toISOString(),
-        isLastLevel: st.module === 4 && st.taskIndex === 9
-      });
+      const isLastLevel = st.module === 4 && st.taskIndex === 9;
+      const reportedModule = st.module;
+      const reportedTask = st.taskIndex;
+      const reportedAttempts = 4 - st.hearts;
 
       st.taskIndex++;
       if (st.taskIndex >= 10) {
@@ -109,29 +127,46 @@ export class BrowserSearchEngineService {
         if (st.module >= 5) {
           st.gameWon = true;
           st.currentTask = null;
-          this.saveState(st);
-          return;
         }
       }
-      st.currentTask = this.tasksByModule[st.module][st.taskIndex];
+      
+      if (!st.gameWon) {
+        st.currentTask = this.tasksByModule[st.module][st.taskIndex];
+      }
+
+      this.saveState(st);
+
+      this.progress.report({
+        levelId: `browser-search-m${reportedModule}-t${reportedTask}`,
+        fase: reportedModule,
+        result: 'success',
+        attempts: reportedAttempts,
+        timestamp: new Date().toISOString(),
+        isLastLevel: isLastLevel,
+        score: this.score,
+        gameState: JSON.stringify(this.state.value)
+      });
     } else {
+      st.hearts--;
+      if (st.hearts <= 0) {
+        st.isGameOver = true;
+        st.currentTask = null;
+        st.deathCount++;
+      }
+
+      this.saveState(st);
+
       this.progress.report({
         levelId: `browser-search-m${st.module}-t${st.taskIndex}`,
         fase: st.module,
         result: 'failure',
         attempts: 1,
         timestamp: new Date().toISOString(),
-        isLastLevel: false
+        isLastLevel: false,
+        score: this.score,
+        gameState: JSON.stringify(this.state.value)
       });
-
-      st.hearts--;
-      if (st.hearts <= 0) {
-        st.isGameOver = true;
-        st.currentTask = null;
-      }
     }
-
-    this.saveState(st);
   }
 
   public retryModule() {

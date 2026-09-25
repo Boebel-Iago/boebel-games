@@ -5,11 +5,16 @@ export interface GameState {
   module: number;
   phase: number;
   hearts: number;
+  deathCount: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class HardwareCareEngineService {
-  state: GameState = { module: 0, phase: 0, hearts: 3 };
+  state: GameState = { module: 0, phase: 0, hearts: 3, deathCount: 0 };
+  
+  get score(): number {
+    return Math.max(0, (this.state.module * 200) + (this.state.phase * 20) - (this.state.deathCount * 20));
+  }
   
   // Módulo 1: Mãos Limpas (Tap)
   m1Data = [
@@ -86,34 +91,24 @@ export class HardwareCareEngineService {
   currentTaskIndex: number = 0;
 
   constructor(private progress: ProgressReporter) {
-    this.loadState();
-    this.initializeModule();
-  }
-
-  loadState() {
-    const saved = localStorage.getItem('boebel_hardware_care_state');
-    if (saved) {
-      this.state = JSON.parse(saved);
-      // Ensure validity
-      if (this.state.module > 4) {
-        this.resetGame();
+    this.progress.fetchSessionState()?.subscribe(session => {
+      if (session) {
+        try {
+          this.state = JSON.parse(session);
+          // Ensure validity
+          if (this.state.module > 4) {
+            this.resetGame();
+          }
+        } catch (e) {
+          console.error('Error parsing session state', e);
+        }
       }
-    } else {
-      this.state = { module: 0, phase: 0, hearts: 3 };
-    }
-  }
-
-  saveState() {
-    if (this.state.module > 4) {
-      localStorage.removeItem('boebel_hardware_care_state');
-    } else {
-      localStorage.setItem('boebel_hardware_care_state', JSON.stringify(this.state));
-    }
+      this.initializeModule();
+    });
   }
 
   resetGame() {
-    this.state = { module: 0, phase: 0, hearts: 3 };
-    this.saveState();
+    this.state = { module: 0, phase: 0, hearts: 3, deathCount: 0 };
     this.initializeModule();
   }
 
@@ -147,23 +142,28 @@ export class HardwareCareEngineService {
   }
 
   reportMistake() {
-    this.progress.report({
-      levelId: `hardware-care-m\${this.state.module + 1}-p\${this.state.phase + 1}`,
-      fase: this.state.module * 10 + this.state.phase,
-      result: 'failure',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: false
-    });
+    const reportLevelId = `hardware-care-m${this.state.module + 1}-p${this.state.phase + 1}`;
+    const reportFase = this.state.module * 10 + this.state.phase;
 
     this.state.hearts--;
     if (this.state.hearts <= 0) {
       // Restart current module
+      this.state.deathCount++;
       this.state.hearts = 3;
       this.state.phase = 0;
       this.initializeModule();
     }
-    this.saveState();
+
+    this.progress.report({
+      levelId: reportLevelId,
+      fase: reportFase,
+      result: 'failure',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
+    });
   }
 
   completePhase() {
@@ -171,22 +171,12 @@ export class HardwareCareEngineService {
     const isLastPhase = this.state.phase === 9;
     const isLastLevel = isLastModule && isLastPhase;
 
-    this.progress.report({
-      levelId: `hardware-care-m\${this.state.module + 1}-p\${this.state.phase + 1}`,
-      fase: this.state.module * 10 + this.state.phase,
-      result: 'success',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
-    });
+    const reportLevelId = `hardware-care-m${this.state.module + 1}-p${this.state.phase + 1}`;
+    const reportFase = this.state.module * 10 + this.state.phase;
 
     if (isLastLevel) {
       this.state.module++; // will be 5 (game over)
-      this.saveState();
-      return;
-    }
-
-    if (isLastPhase) {
+    } else if (isLastPhase) {
       this.state.module++;
       this.state.phase = 0;
       this.state.hearts = 3; // refill hearts on new module
@@ -194,6 +184,16 @@ export class HardwareCareEngineService {
     } else {
       this.state.phase++;
     }
-    this.saveState();
+
+    this.progress.report({
+      levelId: reportLevelId,
+      fase: reportFase,
+      result: 'success',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isLastLevel,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
+    });
   }
 }

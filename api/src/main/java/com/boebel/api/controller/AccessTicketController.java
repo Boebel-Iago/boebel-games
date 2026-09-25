@@ -133,7 +133,7 @@ public class AccessTicketController {
         List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticket.getCode())
                 .stream()
                 .map(s -> new StudentSessionDTO(s.getId(), s.getStudentName(), s.getGameRoute(),
-                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt()))
+                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt(), s.getScore() != null ? s.getScore() : 0, s.getGameState() != null ? s.getGameState() : "{}"))
                 .toList();
 
         return ResponseEntity.ok(sessions);
@@ -349,7 +349,13 @@ public class AccessTicketController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Sala expirada"));
         }
 
-        return ResponseEntity.ok(Map.of("status", "valid"));
+                return ResponseEntity.ok(Map.of(
+            "status", "valid",
+            "score", session.getScore() != null ? session.getScore() : 0,
+            "gameState", session.getGameState() != null ? session.getGameState() : "{}",
+            "currentStage", session.getCurrentStage(),
+            "totalMistakes", session.getTotalMistakes()
+        ));
     }
 
     /**
@@ -387,6 +393,8 @@ public class AccessTicketController {
         }
 
         session.setCurrentStage(request.nextStage());
+        if (request.score() != null) session.setScore(request.score());
+        if (request.gameState() != null) session.setGameState(request.gameState());
         session.setTotalMistakes(session.getTotalMistakes() + request.mistakesInThisLevel());
 
         if (request.gameFinished()) {
@@ -407,7 +415,7 @@ public class AccessTicketController {
         List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticketCode)
                 .stream()
                 .map(s -> new StudentSessionDTO(s.getId(), s.getStudentName(), s.getGameRoute(),
-                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt()))
+                        s.getCurrentStage(), s.getTotalMistakes(), s.isCompleted(), s.getStartedAt(), s.getScore() != null ? s.getScore() : 0, s.getGameState() != null ? s.getGameState() : "{}"))
                 .toList();
         messagingTemplate.convertAndSend("/topic/sessions/" + ticketCode, sessions);
     }

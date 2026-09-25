@@ -5,6 +5,7 @@ export interface GameState {
   modulo: number; // 0 to 4
   tarefa: number; // 0 to 9
   vidas: number; // 0 to 3
+  deathCount: number;
 }
 
 export interface TaskOption {
@@ -25,41 +26,31 @@ export interface DropZone {
   label?: string;
 }
 
-const STORAGE_KEY = 'boebel_tech_investigators_state';
-
 @Injectable({ providedIn: 'root' })
 export class TechInvestigatorsEngineService {
-  private state: GameState = { modulo: 0, tarefa: 0, vidas: 3 };
+  private state: GameState = { modulo: 0, tarefa: 0, vidas: 3, deathCount: 0 };
 
   constructor(private progress: ProgressReporter) {
-    this.loadState();
+    const obs = this.progress.fetchSessionState();
+    if (obs) {
+      obs.subscribe(session => {
+        if (session && session.gameState && session.gameState !== '{}') {
+          this.state = JSON.parse(session.gameState);
+        }
+      });
+    }
+  }
+
+  get score(): number {
+    return Math.max(0, (this.state.modulo * 200) + (this.state.tarefa * 20) - (this.state.deathCount * 20));
   }
 
   public getState(): GameState {
     return { ...this.state };
   }
 
-  public loadState(): void {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.modulo !== undefined && parsed.tarefa !== undefined && parsed.vidas !== undefined) {
-          this.state = parsed;
-        }
-      } catch (e) {
-        console.error('Failed to parse game state', e);
-      }
-    }
-  }
-
-  public saveState(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
-  }
-
   public clearState(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    this.state = { modulo: 0, tarefa: 0, vidas: 3 };
+    this.state = { modulo: 0, tarefa: 0, vidas: 3, deathCount: 0 };
   }
 
   public handleSuccess(): void {
@@ -71,7 +62,9 @@ export class TechInvestigatorsEngineService {
       result: 'success',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
+      isLastLevel: isLastLevel,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (isLastLevel) {
@@ -83,7 +76,6 @@ export class TechInvestigatorsEngineService {
         this.state.modulo++;
         this.state.tarefa = 0;
       }
-      this.saveState();
     }
   }
 
@@ -94,7 +86,9 @@ export class TechInvestigatorsEngineService {
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     this.state.vidas--;
@@ -102,8 +96,8 @@ export class TechInvestigatorsEngineService {
       // Restart current module
       this.state.tarefa = 0;
       this.state.vidas = 3;
+      this.state.deathCount++;
     }
-    this.saveState();
   }
 
   public shuffle<T>(array: T[]): T[] {

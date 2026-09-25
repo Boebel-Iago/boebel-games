@@ -15,6 +15,7 @@ export interface GameState {
   taskIndex: number; // 0 to 9
   hearts: number;
   score: number;
+  deathCount: number;
   isGameOver: boolean;
   isGameWon: boolean;
   currentTasks: FactTask[];
@@ -24,19 +25,22 @@ export interface GameState {
   providedIn: 'root'
 })
 export class FactCheckerEngineService {
-  private readonly STORAGE_KEY = 'boebel_fact_checker_state';
-
   private defaultState: GameState = {
     fase: 0,
     taskIndex: 0,
     hearts: 3,
     score: 0,
+    deathCount: 0,
     isGameOver: false,
     isGameWon: false,
     currentTasks: []
   };
 
   public state = signal<GameState>(this.defaultState);
+
+  get score(): number {
+    return Math.max(0, (this.state().fase * 200) + (this.state().taskIndex * 20) - (this.state().deathCount * 20));
+  }
 
   // Raw Task Data
   private module1Tasks: FactTask[] = [
@@ -100,7 +104,7 @@ export class FactCheckerEngineService {
     { id: '5-6', type: 'grand_checker', content: 'A capital do Brasil é Brasília.', correctAnswer: 'Fato Verificado', explanation: 'Informação geográfica correta.' },
     { id: '5-7', type: 'grand_checker', content: 'Você não vai crer no que este cachorro fez.', correctAnswer: 'Clickbait', explanation: 'Clássico formato de clickbait.' },
     { id: '5-8', type: 'grand_checker', content: 'A Terra é plana.', correctAnswer: 'Fake News', explanation: 'Mito anticientífico.' },
-    { id: '5-9', type: 'grand_checker', content: 'Cientistas descobrem novo planeta habitável.', correctAnswer: 'Fato Verificado', explanation: 'Fato possível e frequentemente noticiado com bases reais.' }, // Assuming it's based on a real verified fact format for the game
+    { id: '5-9', type: 'grand_checker', content: 'Cientistas descobrem novo planeta habitável.', correctAnswer: 'Fato Verificado', explanation: 'Fato possível e frequentemente noticiado com bases reais.' },
     { id: '5-10', type: 'grand_checker', content: 'Bomba! Celebridade revela tudo e a internet quebra.', correctAnswer: 'Clickbait', explanation: 'Exagero típico para atrair visitas.' }
   ];
 
@@ -109,16 +113,17 @@ export class FactCheckerEngineService {
   }
 
   private loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      this.state.set(JSON.parse(saved));
-    } else {
-      this.startModule(0);
-    }
-  }
-
-  private saveState() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state()));
+    this.progress.fetchSessionState()?.subscribe(saved => {
+      if (saved) {
+        try {
+          this.state.set(JSON.parse(saved));
+        } catch (e) {
+          this.startModule(0);
+        }
+      } else {
+        this.startModule(0);
+      }
+    });
   }
 
   private shuffleArray(array: any[]) {
@@ -147,7 +152,6 @@ export class FactCheckerEngineService {
       hearts: 3,
       currentTasks: this.shuffleArray(tasks).slice(0, 10)
     }));
-    this.saveState();
   }
 
   public submitAnswer(answer: string): boolean {
@@ -163,8 +167,8 @@ export class FactCheckerEngineService {
         // Module complete
         this.completePhase(st.fase === 4);
       } else {
-        this.state.update(s => ({ ...s, taskIndex: nextTaskIndex, score: s.score + 10 }));
-        this.saveState();
+        this.state.update(s => ({ ...s, taskIndex: nextTaskIndex }));
+        this.state.update(s => ({ ...s, score: this.score }));
       }
       return true;
     } else {
@@ -173,12 +177,11 @@ export class FactCheckerEngineService {
       const newHearts = st.hearts - 1;
       if (newHearts <= 0) {
         // Module failed
-        this.state.update(s => ({ ...s, hearts: 0 }));
-        this.saveState();
+        this.state.update(s => ({ ...s, hearts: 0, deathCount: s.deathCount + 1 }));
       } else {
         this.state.update(s => ({ ...s, hearts: newHearts }));
-        this.saveState();
       }
+      this.state.update(s => ({ ...s, score: this.score }));
       return false;
     }
   }
@@ -200,7 +203,9 @@ export class FactCheckerEngineService {
       result: 'success',
       attempts: 1, // simplified for this structure
       timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
+      isLastLevel: isLastLevel,
+      score: this.score,
+      gameState: JSON.stringify(st)
     });
 
     if (isLastLevel) {
@@ -218,7 +223,10 @@ export class FactCheckerEngineService {
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(st)
     });
   }
 }
+

@@ -38,6 +38,10 @@ public class StudentSession {
     private int totalMistakes = 0;
 
     private boolean completed = false;
+    private Integer score = 0;
+
+    @Column(columnDefinition = "TEXT")
+    private String gameState;
 
     private LocalDateTime startedAt = LocalDateTime.now();
 }

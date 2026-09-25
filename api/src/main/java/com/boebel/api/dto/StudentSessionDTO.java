@@ -14,5 +14,7 @@ public record StudentSessionDTO(
         int currentStage,
         int totalMistakes,
         boolean completed,
-        LocalDateTime startedAt
+        LocalDateTime startedAt,
+        Integer score,
+        String gameState
 ) {}

@@ -120,7 +120,9 @@ export class PixelArtComponent implements OnInit {
       result: 'success',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: isLast
+      isLastLevel: isLast,
+      score: this.engine.score,
+      gameState: JSON.stringify(this.engine.getState())
     });
     this.engine.advanceTask();
   }
@@ -132,7 +134,9 @@ export class PixelArtComponent implements OnInit {
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.engine.score,
+      gameState: JSON.stringify(this.engine.getState())
     });
     this.engine.loseHeart();
   }

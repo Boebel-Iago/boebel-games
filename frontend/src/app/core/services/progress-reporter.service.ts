@@ -11,6 +11,8 @@ export interface ProgressData {
   attempts: number;
   timestamp: string;
   isLastLevel: boolean; // NOVO: O jogo que avisa se ele acabou!
+  score?: number;
+  gameState?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +31,13 @@ export class ProgressReporter {
    * 
    * @param {ProgressData} data O payload de telemetria emitido pelo jogo.
    */
+
+  fetchSessionState(): import('rxjs').Observable<any> | null {
+    const sessionId = sessionStorage.getItem('sessionId');
+    if (!sessionId) return null;
+    return this.gameService.fetchSessionStatus(sessionId);
+  }
+
   report(data: ProgressData): void {
     const sessionId = sessionStorage.getItem('sessionId');
     
@@ -45,7 +54,7 @@ export class ProgressReporter {
       // Usa a flag genérica que o jogo enviou para saber se é o fim
       const nextStage = data.isLastLevel ? data.fase : data.fase + 1;
 
-      this.gameService.updateGameProgress(sessionId, nextStage, this.mistakesInCurrentLevel, data.isLastLevel)
+      this.gameService.updateGameProgress(sessionId, nextStage, this.mistakesInCurrentLevel, data.isLastLevel, data.score, data.gameState)
         .subscribe({
           next: () => {
             this.mistakesInCurrentLevel = 0;

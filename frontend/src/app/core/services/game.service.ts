@@ -9,6 +9,8 @@ export interface ProgressUpdatePayload {
   nextStage: number;
   mistakesInThisLevel: number;
   gameFinished: boolean;
+  score?: number;
+  gameState?: string;
 }
 
 @Injectable({
@@ -33,11 +35,27 @@ export class GameService {
    * @param {boolean} isFinished Indica se o aluno completou o jogo inteiro.
    * @returns {Observable<any>} Confirmação da atualização de progresso.
    */
-  updateGameProgress(sessionId: string, nextStage: number, mistakes: number, isFinished: boolean): Observable<any> {
+  
+  fetchSessionStatus(sessionId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${sessionId}/status`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 403) {
+          alert('⏸️ Esta sala foi pausada ou encerrada pelo professor!\n\nVocê será redirecionado.');
+          sessionStorage.clear();
+          this.router.navigate(['/']);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateGameProgress(sessionId: string, nextStage: number, mistakes: number, isFinished: boolean, score?: number, gameState?: string): Observable<any> {
     const payload: ProgressUpdatePayload = {
       nextStage: nextStage,
       mistakesInThisLevel: mistakes,
-      gameFinished: isFinished
+      gameFinished: isFinished,
+      score: score,
+      gameState: gameState
     };
     
     return this.http.put(`${this.apiUrl}/${sessionId}/progress`, payload).pipe(

@@ -6,6 +6,7 @@ export interface MiniPosterState {
   taskIndex: number;
   hearts: number;
   tasks: any[];
+  deathCount: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -14,13 +15,31 @@ export class MiniPosterEngineService {
     modulo: 0,
     taskIndex: 0,
     hearts: 3,
-    tasks: []
+    tasks: [],
+    deathCount: 0
   };
 
-  private readonly STORAGE_KEY = 'boebel_mini_poster_state';
-
   constructor(private progress: ProgressReporter) {
-    this.loadState();
+    const obs = this.progress.fetchSessionState();
+    if (obs) {
+      obs.subscribe(res => {
+        if (res && res.gameState) {
+          try {
+            this.state = JSON.parse(res.gameState);
+          } catch (e) {
+            this.initModulo(0);
+          }
+        } else {
+          this.initModulo(0);
+        }
+      });
+    } else {
+      this.initModulo(0);
+    }
+  }
+
+  get score(): number {
+    return Math.max(0, (this.state.modulo * 200) + (this.state.taskIndex * 20) - (this.state.deathCount * 20));
   }
 
   private shuffleArray(array: any[]) {
@@ -30,23 +49,6 @@ export class MiniPosterEngineService {
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
-  }
-
-  private loadState() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      this.state = JSON.parse(saved);
-    } else {
-      this.initModulo(0);
-    }
-  }
-
-  private saveState() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
-  }
-
-  private clearState() {
-    localStorage.removeItem(this.STORAGE_KEY);
   }
 
   public initModulo(moduloIndex: number) {
@@ -126,26 +128,29 @@ export class MiniPosterEngineService {
     }
 
     this.state.tasks = this.shuffleArray(baseTasks);
-    this.saveState();
   }
 
   public reportMistake() {
     this.state.hearts--;
     const globalFase = this.state.modulo * 10 + this.state.taskIndex;
     
+    if (this.state.hearts <= 0) {
+      this.state.deathCount++;
+    }
+
     this.progress.report({
       levelId: `fase-${globalFase}`,
       fase: globalFase,
       result: 'failure',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: false
+      isLastLevel: false,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (this.state.hearts <= 0) {
       this.initModulo(this.state.modulo);
-    } else {
-      this.saveState();
     }
   }
 
@@ -159,18 +164,18 @@ export class MiniPosterEngineService {
       result: 'success',
       attempts: 1,
       timestamp: new Date().toISOString(),
-      isLastLevel: isLastTask
+      isLastLevel: isLastTask,
+      score: this.score,
+      gameState: JSON.stringify(this.state)
     });
 
     if (isLastTask) {
-      this.clearState();
       this.state.taskIndex++;
     } else {
       if (this.state.taskIndex === 9) {
         this.initModulo(this.state.modulo + 1);
       } else {
         this.state.taskIndex++;
-        this.saveState();
       }
     }
   }

@@ -1,128 +1,101 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FutureFairEngineService, Task } from './engine/future-fair-engine.service';
 import { ProgressReporter } from '../../../core/services/progress-reporter.service';
-import { FutureFairEngineService } from './engine/future-fair-engine.service';
-
-interface PanelItem {
-  type: string;
-  x: number;
-  y: number;
-  text?: string;
-}
-
-interface Panel {
-  items: PanelItem[];
-}
 
 @Component({
   selector: 'app-future-fair',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './future-fair.component.html',
   styleUrls: ['./future-fair.component.scss']
 })
-/**
- * FutureFairComponent
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
 export class FutureFairComponent {
-  charPlaced = false;
-  speechText = '';
-  propPlaced = false;
-  
-  panels: Panel[] = [
-    { items: [] },
-    { items: [] },
-    { items: [] },
-    { items: [] }
-  ];
-  
-  draggedItem: string | null = null;
+  draggedItem: any = null;
 
   constructor(
     public engine: FutureFairEngineService,
     private progress: ProgressReporter
   ) {}
 
-  completePhase(isLastLevel: boolean) {
-    this.progress.report({
-      levelId: `fase-${this.engine.fase}`,
-      fase: this.engine.fase,
-      result: 'success',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
-    });
-    if (!isLastLevel) {
-      this.engine.fase++;
-    }
+  get currentTask(): Task | null {
+    return this.engine.getCurrentTask();
   }
 
-  reportMistake() {
-    this.progress.report({
-      levelId: `fase-${this.engine.fase}`,
-      fase: this.engine.fase,
-      result: 'failure',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: false
-    });
-  }
-
-  onDragStart(event: DragEvent, itemType: string) {
-    this.draggedItem = itemType;
-    event.dataTransfer?.setData('text/plain', itemType);
-  }
-
-  onDropP0(event: DragEvent) {
-    event.preventDefault();
-    if (this.draggedItem === 'character') {
-      this.charPlaced = true;
-      setTimeout(() => this.completePhase(false), 500);
-    } else {
-      this.reportMistake();
-    }
+  get heartsArray(): number[] {
+    return Array(this.engine.state.hearts).fill(0);
   }
   
+  get lostHeartsArray(): number[] {
+    return Array(3 - this.engine.state.hearts).fill(0);
+  }
+
+  onTapOption(optionId: string) {
+    if (!this.currentTask || this.currentTask.type !== 'tap') return;
+    this.handleAnswer(optionId);
+  }
+
+  onDragStart(event: DragEvent, item: any) {
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', item.id);
+      event.dataTransfer.effectAllowed = 'move';
+      this.draggedItem = item;
+    }
+  }
+
   onDragOver(event: DragEvent) {
-    event.preventDefault();
+    event.preventDefault(); // Necessary to allow dropping
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
   }
 
-  checkSpeech() {
-    if (this.speechText.trim().length >= 3) {
-      this.completePhase(false);
+  onDrop(event: DragEvent, zoneId: string) {
+    event.preventDefault();
+    if (!this.draggedItem) return;
+    this.handleAnswer(zoneId);
+    this.draggedItem = null;
+  }
+
+  handleAnswer(selectedId: string) {
+    const isCorrect = this.engine.processAnswer(selectedId);
+    const globalTaskNumber = ((this.engine.state.module - 1) * 10) + this.engine.state.taskIndex + 1;
+    const isLastLevel = globalTaskNumber === 50;
+
+    if (isCorrect) {
+      this.progress.report({
+        levelId: `future-fair-m${this.engine.state.module}-t${this.engine.state.taskIndex + 1}`,
+        fase: globalTaskNumber - 1,
+        result: 'success',
+        attempts: 1,
+        timestamp: new Date().toISOString(),
+        isLastLevel: isLastLevel
+      });
+
+      const isGameOver = this.engine.advanceTask();
+      if (isGameOver) {
+        this.engine.clearState();
+      }
     } else {
-      this.reportMistake();
-      alert('Digite pelo menos 3 caracteres!');
+      this.progress.report({
+        levelId: `future-fair-m${this.engine.state.module}-t${this.engine.state.taskIndex + 1}`,
+        fase: globalTaskNumber - 1,
+        result: 'failure',
+        attempts: 1,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
+
+      if (this.engine.state.hearts <= 0) {
+        alert('Você perdeu todos os corações! O módulo será reiniciado.');
+        this.engine.resetModule();
+      } else {
+        alert('Ops, resposta errada! Você perdeu 1 coração.');
+      }
     }
   }
 
-  onDropP2(event: DragEvent) {
-    event.preventDefault();
-    if (this.draggedItem === 'prop') {
-      this.propPlaced = true;
-      setTimeout(() => this.completePhase(false), 500);
-    } else {
-      this.reportMistake();
-    }
-  }
-
-  onDropP3(event: DragEvent, panelIndex: number) {
-    event.preventDefault();
-    const type = event.dataTransfer?.getData('text/plain') || this.draggedItem;
-    if (type) {
-      const target = event.currentTarget as HTMLElement;
-      const panelRect = target.getBoundingClientRect();
-      const x = event.clientX - panelRect.left - 25;
-      const y = event.clientY - panelRect.top - 25;
-      this.panels[panelIndex].items.push({ type, x, y, text: '' });
-    }
-  }
-
-  publishHQ() {
-    this.completePhase(true);
-    alert('HQ Publicada com sucesso! Parabéns!');
+  resetGame() {
+    this.engine.resetState();
   }
 }

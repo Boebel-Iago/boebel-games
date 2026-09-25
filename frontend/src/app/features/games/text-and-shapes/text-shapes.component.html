@@ -1,123 +1,81 @@
-<div class="min-h-screen bg-blue-50 p-6 flex flex-col items-center">
-  <h1 class="text-3xl font-bold text-blue-800 mb-6"><i class="fas fa-pencil-alt mr-2"></i>Texto e Formas</h1>
-
-  <!-- Phase 0 -->
-  <div *ngIf="state.fase === 0" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
-    <h2 class="text-xl font-bold text-gray-700 mb-4">Fase 0: Negrito</h2>
-    <p class="text-gray-600 mb-4 text-lg">Escreva a frase: "O cachorro é grande." e deixe a palavra "cachorro" em <strong>Negrito</strong>.</p>
-    
-    <div class="mb-4 flex gap-2">
-      <button (click)="execCmd('bold')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded font-bold text-lg cursor-pointer">B (Negrito)</button>
+<div class="w-full h-full bg-blue-50 relative flex flex-col p-4 select-none">
+  
+  <!-- Header: Vidas e Módulo -->
+  <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6 w-full max-w-4xl mx-auto">
+    <div class="text-3xl font-bold text-gray-800">
+      Módulo {{ state.modulo }} <span class="text-gray-400 text-xl">| Tarefa {{ state.fase + 1 }}/10</span>
     </div>
-    
-    <div #editor contenteditable="true" class="w-full h-32 border-2 border-gray-300 rounded p-4 mb-4 text-xl outline-none focus:border-blue-500 bg-gray-50">
-    </div>
-    
-    <button (click)="validatePhase0()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-lg shadow cursor-pointer">Verificar</button>
-  </div>
-
-  <!-- Phase 1 -->
-  <div *ngIf="state.fase === 1" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
-    <h2 class="text-xl font-bold text-gray-700 mb-4">Fase 1: Cores</h2>
-    <p class="text-gray-600 mb-4 text-lg">Escreva a frase: "Fogo e Água". Deixe a palavra "Fogo" <span class="text-red-500 font-bold">vermelha</span> e "Água" <span class="text-blue-500 font-bold">azul</span>.</p>
-    
-    <div class="mb-4 flex gap-2">
-      <button (click)="execCmd('foreColor', 'red')" class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded font-bold text-lg cursor-pointer">Vermelho</button>
-      <button (click)="execCmd('foreColor', 'blue')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded font-bold text-lg cursor-pointer">Azul</button>
-    </div>
-    
-    <div #editor contenteditable="true" class="w-full h-32 border-2 border-gray-300 rounded p-4 mb-4 text-xl outline-none focus:border-blue-500 bg-gray-50">
-    </div>
-    
-    <button (click)="validatePhase1()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-lg shadow cursor-pointer">Verificar</button>
-  </div>
-
-  <!-- Phase 2 -->
-  <div *ngIf="state.fase === 2" class="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6">
-    <h2 class="text-xl font-bold text-gray-700 mb-4">Fase 2: Formas (A Casa)</h2>
-    <p class="text-gray-600 mb-4 text-lg">Arraste um quadrado e um triângulo para a área de desenho para formar uma casinha!</p>
-    
-    <div class="flex gap-6">
-      <div class="w-1/4 bg-gray-50 p-4 border-2 border-gray-200 rounded-lg flex flex-col gap-6">
-        <h3 class="font-bold text-gray-600 text-center text-lg">Caixa de Formas</h3>
-        
-        <div draggable="true" (dragstart)="onDragStart($event, availableShapes[0])" class="w-16 h-16 bg-blue-500 mx-auto cursor-pointer shadow-md"></div>
-        
-        <div draggable="true" (dragstart)="onDragStart($event, availableShapes[1])" class="w-0 h-0 mx-auto cursor-pointer shadow-md" style="border-left: 32px solid transparent; border-right: 32px solid transparent; border-bottom: 64px solid #ef4444;"></div>
+    <div class="flex gap-2">
+      <div *ngFor="let h of [1,2,3]; let i = index" class="text-3xl">
+        {{ i < state.vidas ? '❤️' : '🤍' }}
       </div>
-      
-      <div class="w-3/4">
-        <svg class="w-full h-96 border-4 border-dashed border-gray-300 bg-blue-50 rounded-lg" (dragover)="onDragOver($event)" (drop)="onCanvasDrop($event)">
-          <ng-container *ngFor="let shape of state.shapes">
-            <rect *ngIf="shape.type === 'square'" [attr.x]="shape.x" [attr.y]="shape.y" width="64" height="64" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-            
-            <circle *ngIf="shape.type === 'circle'" [attr.cx]="shape.x + 32" [attr.cy]="shape.y + 32" r="32" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-            
-            <polygon *ngIf="shape.type === 'triangle'" [attr.points]="(shape.x+32) + ',' + shape.y + ' ' + shape.x + ',' + (shape.y+64) + ' ' + (shape.x+64) + ',' + (shape.y+64)" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-          </ng-container>
-        </svg>
-      </div>
-    </div>
-    
-    <div class="mt-6">
-      <button (click)="validatePhase2()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-lg shadow cursor-pointer">Verificar Casinha</button>
     </div>
   </div>
 
-  <!-- Phase 3 -->
-  <div *ngIf="state.fase === 3" class="w-full max-w-5xl bg-white rounded-xl shadow-lg p-6">
-    <h2 class="text-xl font-bold text-gray-700 mb-4">Fase 3: Modo Livre!</h2>
-    <p class="text-gray-600 mb-4 text-lg">Escreva uma história sobre seu jogo favorito usando as ferramentas de texto. Depois, crie um cenário ao lado com as formas que quiser!</p>
-    
-    <div class="flex gap-6">
-      <!-- Text Editor -->
-      <div class="w-1/2 flex flex-col">
-        <div class="mb-4 flex gap-2 flex-wrap bg-gray-100 p-3 rounded-lg border border-gray-200">
-          <button (click)="execCmd('bold')" class="px-3 py-1 bg-white hover:bg-gray-200 rounded font-bold border border-gray-300 cursor-pointer">B</button>
-          <button (click)="execCmd('italic')" class="px-3 py-1 bg-white hover:bg-gray-200 rounded italic border border-gray-300 cursor-pointer">I</button>
-          <button (click)="execCmd('underline')" class="px-3 py-1 bg-white hover:bg-gray-200 rounded underline border border-gray-300 cursor-pointer">U</button>
-          <div class="w-px bg-gray-300 mx-1"></div>
-          <button (click)="execCmd('fontSize', '3')" class="px-3 py-1 bg-white hover:bg-gray-200 rounded text-sm border border-gray-300 cursor-pointer">Pequeno</button>
-          <button (click)="execCmd('fontSize', '6')" class="px-3 py-1 bg-white hover:bg-gray-200 rounded text-lg font-bold border border-gray-300 cursor-pointer">Grande</button>
-          <div class="w-px bg-gray-300 mx-1"></div>
-          <button (click)="execCmd('foreColor', 'black')" class="w-8 h-8 bg-black rounded-full border-2 border-white shadow cursor-pointer"></button>
-          <button (click)="execCmd('foreColor', 'red')" class="w-8 h-8 bg-red-500 rounded-full border-2 border-white shadow cursor-pointer"></button>
-          <button (click)="execCmd('foreColor', 'blue')" class="w-8 h-8 bg-blue-500 rounded-full border-2 border-white shadow cursor-pointer"></button>
-          <button (click)="execCmd('foreColor', 'green')" class="w-8 h-8 bg-green-500 rounded-full border-2 border-white shadow cursor-pointer"></button>
-        </div>
-        <div #editor contenteditable="true" class="w-full h-full min-h-[350px] border-2 border-gray-300 rounded p-4 text-lg outline-none focus:border-blue-500 bg-yellow-50">
-        </div>
-      </div>
-      
-      <!-- Canvas -->
-      <div class="w-1/2 flex flex-col gap-4">
-        <div class="flex gap-6 justify-center items-center bg-gray-50 p-4 border-2 border-gray-200 rounded-lg">
-          <div draggable="true" (dragstart)="onDragStart($event, {type: 'square', color: '#3b82f6'})" class="w-12 h-12 bg-blue-500 cursor-pointer shadow-md"></div>
-          <div draggable="true" (dragstart)="onDragStart($event, {type: 'triangle', color: '#ef4444'})" class="w-0 h-0 cursor-pointer shadow-md" style="border-left: 24px solid transparent; border-right: 24px solid transparent; border-bottom: 48px solid #ef4444;"></div>
-          <div draggable="true" (dragstart)="onDragStart($event, {type: 'circle', color: '#22c55e'})" class="w-12 h-12 bg-green-500 rounded-full cursor-pointer shadow-md"></div>
-          <div draggable="true" (dragstart)="onDragStart($event, {type: 'square', color: '#a16207'})" class="w-12 h-12 bg-yellow-700 cursor-pointer shadow-md"></div>
-          <div draggable="true" (dragstart)="onDragStart($event, {type: 'circle', color: '#facc15'})" class="w-12 h-12 bg-yellow-400 rounded-full cursor-pointer shadow-md"></div>
-        </div>
-        
-        <svg class="w-full h-[350px] border-4 border-dashed border-gray-300 bg-blue-50 rounded-lg" (dragover)="onDragOver($event)" (drop)="onCanvasDrop($event)">
-          <ng-container *ngFor="let shape of state.shapes">
-            <rect *ngIf="shape.type === 'square'" [attr.x]="shape.x" [attr.y]="shape.y" width="60" height="60" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-            
-            <circle *ngIf="shape.type === 'circle'" [attr.cx]="shape.x + 30" [attr.cy]="shape.y + 30" r="30" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-            
-            <polygon *ngIf="shape.type === 'triangle'" [attr.points]="(shape.x+30) + ',' + shape.y + ' ' + shape.x + ',' + (shape.y+60) + ' ' + (shape.x+60) + ',' + (shape.y+60)" [attr.fill]="shape.color" draggable="true" (dragstart)="onShapeDragStart($event, shape)" class="cursor-move"/>
-          </ng-container>
-        </svg>
-      </div>
-    </div>
-    
-    <div class="mt-8 text-center">
-      <button (click)="completePhase3()" class="px-12 py-4 bg-purple-600 hover:bg-purple-700 text-white text-2xl font-bold rounded-xl shadow-lg cursor-pointer transform hover:scale-105 transition-transform"><i class="fas fa-check-circle mr-2"></i>Concluir Tarefa!</button>
-    </div>
+  <div *ngIf="state.completed" class="flex-1 flex flex-col items-center justify-center">
+    <div class="text-6xl mb-4">🏆</div>
+    <h2 class="text-4xl font-bold text-green-600 mb-4">Parabéns!</h2>
+    <p class="text-xl text-gray-600">Você concluiu todos os desafios de Texto e Formas!</p>
   </div>
 
-  <div *ngIf="state.fase === 4" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-10 text-center mt-10">
-    <h2 class="text-4xl font-bold text-green-600 mb-6"><i class="fas fa-star text-yellow-400 mr-2 text-5xl"></i>Parabéns!<i class="fas fa-star text-yellow-400 ml-2 text-5xl"></i></h2>
-    <p class="text-2xl text-gray-700">Você completou todas as atividades de Texto e Formas com sucesso!</p>
+  <div *ngIf="!state.completed && currentTask" class="flex-1 flex flex-col items-center max-w-4xl mx-auto w-full">
+    
+    <div class="bg-white rounded-3xl p-8 shadow-lg w-full mb-8 text-center border-4 border-blue-200">
+      <h2 class="text-3xl font-bold text-gray-700 mb-2">{{ currentTask.prompt }}</h2>
+    </div>
+
+    <!-- Módulo 1: Digitação -->
+    <div *ngIf="currentTask.type === 'input'" class="flex flex-col items-center gap-6 w-full">
+      <div class="text-6xl font-black text-blue-900 tracking-widest bg-blue-100 px-8 py-4 rounded-2xl border-4 border-blue-300">
+        {{ currentTask.word }}
+      </div>
+      <div class="flex gap-4 items-center w-full max-w-md mt-4">
+        <input type="text" [(ngModel)]="inputValue" class="flex-1 text-3xl p-4 rounded-xl border-4 border-gray-300 focus:border-blue-500 text-center uppercase font-bold" placeholder="Digite aqui">
+        <button (click)="checkInput()" class="bg-blue-600 text-white font-bold text-2xl px-8 py-4 rounded-xl shadow-lg active:scale-95 transition-transform hover:bg-blue-700">Verificar</button>
+      </div>
+    </div>
+
+    <!-- Módulo 2: Pintor -->
+    <div *ngIf="currentTask.type === 'color'" class="flex flex-col items-center gap-12 w-full">
+      <div class="text-7xl font-black text-gray-800 tracking-wider">
+        {{ currentTask.word }}
+      </div>
+      <div class="flex gap-6 justify-center flex-wrap">
+        <button *ngFor="let opt of currentTask.options" (click)="checkOption(opt)"
+                class="w-32 h-32 rounded-full shadow-xl border-4 border-white active:scale-95 transition-transform hover:scale-105"
+                [ngClass]="opt.class"></button>
+      </div>
+    </div>
+
+    <!-- Módulo 3: Formatação -->
+    <div *ngIf="currentTask.type === 'format'" class="flex flex-col items-center gap-12 w-full">
+      <div class="text-6xl text-gray-800 tracking-wider">
+        {{ currentTask.word }}
+      </div>
+      <div class="flex gap-8 justify-center">
+        <button *ngFor="let opt of currentTask.options" (click)="checkOption(opt)"
+                class="w-32 h-32 bg-white rounded-2xl shadow-xl border-4 border-gray-200 flex items-center justify-center text-5xl active:scale-95 transition-transform hover:bg-gray-50 text-gray-800"
+                [style]="opt.style">
+          A
+        </button>
+      </div>
+    </div>
+
+    <!-- Módulo 4: Forma -->
+    <div *ngIf="currentTask.type === 'shape'" class="flex gap-8 justify-center w-full mt-12">
+      <button *ngFor="let opt of currentTask.options" (click)="checkOption(opt)"
+              class="w-40 h-40 bg-white rounded-3xl shadow-xl border-4 border-gray-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-transform hover:border-blue-400">
+        <i class="fas {{ opt.icon }} text-6xl text-gray-400"></i>
+      </button>
+    </div>
+
+    <!-- Módulo 5: Combinado -->
+    <div *ngIf="currentTask.type === 'combination'" class="grid grid-cols-3 gap-6 w-full max-w-3xl mt-4">
+      <button *ngFor="let opt of currentTask.options" (click)="checkOption(opt)"
+              class="h-40 bg-white rounded-3xl shadow-md border-4 border-gray-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-transform hover:shadow-xl">
+        <i class="fas {{ opt.icon }} text-7xl" [ngClass]="opt.class"></i>
+      </button>
+    </div>
+
   </div>
 </div>

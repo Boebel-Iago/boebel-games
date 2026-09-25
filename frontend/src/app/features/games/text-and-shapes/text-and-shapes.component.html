@@ -1,0 +1,84 @@
+<div class="min-h-screen bg-blue-100 flex flex-col items-center py-10 font-sans">
+  
+  <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden p-8 relative">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 bg-blue-500 text-white p-4 rounded-2xl shadow-md">
+      <div class="text-2xl font-bold">Módulo {{ engine.state.modulo }}</div>
+      <div class="text-xl">Fase {{ engine.state.fase + 1 }} / 10</div>
+      <div class="flex gap-2">
+        <i *ngFor="let h of [1,2,3]; let i = index" 
+           class="fas fa-heart text-3xl"
+           [ngClass]="i < engine.state.vidas ? 'text-red-500' : 'text-gray-300'"></i>
+      </div>
+    </div>
+
+    <!-- Game Over State -->
+    <div *ngIf="engine.state.vidas <= 0 && !engine.state.completed" class="text-center py-20">
+      <h2 class="text-5xl font-bold text-red-500 mb-6">Poxa, você perdeu!</h2>
+      <p class="text-2xl text-gray-700 mb-8">Acabaram as suas vidas neste módulo.</p>
+      <button (click)="restart()" 
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-2xl shadow-lg transform transition hover:scale-105">
+        Tentar Novamente
+      </button>
+    </div>
+
+    <!-- Victory State -->
+    <div *ngIf="engine.state.completed" class="text-center py-20">
+      <h2 class="text-5xl font-bold text-green-500 mb-6">Parabéns!</h2>
+      <p class="text-2xl text-gray-700 mb-8">Você completou todos os desafios!</p>
+      <i class="fas fa-trophy text-9xl text-yellow-400"></i>
+    </div>
+
+    <!-- Gameplay Area -->
+    <div *ngIf="engine.state.vidas > 0 && !engine.state.completed && engine.currentTask" class="flex flex-col items-center">
+      
+      <div class="text-3xl font-bold text-gray-800 mb-8 text-center" [ngClass]="{'animate-shake text-red-500': showError}">
+        {{ engine.currentTask.prompt }}
+      </div>
+
+      <div *ngIf="engine.currentTask.word" class="text-6xl font-black mb-12 text-gray-900 border-4 border-dashed border-gray-300 p-8 rounded-2xl bg-gray-50">
+        {{ engine.currentTask.word }}
+      </div>
+
+      <!-- Module 1: Input -->
+      <div *ngIf="engine.currentTask.type === 'input'" class="w-full max-w-md flex flex-col gap-4">
+        <input type="text" [(ngModel)]="inputValue" 
+               (keyup.enter)="checkInput()"
+               class="text-4xl text-center border-4 border-blue-300 rounded-2xl p-4 focus:outline-none focus:border-blue-500 shadow-inner"
+               placeholder="Digite aqui...">
+        <button (click)="checkInput()" 
+                class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-2xl shadow-md transform transition hover:scale-105">
+          Verificar
+        </button>
+      </div>
+
+      <!-- Modules 2, 3, 4, 5: Buttons -->
+      <div *ngIf="engine.currentTask.type !== 'input'" class="flex flex-wrap justify-center gap-6">
+        <button *ngFor="let option of engine.currentTask.options"
+                (click)="handleAnswer(option)"
+                class="flex flex-col items-center justify-center p-6 border-4 border-gray-200 rounded-3xl hover:border-blue-500 hover:bg-blue-50 transform transition hover:scale-110 shadow-md bg-white min-w-[150px]">
+          
+          <!-- If color or formatting -->
+          <div *ngIf="engine.currentTask.type === 'color'" 
+               class="w-20 h-20 rounded-full mb-4 shadow-inner" 
+               [ngClass]="option.class"></div>
+               
+          <div *ngIf="engine.currentTask.type === 'format'" 
+               class="text-5xl font-serif mb-4 text-gray-800" 
+               [style]="option.style">
+            A
+          </div>
+
+          <!-- If shape or combo -->
+          <i *ngIf="engine.currentTask.type === 'shape' || engine.currentTask.type === 'combination'" 
+             class="fas text-7xl mb-4" 
+             [ngClass]="[option.icon, option.class || 'text-gray-800']"></i>
+             
+          <span class="text-xl font-bold text-gray-700">{{ option.label }}</span>
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>

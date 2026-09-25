@@ -1,138 +1,116 @@
-<div class="game-container p-6 w-full h-full bg-blue-50 relative select-none">
-  <h1 class="text-3xl font-bold text-center text-blue-800 mb-6">Mini-Cartaz Digital</h1>
-
-  <!-- Phase 0 -->
-  <div *ngIf="fase === 0" class="phase relative w-full h-[600px] bg-white rounded-lg shadow-md border-2 border-blue-200 p-4">
-    <h2 class="text-xl font-bold text-blue-700 mb-4">Fase 1: Redimensionando Imagens</h2>
-    <p class="text-gray-700 mb-4">Arraste a imagem do cachorrinho e mude o tamanho dela para encaixar na caixa pontilhada.</p>
-
-    <!-- Target Box -->
-    <div class="target-box absolute border-4 border-dashed border-gray-400 rounded-lg flex items-center justify-center text-gray-400 font-bold"
-         [style.left.px]="targetBox0.x" [style.top.px]="targetBox0.y"
-         [style.width.px]="targetBox0.width" [style.height.px]="targetBox0.height">
-      Solte e redimensione aqui
+<div class="w-full h-full bg-blue-50 relative flex flex-col p-4 select-none overflow-hidden">
+  
+  <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6 w-full max-w-4xl mx-auto">
+    <div class="text-3xl font-bold text-gray-800">
+      Módulo {{ state.modulo + 1 }} <span class="text-gray-400 text-xl">| Tarefa {{ state.taskIndex + 1 }}/10</span>
     </div>
-
-    <!-- Draggable/Resizable Image -->
-    <div class="draggable-item absolute bg-yellow-200 border-2 border-yellow-500 rounded cursor-move flex items-center justify-center text-4xl shadow-lg hover:shadow-xl transition-shadow"
-         [style.left.px]="dogImage.x" [style.top.px]="dogImage.y"
-         [style.width.px]="dogImage.width" [style.height.px]="dogImage.height"
-         (mousedown)="onMouseDown($event, dogImage, 'drag')">
-      🐶
-      <!-- Resize Handle -->
-      <div class="resize-handle absolute bottom-0 right-0 w-6 h-6 bg-blue-500 cursor-nwse rounded-tl-lg rounded-br"
-           (mousedown)="onMouseDown($event, dogImage, 'resize'); $event.stopPropagation()"></div>
+    <div class="flex gap-2">
+      <div *ngFor="let h of [1,2,3]; let i = index" class="text-3xl">
+        {{ i < state.hearts ? '❤️' : '🤍' }}
+      </div>
     </div>
   </div>
 
-  <!-- Phase 1 -->
-  <div *ngIf="fase === 1" class="phase relative w-full h-[600px] bg-white rounded-lg shadow-md border-2 border-green-200 p-4">
-    <h2 class="text-xl font-bold text-green-700 mb-4">Fase 2: Estrutura do Cartaz</h2>
-    <p class="text-gray-700 mb-4">Veja o modelo à esquerda e arraste o Texto e a Imagem para os lugares corretos à direita.</p>
-
-    <!-- Wireframe (Left) -->
-    <div class="wireframe absolute left-10 top-32 w-64 h-64 border-2 border-gray-300 bg-gray-50 flex flex-col items-center justify-start p-4 gap-4 rounded-lg pointer-events-none">
-      <div class="w-full h-12 bg-gray-200 border border-gray-400 flex items-center justify-center font-bold text-gray-500 rounded">Texto no topo</div>
-      <div class="w-full h-32 bg-gray-200 border border-gray-400 flex items-center justify-center font-bold text-gray-500 rounded">Imagem abaixo</div>
-    </div>
-
-    <!-- Target Canvas (Right) -->
-    <div class="target-canvas absolute left-[400px] top-32 w-64 h-64 border-2 border-blue-300 bg-blue-50 rounded-lg pointer-events-none">
-      <div class="absolute border-2 border-dashed border-gray-400 rounded"
-           [style.left.px]="targetText1.x - 400" [style.top.px]="targetText1.y - 128"
-           [style.width.px]="targetText1.width" [style.height.px]="targetText1.height"></div>
-      <div class="absolute border-2 border-dashed border-gray-400 rounded"
-           [style.left.px]="targetImage1.x - 400" [style.top.px]="targetImage1.y - 128"
-           [style.width.px]="targetImage1.width" [style.height.px]="targetImage1.height"></div>
-    </div>
-
-    <!-- Draggable Blocks -->
-    <div class="draggable-item absolute bg-blue-100 border-2 border-blue-500 rounded cursor-move flex items-center justify-center font-bold text-blue-700 shadow-md z-10"
-         [style.left.px]="textBlock1.x" [style.top.px]="textBlock1.y"
-         [style.width.px]="textBlock1.width" [style.height.px]="textBlock1.height"
-         (mousedown)="onMouseDown($event, textBlock1, 'drag')">
-      Caixa de Texto
-    </div>
-
-    <div class="draggable-item absolute bg-orange-100 border-2 border-orange-500 rounded cursor-move flex items-center justify-center font-bold text-orange-700 shadow-md z-10"
-         [style.left.px]="imageBlock1.x" [style.top.px]="imageBlock1.y"
-         [style.width.px]="imageBlock1.width" [style.height.px]="imageBlock1.height"
-         (mousedown)="onMouseDown($event, imageBlock1, 'drag')">
-      Caixa de Imagem
-    </div>
+  <div *ngIf="state.modulo > 4 || state.taskIndex >= 10" class="flex-1 flex flex-col items-center justify-center">
+    <div class="text-6xl mb-4">🏆</div>
+    <h2 class="text-4xl font-bold text-green-600 mb-4">Parabéns!</h2>
+    <p class="text-xl text-gray-600">Você concluiu todos os desafios do Mini-Cartaz!</p>
   </div>
 
-  <!-- Phase 2 -->
-  <div *ngIf="fase === 2" class="phase relative w-full h-[600px] bg-white rounded-lg shadow-md border-2 border-purple-200 p-4">
-    <h2 class="text-xl font-bold text-purple-700 mb-4">Fase 3: Formatando o Texto</h2>
-    <p class="text-gray-700 mb-4">Escreva um título, clique no botão para deixá-lo em <b>Negrito</b>, e depois escreva pelo menos 3 frases na caixa de baixo.</p>
+  <div *ngIf="state.modulo <= 4 && state.taskIndex < 10 && currentTask" class="flex-1 flex flex-col items-center max-w-4xl mx-auto w-full">
+    
+    <!-- M1 -->
+    <div *ngIf="state.modulo === 0" class="flex flex-col items-center w-full gap-8">
+      <h2 class="text-3xl font-bold text-gray-700">Arraste a IMAGEM para a Área da Imagem</h2>
+      <div class="flex gap-8 w-full justify-center mt-4">
+        <div class="w-48 h-48 bg-white border-4 border-blue-400 rounded-2xl flex items-center justify-center cursor-grab active:cursor-grabbing text-7xl text-blue-500 shadow-lg"
+             draggable="true" (dragstart)="onDragStart($event, 'image')">
+          <i class="fas {{ currentTask.imageIcon }}"></i>
+        </div>
+      </div>
+      <div class="flex gap-8 w-full justify-center mt-12">
+        <div class="w-64 h-64 border-4 border-dashed border-gray-400 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 text-2xl font-bold"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'image')">
+          ÁREA DA IMAGEM
+        </div>
+        <div class="w-64 h-32 border-4 border-dashed border-gray-400 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 text-2xl font-bold"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'title')">
+          ÁREA DO TEXTO
+        </div>
+      </div>
+    </div>
 
-    <div class="w-full max-w-2xl mx-auto border-2 border-gray-300 p-6 rounded-lg bg-gray-50 flex flex-col gap-4">
-      <div class="toolbar flex gap-2">
-        <button class="px-4 py-2 bg-gray-200 border border-gray-400 rounded hover:bg-gray-300 font-bold"
-                [class.bg-blue-300]="phase2IsBold"
-                (click)="toggleBold()">B (Negrito)</button>
+    <!-- M2 -->
+    <div *ngIf="state.modulo === 1" class="flex flex-col items-center w-full gap-8">
+      <h2 class="text-3xl font-bold text-gray-700">Qual título combina com o cartaz?</h2>
+      <div class="w-64 h-64 bg-white border-4 border-blue-400 rounded-3xl flex items-center justify-center text-9xl text-blue-600 shadow-xl mb-4">
+        <i class="fas {{ currentTask.img }}"></i>
+      </div>
+      <div class="flex flex-col gap-4 w-full max-w-md">
+        <button *ngFor="let opt of currentTask.options" (click)="checkM2(opt)"
+                class="bg-white border-4 border-gray-200 text-2xl font-bold text-gray-700 p-4 rounded-xl shadow hover:bg-blue-50 active:scale-95 transition-transform">
+          {{ opt }}
+        </button>
+      </div>
+    </div>
+
+    <!-- M3 -->
+    <div *ngIf="state.modulo === 2" class="flex flex-col items-center w-full gap-8">
+      <h2 class="text-3xl font-bold text-gray-700">Alinhe o texto ao <span class="text-blue-600">{{ currentTask.prompt }}</span></h2>
+      <div class="w-full bg-white border-4 border-gray-200 p-8 rounded-2xl shadow mb-8">
+        <div class="text-4xl font-bold text-gray-800 w-full text-center">TÍTULO DO CARTAZ</div>
+      </div>
+      <div class="flex gap-8">
+        <button (click)="checkM3('left')" class="w-24 h-24 bg-white border-4 border-gray-300 rounded-xl flex items-center justify-center text-4xl text-gray-600 hover:bg-gray-100 active:scale-95"><i class="fas fa-align-left"></i></button>
+        <button (click)="checkM3('center')" class="w-24 h-24 bg-white border-4 border-gray-300 rounded-xl flex items-center justify-center text-4xl text-gray-600 hover:bg-gray-100 active:scale-95"><i class="fas fa-align-center"></i></button>
+        <button (click)="checkM3('right')" class="w-24 h-24 bg-white border-4 border-gray-300 rounded-xl flex items-center justify-center text-4xl text-gray-600 hover:bg-gray-100 active:scale-95"><i class="fas fa-align-right"></i></button>
+      </div>
+    </div>
+
+    <!-- M4 -->
+    <div *ngIf="state.modulo === 3" class="flex flex-col items-center w-full gap-8">
+      <h2 class="text-3xl font-bold text-gray-700">Qual imagem combina com este título?</h2>
+      <div class="bg-blue-600 text-white font-black text-5xl p-8 rounded-3xl shadow-lg w-full text-center uppercase tracking-wider mb-8">
+        {{ currentTask.title }}
+      </div>
+      <div class="flex gap-8">
+        <button *ngFor="let opt of currentTask.options" (click)="checkM4(opt)"
+                class="w-40 h-40 bg-white border-4 border-gray-200 rounded-2xl shadow hover:border-blue-400 active:scale-95 flex items-center justify-center text-6xl text-gray-700">
+          <i class="fas {{ opt }}"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- M5 -->
+    <div *ngIf="state.modulo === 4" class="flex flex-col items-center w-full gap-4">
+      <h2 class="text-3xl font-bold text-gray-700">Monte o Cartaz: Arraste o Título e a Imagem</h2>
+      
+      <div class="flex gap-8 mt-4">
+        <div *ngIf="!m5PlacedTitle" class="bg-blue-600 text-white font-bold text-2xl p-4 rounded-xl shadow cursor-grab active:cursor-grabbing" draggable="true" (dragstart)="onDragStart($event, 'title')">
+          {{ currentTask.title }}
+        </div>
+        <div *ngIf="!m5PlacedImage" class="w-24 h-24 bg-white border-4 border-blue-400 rounded-xl flex items-center justify-center text-5xl text-blue-500 cursor-grab active:cursor-grabbing shadow" draggable="true" (dragstart)="onDragStart($event, 'image')">
+          <i class="fas {{ currentTask.img }}"></i>
+        </div>
       </div>
 
-      <input type="text" [(ngModel)]="phase2Title" placeholder="Digite o Título..."
-             class="w-full p-2 border border-gray-400 rounded text-xl"
-             [ngClass]="{'font-bold': phase2IsBold}">
-
-      <textarea [(ngModel)]="phase2Sentences" placeholder="Escreva 3 frases aqui (use ponto final)..."
-                class="w-full h-32 p-2 border border-gray-400 rounded resize-none"></textarea>
-
-      <button class="self-end px-6 py-2 bg-purple-600 text-white font-bold rounded hover:bg-purple-700"
-              (click)="validatePhase2()">Verificar</button>
-    </div>
-  </div>
-
-  <!-- Phase 3 -->
-  <div *ngIf="fase === 3" class="phase relative w-full h-[800px] bg-white rounded-lg shadow-md border-2 border-pink-200 p-4">
-    <h2 class="text-xl font-bold text-pink-700 mb-4">Fase 4: Seu Mini-Cartaz Final!</h2>
-    <p class="text-gray-700 mb-4">Crie um cartaz sobre o seu animal favorito! Adicione imagens, posicione, mude o tamanho e escreva seu texto.</p>
-
-    <div class="flex gap-4 h-[650px]">
-      <!-- Toolbar Sidebar -->
-      <div class="w-48 bg-gray-100 p-4 rounded border border-gray-300 flex flex-col gap-4 shadow-inner">
-        <h3 class="font-bold text-gray-700">Imagens</h3>
-        <div class="flex flex-wrap gap-2">
-          <button *ngFor="let img of phase3Images" class="text-3xl p-2 bg-white border border-gray-300 rounded hover:bg-blue-50"
-                  (click)="addPhase3Image(img)">
-            {{img}}
-          </button>
+      <div class="w-[400px] h-[500px] bg-white border-8 border-gray-200 rounded-3xl mt-8 flex flex-col p-8 gap-8 shadow-2xl">
+        <div class="w-full h-24 border-4 border-dashed border-gray-300 rounded-xl flex items-center justify-center"
+             [ngClass]="m5PlacedTitle ? 'bg-blue-600 text-white border-solid' : 'bg-gray-50 text-gray-400'"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'title')">
+          <span *ngIf="!m5PlacedTitle" class="font-bold text-xl">SOLTE O TÍTULO AQUI</span>
+          <span *ngIf="m5PlacedTitle" class="font-bold text-3xl">{{ currentTask.title }}</span>
         </div>
         
-        <h3 class="font-bold text-gray-700 mt-4">Texto</h3>
-        <button class="px-4 py-2 bg-gray-200 border border-gray-400 rounded hover:bg-gray-300 font-bold"
-                [class.bg-blue-300]="phase3IsBold"
-                (click)="toggleBold()">B (Negrito)</button>
-
-        <button class="mt-auto px-4 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 shadow-md transform hover:scale-105 transition-transform"
-                (click)="finishPhase3()">Finalizar Cartaz</button>
-      </div>
-
-      <!-- Canvas -->
-      <div class="flex-1 border-2 border-dashed border-pink-300 bg-pink-50 relative overflow-hidden rounded-lg shadow-inner">
-        
-        <!-- Text Area Overlay -->
-        <textarea [(ngModel)]="phase3Text" placeholder="Escreva o texto do seu cartaz aqui..."
-                  class="absolute bg-transparent border-none outline-none resize-none p-4 w-full h-full text-lg z-0"
-                  [ngClass]="{'font-bold': phase3IsBold}"></textarea>
-
-        <!-- Draggable Elements -->
-        <div *ngFor="let el of phase3Elements"
-             class="draggable-item absolute bg-white border border-gray-300 rounded shadow-md cursor-move flex items-center justify-center text-5xl z-10 hover:shadow-lg transition-shadow"
-             [style.left.px]="el.x" [style.top.px]="el.y"
-             [style.width.px]="el.width" [style.height.px]="el.height"
-             (mousedown)="onMouseDown($event, el, 'drag')">
-          {{el.content}}
-          <!-- Resize Handle -->
-          <div class="resize-handle absolute bottom-0 right-0 w-6 h-6 bg-blue-500 cursor-nwse rounded-tl-lg rounded-br"
-               (mousedown)="onMouseDown($event, el, 'resize'); $event.stopPropagation()"></div>
+        <div class="w-full flex-1 border-4 border-dashed border-gray-300 rounded-xl flex items-center justify-center"
+             [ngClass]="m5PlacedImage ? 'border-solid bg-blue-50' : 'bg-gray-50 text-gray-400'"
+             (dragover)="onDragOver($event)" (drop)="onDrop($event, 'image')">
+          <span *ngIf="!m5PlacedImage" class="font-bold text-xl">SOLTE A IMAGEM AQUI</span>
+          <i *ngIf="m5PlacedImage" class="fas {{ currentTask.img }} text-9xl text-blue-500"></i>
         </div>
-
       </div>
-    </div>
-  </div>
 
+    </div>
+
+  </div>
 </div>

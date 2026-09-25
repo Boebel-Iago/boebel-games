@@ -113,6 +113,14 @@ export class CreatorsEngineService {
     }
   }
 
+  private shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
   private startMission(isRestore = false) {
     if (!isRestore) this.updateState({ currentTaskIndex: 0 });
     this.loadCurrentTask();
@@ -122,12 +130,12 @@ export class CreatorsEngineService {
     if (this.currentMission.type === 'license-cards') {
       if (this.state.currentTaskIndex < this.licenseTasks.length) {
         const task = this.licenseTasks[this.state.currentTaskIndex];
-        const opts = [task.correctAnswer, ...task.wrongAnswers].sort(() => Math.random() - 0.5);
+        const opts = this.shuffleArray([task.correctAnswer, ...task.wrongAnswers]);
         this.updateState({ currentOptions: opts });
       }
     } else if (this.currentMission.type === 'drag-drop') {
       const lvl = Math.min(this.state.currentTaskIndex, this.dragDropData.length - 1);
-      const items = [...this.dragDropData[lvl]].sort(() => Math.random() - 0.5);
+      const items = this.shuffleArray([...this.dragDropData[lvl]]);
       this.updateState({
         freeCol: [], creditsCol: [], plagiarismCol: [],
         showDragError: false, unassignedItems: items

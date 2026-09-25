@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CreatorsEngineService } from '../../engine/creators-engine.service';
 
@@ -44,25 +44,30 @@ import { CreatorsEngineService } from '../../engine/creators-engine.service';
           <p class="text-gray-800 text-lg">O uso respeitou a licença original?</p>
         </div>
 
+        <div class="flex flex-col gap-4" [ngClass]="{\'flex-col-reverse\': swapButtons}">
+
         <button (click)="engine.voteAudit(true)"
           class="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-2xl shadow-lg border-b-8 border-emerald-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center group">
           <span class="text-5xl mb-2 group-hover:scale-110 transition-transform">✅</span>
           <span class="text-2xl font-black uppercase">APROVADO</span>
           <span class="text-sm mt-1 opacity-90">Tudo Legal</span>
         </button>
-
         <button (click)="engine.voteAudit(false)"
           class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-2xl shadow-lg border-b-8 border-red-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center group">
           <span class="text-5xl mb-2 group-hover:scale-110 transition-transform">❌</span>
           <span class="text-2xl font-black uppercase">REPROVADO</span>
           <span class="text-sm mt-1 opacity-90">Violação de Direitos</span>
         </button>
+        </div>
       </div>
 
     </div>
   `
 })
-export class AuditComponent {
+export class AuditComponent implements OnInit {
+  swapButtons = false;
+  ngOnInit() { this.swapButtons = Math.random() > 0.5; }
+
   constructor(public engine: CreatorsEngineService) {}
   get state() { return this.engine.stateValue; }
   get task() { return this.engine.auditTasks[this.state.currentTaskIndex]; }

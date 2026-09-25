@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CreatorsEngineService } from '../../engine/creators-engine.service';
 
@@ -37,25 +37,30 @@ import { CreatorsEngineService } from '../../engine/creators-engine.service';
           <p class="text-gray-800 text-lg">Essa atitude foi correta ou foi plágio?</p>
         </div>
 
+        <div class="flex flex-col gap-4" [ngClass]="{\'flex-col-reverse\': swapButtons}">
+
         <button (click)="engine.votePlagiarism(true)"
           class="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-2xl shadow-lg border-b-8 border-emerald-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center group">
           <span class="text-5xl mb-2 group-hover:scale-110 transition-transform">✅</span>
           <span class="text-2xl font-black uppercase">Uso Correto</span>
           <span class="text-sm mt-1 opacity-90">Deu os créditos / É livre</span>
         </button>
-
         <button (click)="engine.votePlagiarism(false)"
           class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-2xl shadow-lg border-b-8 border-red-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center group">
           <span class="text-5xl mb-2 group-hover:scale-110 transition-transform">❌</span>
           <span class="text-2xl font-black uppercase">Plágio / Erro</span>
           <span class="text-sm mt-1 opacity-90">Copiou e fingiu que é seu</span>
         </button>
+        </div>
       </div>
 
     </div>
   `
 })
-export class PlagiarismCourtComponent {
+export class PlagiarismCourtComponent implements OnInit {
+  swapButtons = false;
+  ngOnInit() { this.swapButtons = Math.random() > 0.5; }
+
   constructor(public engine: CreatorsEngineService) {}
   get state() { return this.engine.stateValue; }
   

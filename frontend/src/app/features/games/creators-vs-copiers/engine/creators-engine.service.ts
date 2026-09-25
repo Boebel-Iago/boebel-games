@@ -5,6 +5,8 @@ import { CreatorsMission, LicenseTask, PlagiarismTask, DragDropItem, AuditTask }
 import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
 export interface GameState {
+  lives: number;
+  isGameOver: boolean;
   currentMissionIndex: number;
   currentTaskIndex: number; // Also acts as phase level for drag-drop
   displayMode: 'briefing' | 'gameplay' | 'mission-complete' | 'finished';
@@ -33,6 +35,8 @@ export class CreatorsEngineService {
   private state: GameState = {
     currentMissionIndex: 0,
     currentTaskIndex: 0,
+      lives: 3,
+      isGameOver: false,
     displayMode: 'briefing',
     currentDialogueIndex: 0,
     gameFinished: false,
@@ -105,9 +109,13 @@ export class CreatorsEngineService {
       } else {
         const nextIdx = this.state.currentMissionIndex + 1;
         if (nextIdx >= this.missions.length) {
-          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0, gameFinished: true, displayMode: 'finished' });
+          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0,
+      lives: 3,
+      isGameOver: false, gameFinished: true, displayMode: 'finished' });
         } else {
-          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0, displayMode: 'briefing' });
+          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0,
+      lives: 3,
+      isGameOver: false, displayMode: 'briefing' });
         }
       }
     }
@@ -122,7 +130,7 @@ export class CreatorsEngineService {
   }
 
   private startMission(isRestore = false) {
-    if (!isRestore) this.updateState({ currentTaskIndex: 0 });
+    if (!isRestore) this.updateState({ currentTaskIndex: 0, lives: 3, isGameOver: false });
     this.loadCurrentTask();
   }
 
@@ -145,6 +153,25 @@ export class CreatorsEngineService {
 
   // ==== ACTIONS ====
 
+  private handleWrongAnswer(baseFeedback: string) {
+    const lives = this.state.lives - 1;
+    const isGameOver = lives <= 0;
+    let text = baseFeedback;
+    if (isGameOver) {
+      text += '\n\n⚠️ FIM DE JOGO! Você cometeu muitos erros e perdeu seu distintivo. A missão será reiniciada. Leia com mais atenção!';
+    } else {
+      text += `\n\nCuidado! Você tem apenas mais ${lives} chance${lives > 1 ? 's' : ''}.`;
+    }
+    
+    this.updateState({
+      isCorrectGuess: false,
+      feedbackText: text,
+      showFeedbackModal: true,
+      lives,
+      isGameOver
+    });
+  }
+
   checkLicense(selectedAnswer: string) {
     if (this.currentMission.type !== 'license-cards') return;
     
@@ -156,11 +183,7 @@ export class CreatorsEngineService {
         showFeedbackModal: true
       });
     } else {
-      this.updateState({
-        isCorrectGuess: false,
-        feedbackText: 'Cuidado! Leia o símbolo novamente. Lembre-se do que conversamos sobre Direitos Autorais e Creative Commons.',
-        showFeedbackModal: true
-      });
+      this.handleWrongAnswer('Cuidado! Leia o símbolo novamente. Lembre-se do que conversamos sobre Direitos Autorais e Creative Commons.');
     }
   }
 
@@ -181,13 +204,10 @@ export class CreatorsEngineService {
         showFeedbackModal: true
       });
     } else {
-      this.updateState({
-        isCorrectGuess: false,
-        feedbackText: voteForCorrectUse 
-          ? 'Atenção, Juiz! Você deixou um plágio passar despercebido. Leia a atitude do aluno novamente.' 
-          : 'Opa! Você penalizou um aluno que fez tudo certo. Lembre-se: se há créditos ou uso apropriado, está correto!',
-        showFeedbackModal: true
-      });
+      const fb = voteForCorrectUse 
+        ? 'Atenção, Juiz! Você deixou um plágio passar despercebido. Leia a atitude do aluno novamente.' 
+        : 'Opa! Você penalizou um aluno que fez tudo certo. Lembre-se: se há créditos ou uso apropriado, está correto!';
+      this.handleWrongAnswer(fb);
     }
   }
 
@@ -214,7 +234,7 @@ export class CreatorsEngineService {
         showFeedbackModal: true
       });
     } else {
-      this.updateState({ showDragError: true });
+      this.handleWrongAnswer('Existem itens nas colunas erradas! Revise cada um deles com atenção.');
     }
   }
 
@@ -230,18 +250,21 @@ export class CreatorsEngineService {
         showFeedbackModal: true
       });
     } else {
-      this.updateState({
-        isCorrectGuess: false,
-        feedbackText: voteForApproved 
-          ? 'Auditoria Falhou! Você aprovou algo que pode render um processo para a escola!' 
-          : 'Calma, Auditor! Você reprovou um recurso que estava sendo usado de forma perfeitamente legal.',
-        showFeedbackModal: true
-      });
+      const fb = voteForApproved 
+        ? 'Auditoria Falhou! Você aprovou algo que pode render um processo para a escola!' 
+        : 'Calma, Auditor! Você reprovou um recurso que estava sendo usado de forma perfeitamente legal.';
+      this.handleWrongAnswer(fb);
     }
   }
 
   nextStep() {
     this.updateState({ showFeedbackModal: false });
+
+    if (this.state.isGameOver) {
+      this.reportProgress('failure', false);
+      this.startMission();
+      return;
+    }
 
     if (!this.state.isCorrectGuess) {
       this.reportProgress('failure', false);

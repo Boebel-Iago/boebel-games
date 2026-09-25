@@ -1,101 +1,124 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { ProfessionsEngineService } from './engine/professions-engine.service';
-
-import { BriefingComponent } from './activities/briefing/briefing.component';
-import { ToolMatchComponent } from './activities/tool-match/tool-match.component';
-import { HwSwChallengeComponent } from './activities/hw-sw-challenge/hw-sw-challenge.component';
-import { SoftwareIdentifyComponent } from './activities/software-identify/software-identify.component';
-import { CategorySortComponent } from './activities/category-sort/category-sort.component';
-import { DragDropComponent } from './activities/drag-drop/drag-drop.component';
+import { ProgressReporter } from '../../../core/services/progress-reporter.service';
+import { ProfessionsEngineService, Task } from './engine/professions-engine.service';
 
 @Component({
   selector: 'app-professions',
   standalone: true,
-  imports: [
-    CommonModule, 
-    BriefingComponent, 
-    ToolMatchComponent, 
-    HwSwChallengeComponent, 
-    SoftwareIdentifyComponent, 
-    CategorySortComponent, 
-    DragDropComponent
-  ],
+  imports: [CommonModule],
   templateUrl: './professions.component.html',
-  styleUrl: './professions.component.scss'
+  styleUrls: ['./professions.component.scss']
 })
-export class ProfessionsComponent implements OnInit, OnDestroy {
-  studentName = sessionStorage.getItem('studentName') || 'Recruta';
-  private sub!: Subscription;
+export class ProfessionsComponent implements OnInit {
+  currentTask: Task | null = null;
+  feedback: 'correct' | 'wrong' | null = null;
+  draggedItem: string | null = null;
 
-  constructor(public engine: ProfessionsEngineService) {}
+  constructor(
+    public engine: ProfessionsEngineService,
+    private progress: ProgressReporter
+  ) {}
 
   ngOnInit() {
-    this.restoreProgress();
-    this.sub = this.engine.state$.subscribe(() => {
-      this.saveLocalProgress();
-    });
+    this.loadCurrentTask();
   }
 
-  ngOnDestroy() {
-    if (this.sub) this.sub.unsubscribe();
+  loadCurrentTask() {
+    this.currentTask = this.engine.getCurrentTask();
+    this.feedback = null;
+    this.draggedItem = null;
   }
 
-  get state() { return this.engine.stateValue; }
-  get currentMission() { return this.engine.currentMission; }
-  get missionsLength() { return this.engine['missions'].length; }
-
-  // ==== PERSISTÊNCIA ====
-
-  saveLocalProgress() {
-    const absoluteStage = this.engine.getAbsoluteStage();
-    sessionStorage.setItem('currentStage', absoluteStage.toString());
+  get currentModuleTitle(): string {
+    return this.engine.modules[this.engine.state.fase]?.title || 'Concluído!';
   }
 
-  restoreProgress() {
-    const saved = sessionStorage.getItem('currentStage');
-    if (saved) {
-      try {
-        const stage = parseInt(saved, 10);
-        if (!isNaN(stage) && stage > 0) {
-          const m1Total = this.engine.professions.length + this.engine.hwSwChallenges.length;
-          const m2Total = this.engine.softwareTasks.length;
-          const m3Total = this.engine.scenarios.length;
-          const m4Total = this.engine.phase3Data.length;
+  // Tap interactions
+  selectOption(option: string) {
+    if (this.feedback || !this.currentTask || this.currentTask.type !== 'tap') return;
+    this.processAnswer(option);
+  }
 
-          if (stage >= m1Total + m2Total + m3Total + m4Total) {
-            this.engine.restoreProgress({ gameFinished: true, displayMode: 'finished' });
-          } else if (stage >= m1Total + m2Total + m3Total) {
-            this.engine.restoreProgress({ 
-              currentMissionIndex: 3, 
-              phase3Level: stage - (m1Total + m2Total + m3Total) + 1,
-              displayMode: 'gameplay' 
-            });
-          } else if (stage >= m1Total + m2Total) {
-            this.engine.restoreProgress({ 
-              currentMissionIndex: 2, 
-              currentTaskIndex: stage - (m1Total + m2Total),
-              energyBlocks: stage - (m1Total + m2Total),
-              displayMode: 'gameplay' 
-            });
-          } else if (stage >= m1Total) {
-            this.engine.restoreProgress({ 
-              currentMissionIndex: 1, 
-              currentTaskIndex: stage - m1Total,
-              displayMode: 'gameplay' 
-            });
-          } else {
-            this.engine.restoreProgress({ 
-              currentMissionIndex: 0, 
-              currentTaskIndex: stage,
-              displayMode: 'gameplay' 
-            });
-          }
-        }
-      } catch (e) {
-        console.error('Erro ao restaurar progresso', e);
+  // Drag & Drop interactions
+  onDragStart(event: DragEvent, item: string) {
+    this.draggedItem = item;
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', item);
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onDrop(event: DragEvent, zone: string) {
+    event.preventDefault();
+    if (this.feedback || !this.draggedItem) return;
+    
+    // Check if the current task is drag or drag-3
+    if (this.currentTask && (this.currentTask.type === 'drag' || this.currentTask.type === 'drag-3')) {
+       // Since the user is asked to drag TO a profession/zone, we match the zone against correct answer.
+       // However, in our engine, for 'drag' the correct option is the one to drop IN.
+       // Wait, if it's "drag camera to Fotógrafo", zone = "Fotógrafo", item = "Camera DSLR".
+       // The correct is "Fotógrafo". Let's check it.
+       this.processAnswer(zone);
+    }
+    this.draggedItem = null;
+  }
+
+  processAnswer(answer: string) {
+    const isCorrect = this.engine.checkAnswer(answer);
+    
+    if (isCorrect) {
+      this.feedback = 'correct';
+    } else {
+      this.feedback = 'wrong';
+      this.progress.report({
+        levelId: `fase-${this.engine.state.fase}`,
+        fase: this.engine.state.fase,
+        result: 'failure',
+        attempts: 1,
+        timestamp: new Date().toISOString(),
+        isLastLevel: false
+      });
+
+      if (this.engine.state.hearts <= 0) {
+         setTimeout(() => {
+           alert('Sem corações! Reiniciando o módulo...');
+           this.engine.restartModule();
+           this.loadCurrentTask();
+         }, 1500);
       }
     }
+  }
+
+  next() {
+    if (this.feedback !== 'correct') {
+       this.feedback = null;
+       return;
+    }
+
+    const stateResult = this.engine.nextTask();
+    
+    if (stateResult === 'next-module' || stateResult === 'finished') {
+       // Just finished a module (phase)
+       const finishedFase = this.engine.state.fase - 1; // Since it increments
+       const isLast = stateResult === 'finished';
+       this.progress.report({
+          levelId: `fase-${finishedFase}`,
+          fase: finishedFase,
+          result: 'success',
+          attempts: 1,
+          timestamp: new Date().toISOString(),
+          isLastLevel: isLast
+       });
+    }
+
+    this.loadCurrentTask();
   }
 }

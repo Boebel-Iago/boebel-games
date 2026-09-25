@@ -1,118 +1,114 @@
-<div class="min-h-screen bg-gray-50 flex flex-col items-center py-6 font-sans px-2">
+<div class="min-h-screen bg-gray-900 text-white flex flex-col p-4 items-center font-sans">
   
-    <!-- Header da Fase -->
-    <div class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-gray-200 pb-4">
-      <div class="text-center md:text-left mb-4 md:mb-0">
-        <h2 class="text-3xl font-bold text-forest-900">{{ currentLevel.title }}</h2>
-        <p class="text-gray-500 font-medium">{{ currentLevel.instruction }}</p>
-      </div>
-      <div>
-        <span class="bg-forest-900 text-white px-5 py-2 rounded-full text-sm font-bold shadow">
-          Fase: {{ currentLevelIndex + 1 }} / {{ levels.length }}
-        </span>
-      </div>
-    </div>
-  
-    <div class="w-full max-w-6xl flex flex-col lg:flex-row gap-6 justify-center">
-      
-      <!-- LADO ESQUERDO: A Matriz de Código -->
-      <div class="bg-gray-900 p-4 rounded-xl shadow-lg border-4 border-gray-800 flex flex-col items-center flex-1">
-        <h3 class="text-green-400 font-mono font-bold mb-4 text-lg md:text-xl tracking-widest uppercase">>>> MATRIZ_DADOS</h3>
-        
-        <div class="flex flex-col text-green-300 font-mono text-lg md:text-2xl font-bold">
-          <!-- Letras das Colunas (A até J) -->
-          <div class="flex pl-8 md:pl-10 text-green-600/70 mb-2">
-            <div *ngFor="let col of columns" class="w-6 md:w-8 text-center">{{ col }}</div>
-          </div>
-  
-          <!-- Linhas com Números + Dados -->
-          <div class="flex">
-            <!-- Números das Linhas (1 até 10) -->
-            <div class="flex flex-col pr-2 md:pr-2 text-green-600/70">
-              <div *ngFor="let row of rows" class="h-6 md:h-8 flex items-center justify-end w-6 md:w-8">{{ row }}</div>
-            </div>
-  
-            <!-- O Código (Os 0, 1, 2, etc) -->
-            <div class="flex flex-col">
-               <div *ngFor="let rowArr of currentPatternGrid" class="flex">
-                  <div *ngFor="let char of rowArr" class="w-6 md:w-8 h-6 md:h-8 flex items-center justify-center">
-                    {{ char }}
-                  </div>
-               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <!-- LADO DIREITO: O Monitor (Área de Desenho) -->
-      <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col items-center flex-1">
-        
-        <!-- Paleta Dinâmica de Cores -->
-        <div class="flex flex-wrap justify-center gap-3 mb-6">
-          <button 
-            *ngFor="let num of getAvailableColorNumbers()"
-            (click)="selectColor(num)"
-            [style.background-color]="currentLevel.colors[num]"
-            [class.ring-4]="selectedNumber === num"
-            class="w-10 h-10 md:w-12 md:h-12 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer hover:scale-110 transition-transform flex items-center justify-center font-bold font-mono text-lg ring-forest-900 ring-offset-2"
-            [ngClass]="num === 0 ? 'text-gray-400' : 'text-white drop-shadow-md'">
-            {{ num }}
-          </button>
-        </div>
-  
-        <!-- Tabuleiro de Desenho com Coordenadas -->
-        <div class="flex flex-col mb-6">
-          <!-- Letras das Colunas (A até J) -->
-          <div class="flex pl-8 md:pl-10 text-gray-400 font-bold mb-1">
-            <div *ngFor="let col of columns" class="w-7 md:w-10 text-center">{{ col }}</div>
-          </div>
-  
-          <div class="flex">
-            <!-- Números das Linhas (1 até 10) -->
-            <div class="flex flex-col pr-1 md:pr-2 text-gray-400 font-bold">
-              <div *ngFor="let row of rows" class="h-7 md:h-10 flex items-center justify-end w-7 md:w-8">{{ row }}</div>
-            </div>
-  
-            <!-- A Grade 10x10 clicável -->
-            <div class="grid grid-cols-10 gap-0 border-4 border-gray-300 bg-gray-100 rounded-lg shadow-inner overflow-hidden">
-              <div 
-                *ngFor="let cellValue of studentGrid; let i = index"
-                (click)="paintCell(i)"
-                [style.background-color]="currentLevel.colors[cellValue]"
-                class="w-7 h-7 md:w-10 md:h-10 border border-gray-300 cursor-pointer hover:brightness-90 transition-colors duration-75">
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Ações do Jogo -->
-        <div class="flex gap-3 w-full max-w-sm">
-          <button 
-            *ngIf="!isLevelCompleted"
-            (click)="clearGrid()" 
-            class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition-colors border border-gray-300">
-            Limpar
-          </button>
-  
-          <button 
-            *ngIf="!isLevelCompleted"
-            (click)="checkAnswer()" 
-            class="flex-1 py-3 bg-forest-900 text-white font-bold rounded-lg hover:bg-forest-800 transition-colors shadow-md">
-            Verificar
-          </button>
-  
-          <button 
-            *ngIf="isLevelCompleted && !gameFinished"
-            (click)="nextLevel()" 
-            class="w-full py-3 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600 transition-colors shadow-lg border-b-4 border-emerald-700 text-lg animate-pulse">
-            PRÓXIMA FASE ➔
-          </button>
-  
-          <div *ngIf="gameFinished" class="w-full py-3 bg-yellow-400 text-yellow-900 text-center font-black rounded-lg shadow-lg text-lg">
-            🏆 VOCÊ VENCEU! 🏆
-          </div>
-        </div>
-  
-      </div>
-    </div>
+  <div *ngIf="state.completed" class="text-center mt-20">
+    <h1 class="text-4xl font-bold text-green-400 mb-4">Você venceu todas as fases!</h1>
+    <button (click)="engine.resetGame()" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl text-xl font-bold shadow-lg">Jogar Novamente</button>
   </div>
+
+  <div *ngIf="!state.completed && currentTask" class="w-full max-w-4xl flex flex-col items-center">
+    
+    <!-- Header -->
+    <div class="w-full flex justify-between items-center bg-gray-800 p-4 rounded-2xl mb-8 shadow-md border border-gray-700">
+      <div>
+        <h2 class="text-xl font-bold text-blue-300">Módulo {{ state.module + 1 }}: {{ moduleNames[state.module] }}</h2>
+        <p class="text-gray-400">Tarefa {{ state.taskIndex + 1 }} / 10</p>
+      </div>
+      <div class="flex space-x-2 text-red-500 text-3xl">
+        <i *ngFor="let _ of [].constructor(state.hearts)" class="fas fa-heart drop-shadow-md"></i>
+        <i *ngFor="let _ of [].constructor(3 - state.hearts)" class="far fa-heart text-gray-600 drop-shadow-md"></i>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <h3 class="text-3xl font-extrabold text-center mb-8 drop-shadow-lg text-white">
+      {{ currentTask.question }}
+    </h3>
+
+    <!-- Módulo 1: Qual é a Cor? -->
+    <div *ngIf="currentTask.type === 'color'" class="grid grid-cols-2 gap-6 w-full max-w-md">
+      <div *ngFor="let opt of currentTask.data.options" 
+           (click)="handleColorTap(opt)"
+           class="h-32 rounded-3xl shadow-xl cursor-pointer border-4 border-gray-700 hover:scale-105 transition-transform"
+           [style.background-color]="opt.code">
+      </div>
+    </div>
+
+    <!-- Módulo 2: Padrão -->
+    <div *ngIf="currentTask.type === 'pattern'" class="w-full flex flex-col items-center">
+      <div class="flex space-x-4 mb-12">
+        <div *ngFor="let c of currentTask.data.pattern" 
+             class="w-20 h-20 rounded-xl shadow-md border-2 border-gray-600 flex items-center justify-center text-4xl"
+             [ngStyle]="{'background-color': c || '#374151'}">
+          <span *ngIf="!c">?</span>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-6 w-full max-w-md">
+        <div *ngFor="let opt of currentTask.data.options" 
+             (click)="handlePatternTap(opt)"
+             class="h-24 rounded-2xl shadow-lg cursor-pointer border-4 border-gray-700 hover:scale-105 transition-transform"
+             [style.background-color]="opt">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 3: Simetria -->
+    <div *ngIf="currentTask.type === 'symmetry'" class="w-full flex flex-col items-center">
+      
+      <div class="mb-8 w-24 h-24 rounded-xl shadow-lg cursor-grab border-4 border-white animate-pulse"
+           draggable="true" 
+           (dragstart)="onDragStart($event, {color: currentTask.data.dragColor})"
+           [style.background-color]="currentTask.data.dragColor">
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 bg-gray-800 p-4 rounded-2xl">
+        <div *ngFor="let cell of currentTask.data.grid; let i = index"
+             class="w-20 h-20 rounded-md border-2"
+             [ngClass]="cell ? 'border-gray-600' : 'border-dashed border-gray-500'"
+             [style.background-color]="cell || 'transparent'"
+             (dragover)="onDragOver($event)"
+             (drop)="onDropSymmetry($event, i)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 4: Coordenadas -->
+    <div *ngIf="currentTask.type === 'coordinates'" class="w-full flex flex-col items-center">
+      <div class="grid grid-cols-3 gap-2 bg-gray-800 p-6 rounded-3xl shadow-xl relative">
+        <div *ngFor="let _ of [].constructor(currentTask.data.gridSize); let r = index" class="contents">
+          <div *ngFor="let _ of [].constructor(currentTask.data.gridSize); let c = index"
+               (click)="handleCoordinateTap(r, c)"
+               class="w-24 h-24 bg-gray-700 hover:bg-gray-600 rounded-lg cursor-pointer border-2 border-gray-600 flex items-center justify-center text-gray-500 text-sm">
+            {{r+1}},{{c+1}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 5: Pintor Digital -->
+    <div *ngIf="currentTask.type === 'painter'" class="w-full flex flex-col items-center">
+      <div class="flex space-x-8 mb-12">
+        <div *ngFor="let drag of currentTask.data.draggables"
+             draggable="true"
+             (dragstart)="onDragStart($event, drag)"
+             class="w-24 h-24 rounded-full shadow-lg cursor-grab border-4 border-white"
+             [style.background-color]="drag.color">
+        </div>
+      </div>
+
+      <div class="flex space-x-8">
+        <div *ngFor="let zone of currentTask.data.zones"
+             (dragover)="onDragOver($event)"
+             (drop)="onDropPainter($event, zone.id)"
+             class="w-32 h-40 rounded-2xl border-4 border-dashed border-gray-500 flex flex-col items-center justify-center p-2"
+             [style.background-color]="painterMatches[zone.id] || 'transparent'">
+          <span class="text-xl font-bold bg-black bg-opacity-50 px-2 py-1 rounded" 
+                [ngClass]="painterMatches[zone.id] ? 'text-white' : 'text-gray-400'">
+            {{ zone.name }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

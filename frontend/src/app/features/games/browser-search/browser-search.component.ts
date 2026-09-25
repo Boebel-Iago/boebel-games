@@ -1,61 +1,85 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BrowserSearchEngineService } from './engine/browser-search-engine.service';
-import { ProgressReporter } from '../../../core/services/progress-reporter.service';
-import { Subscription } from 'rxjs';
-
-import { BriefingComponent } from './activities/briefing/briefing.component';
-import { AnatomyComponent } from './activities/anatomy/anatomy.component';
-import { KeywordSearchComponent } from './activities/keyword-search/keyword-search.component';
+import { BrowserSearchEngineService, GameState } from './engine/browser-search-engine.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-browser-search',
   standalone: true,
-  imports: [CommonModule, BriefingComponent, AnatomyComponent, KeywordSearchComponent],
+  imports: [CommonModule],
   templateUrl: './browser-search.component.html',
-  styleUrl: './browser-search.component.scss'
+  styleUrls: ['./browser-search.component.scss']
 })
 export class BrowserSearchComponent implements OnInit, OnDestroy {
+  gameState: GameState | null = null;
+  private destroy$ = new Subject<void>();
   
-  private sub!: Subscription;
+  draggedItemId: string | null = null;
 
-  constructor(
-    public engine: BrowserSearchEngineService,
-    private progressReporter: ProgressReporter
-  ) {}
+  constructor(public engine: BrowserSearchEngineService) {}
 
   ngOnInit() {
-    this.restoreProgress();
-    // Re-salvar a cada mudança de estado relevante
-    this.sub = this.engine.state$.subscribe(() => {
-      this.saveLocalProgress();
+    this.engine.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
+      this.gameState = state;
     });
   }
 
   ngOnDestroy() {
-    if (this.sub) this.sub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  get state() { return this.engine.stateValue; }
-  get activeMission() { return this.engine.activeMission; }
-  get activeTask() { return this.engine.activeTask; }
-  get missionsLength() { return this.engine['missions'].length; }
-
-  // ==== PERSISTÊNCIA ====
-
-  saveLocalProgress() {
-    sessionStorage.setItem('browserSearch_progress', JSON.stringify(this.state));
-  }
-
-  restoreProgress() {
-    const saved = sessionStorage.getItem('browserSearch_progress');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        this.engine.restoreProgress(parsed);
-      } catch (e) {
-        console.error('Erro ao restaurar progresso', e);
-      }
+  onTapOption(optionId: string) {
+    if (!this.gameState?.currentTask) return;
+    const task = this.gameState.currentTask;
+    if (task.type === 'tap') {
+      const isCorrect = optionId === task.correctOptionId;
+      this.engine.submitAnswer(isCorrect);
     }
+  }
+
+  onDragStart(event: DragEvent, itemId: string) {
+    this.draggedItemId = itemId;
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', itemId);
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault(); // Necessary to allow dropping
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onDrop(event: DragEvent, dropZoneId: string, acceptsId: string) {
+    event.preventDefault();
+    const itemId = event.dataTransfer?.getData('text/plain') || this.draggedItemId;
+    if (!itemId || !this.gameState?.currentTask) return;
+
+    // Check if the drop zone accepts this item
+    const isCorrect = acceptsId === itemId;
+    this.engine.submitAnswer(isCorrect);
+    this.draggedItemId = null;
+  }
+
+  retry() {
+    this.engine.retryModule();
+  }
+
+  reset() {
+    this.engine.resetGame();
+  }
+
+  getModuleTitle(moduleIndex: number): string {
+    const titles = [
+      '1: Palavras-chave',
+      '2: Menos é Mais',
+      '3: Fontes Confiáveis',
+      '4: Busca Exata',
+      '5: O Investigador'
+    ];
+    return titles[moduleIndex] || '';
   }
 }

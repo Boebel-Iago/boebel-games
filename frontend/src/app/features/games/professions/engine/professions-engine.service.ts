@@ -1,375 +1,179 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ProfessionsContentService } from '../content/professions-content.service';
-import { AcademyMission, Profession, Tool, HwSwChallenge, SoftwareTask, Scenario, Phase3Item } from '../content/models';
-import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
-export interface GameState {
-  currentMissionIndex: number;
-  currentTaskIndex: number;
-  displayMode: 'briefing' | 'gameplay' | 'feedback' | 'mission-complete' | 'finished';
-  currentDialogueIndex: number;
-  gameFinished: boolean;
-
-  // Feedback
-  showFeedbackModal: boolean;
-  feedbackText: string;
-  feedbackHardware: string;
-  feedbackSoftware: string;
-  isCorrectGuess: boolean;
-
-  // Fase 1
-  isHwSwChallenge: boolean;
-  hwSwChallengeIndex: number;
-  currentOptions: Tool[];
-  currentHwSwChallenge: HwSwChallenge | null;
-
-  // Fase 2
-  currentSoftwareOptions: string[];
-
-  // Fase 3
-  energyBlocks: number;
-
-  // Fase 4
-  phase3Level: number;
-  showDragError: boolean;
-  unassignedItems: Phase3Item[];
-  workColumn: Phase3Item[];
-  studyColumn: Phase3Item[];
-  leisureColumn: Phase3Item[];
+export interface Task {
+  type: 'drag' | 'tap' | 'drag-3';
+  prompt: string;
+  item?: string; 
+  options: string[]; 
+  correct: string;
 }
 
-@Injectable({ providedIn: 'root' })
+export interface GameModule {
+  id: number;
+  title: string;
+  tasks: Task[];
+}
+
+export interface GameState {
+  fase: number;
+  taskId: number;
+  hearts: number;
+  score: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class ProfessionsEngineService {
-  private contentData: ReturnType<typeof ProfessionsContentService.prototype.getFilteredData>;
-  private missions: AcademyMission[];
+  private readonly STORAGE_KEY = 'boebel_professions_state';
+  public state: GameState = { fase: 0, taskId: 0, hearts: 3, score: 0 };
+  public modules: GameModule[] = [];
 
-  private state: GameState = {
-    currentMissionIndex: 0,
-    currentTaskIndex: 0,
-    displayMode: 'briefing',
-    currentDialogueIndex: 0,
-    gameFinished: false,
-
-    showFeedbackModal: false,
-    feedbackText: '',
-    feedbackHardware: '',
-    feedbackSoftware: '',
-    isCorrectGuess: false,
-
-    isHwSwChallenge: false,
-    hwSwChallengeIndex: 0,
-    currentOptions: [],
-    currentHwSwChallenge: null,
-
-    currentSoftwareOptions: [],
-
-    energyBlocks: 0,
-
-    phase3Level: 1,
-    showDragError: false,
-    unassignedItems: [],
-    workColumn: [],
-    studyColumn: [],
-    leisureColumn: []
-  };
-
-  private stateSubject = new BehaviorSubject<GameState>({ ...this.state });
-
-  constructor(
-    private content: ProfessionsContentService,
-    private progressReporter: ProgressReporter
-  ) {
-    const isDemo = sessionStorage.getItem('isDemoMode') === 'true';
-    this.contentData = this.content.getFilteredData(isDemo);
-    this.missions = this.content.missions;
+  constructor() {
+    this.initModules();
+    this.loadState();
   }
 
-  get state$(): Observable<GameState> {
-    return this.stateSubject.asObservable();
-  }
-
-  get stateValue(): GameState {
-    return this.state;
-  }
-
-  get currentMission(): AcademyMission {
-    return this.missions[this.state.currentMissionIndex];
-  }
-
-  get totalEnergyBlocks(): number {
-    return this.contentData.scenarios.length;
-  }
-
-  get professions(): Profession[] { return this.contentData.professions; }
-  get hwSwChallenges(): HwSwChallenge[] { return this.contentData.hwSwChallenges; }
-  get softwareTasks(): SoftwareTask[] { return this.contentData.softwareTasks; }
-  get scenarios(): Scenario[] { return this.contentData.scenarios; }
-  get phase3Data(): Phase3Item[][] { return this.contentData.phase3Data; }
-
-  private updateState(updates: Partial<GameState>) {
-    this.state = { ...this.state, ...updates };
-    this.stateSubject.next({ ...this.state });
-  }
-
-  restoreProgress(savedState: Partial<GameState>) {
-    this.updateState(savedState);
-    if (this.state.displayMode === 'gameplay') {
-      this.startMission(true);
+  private shuffle(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
   }
 
-  advanceDialogue() {
-    if (this.state.displayMode === 'briefing') {
-      if (this.state.currentDialogueIndex < this.currentMission.briefing.length - 1) {
-        this.updateState({ currentDialogueIndex: this.state.currentDialogueIndex + 1 });
-      } else {
-        this.updateState({ currentDialogueIndex: 0, displayMode: 'gameplay' });
-        this.startMission();
-      }
-    } else if (this.state.displayMode === 'mission-complete') {
-      if (this.state.currentDialogueIndex < this.currentMission.debriefing.length - 1) {
-        this.updateState({ currentDialogueIndex: this.state.currentDialogueIndex + 1 });
-      } else {
-        const nextIdx = this.state.currentMissionIndex + 1;
-        if (nextIdx >= this.missions.length) {
-          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0, gameFinished: true, displayMode: 'finished' });
-        } else {
-          this.updateState({ currentDialogueIndex: 0, currentMissionIndex: nextIdx, currentTaskIndex: 0, displayMode: 'briefing' });
-        }
-      }
-    }
-  }
+  private initModules() {
+    // Modulo 0: Hardware do Profissional (Drag)
+    const m0Tasks: Task[] = Array(10).fill(null).map((_, i) => ({
+      type: 'drag',
+      prompt: 'Arraste a ferramenta (hardware) correta para a profissão!',
+      item: ['Câmera DSLR', 'Estetoscópio Digital', 'Mesa Digitalizadora', 'Drone', 'Microfone Condensador', 'Óculos VR', 'Impressora 3D', 'Tablet Industrial', 'Termômetro Laser', 'Scanner Corporal'][i],
+      options: ['Fotógrafo', 'Médico', 'Designer', 'Engenheiro Agrônomo', 'Podcaster', 'Arquiteto', 'Designer de Produto', 'Gerente de Logística', 'Técnico de Segurança', 'Fisioterapeuta'],
+      correct: ['Fotógrafo', 'Médico', 'Designer', 'Engenheiro Agrônomo', 'Podcaster', 'Arquiteto', 'Designer de Produto', 'Gerente de Logística', 'Técnico de Segurança', 'Fisioterapeuta'][i]
+    }));
 
-  private startMission(isRestore = false) {
-    if (!isRestore) {
-      this.updateState({ isHwSwChallenge: false, hwSwChallengeIndex: 0 });
-    }
-    switch (this.currentMission.type) {
-      case 'tool-match':
-        if (!isRestore) this.updateState({ currentTaskIndex: 0 });
-        this.loadCurrentMission1Task();
-        break;
-      case 'software-identify':
-        if (!isRestore) this.updateState({ currentTaskIndex: 0 });
-        this.loadSoftwareTask();
-        break;
-      case 'category-sort':
-        if (!isRestore) this.updateState({ currentTaskIndex: 0, energyBlocks: 0 });
-        break;
-      case 'drag-drop':
-        if (!isRestore) this.updateState({ phase3Level: 1 });
-        this.loadPhase3();
-        break;
-    }
-  }
-
-  private loadCurrentMission1Task() {
-    if (this.state.currentTaskIndex < this.professions.length) {
-      const prof = this.professions[this.state.currentTaskIndex];
-      const opts = [prof.correctTool, ...prof.wrongTools].sort(() => Math.random() - 0.5);
-      this.updateState({ currentOptions: opts });
-    }
-  }
-
-  private loadSoftwareTask() {
-    if (this.state.currentTaskIndex < this.softwareTasks.length) {
-      const task = this.softwareTasks[this.state.currentTaskIndex];
-      const opts = [task.correctAnswer, ...task.wrongAnswers].sort(() => Math.random() - 0.5);
-      this.updateState({ currentSoftwareOptions: opts });
-    }
-  }
-
-  loadPhase3() {
-    const lvl = Math.min(this.state.phase3Level, this.phase3Data.length);
-    const items = [...this.phase3Data[lvl - 1]].sort(() => Math.random() - 0.5);
-    this.updateState({
-      workColumn: [], studyColumn: [], leisureColumn: [],
-      showDragError: false, unassignedItems: items
+    // Modulo 1: Software na Prática (Tap)
+    const m1Tasks: Task[] = Array(10).fill(null).map((_, i) => {
+      const correct = ['AutoCAD', 'Photoshop', 'VS Code', 'Premiere Pro', 'Excel', 'Revit', 'Figma', 'Pro Tools', 'ZBrush', 'Blender'][i];
+      const wrongs = ['Word', 'Paint', 'Bloco de Notas', 'Calculadora'];
+      return {
+        type: 'tap',
+        prompt: `Qual software o ${['Arquiteto', 'Designer Gráfico', 'Programador', 'Editor de Vídeo', 'Contador', 'Engenheiro Civil', 'UI Designer', 'Produtor Musical', 'Modelador 3D', 'Animador'][i]} usa?`,
+        options: this.shuffle([correct, wrongs[i % 4], wrongs[(i+1) % 4]]),
+        correct: correct
+      };
     });
-  }
 
-  // ==== ACTIONS ====
-
-  checkTool(tool: Tool) {
-    const prof = this.professions[this.state.currentTaskIndex];
-    if (tool.name === prof.correctTool.name) {
-      this.updateState({
-        isCorrectGuess: true,
-        feedbackText: prof.feedback,
-        feedbackHardware: prof.hardwareDesc,
-        feedbackSoftware: prof.softwareDesc,
-        showFeedbackModal: true
-      });
-    } else {
-      this.updateState({
-        isCorrectGuess: false,
-        feedbackText: 'Ops! Essa tecnologia não pertence a este profissional. Tente de novo!',
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    }
-  }
-
-  checkHwSw(answer: 'HARDWARE' | 'SOFTWARE') {
-    const challenge = this.state.currentHwSwChallenge!;
-    if (answer === challenge.answer) {
-      this.updateState({
-        isCorrectGuess: true, feedbackText: challenge.explanation,
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    } else {
-      this.updateState({
-        isCorrectGuess: false, feedbackText: `Não é bem assim... A resposta correta é ${challenge.answer}. ${challenge.explanation}`,
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    }
-  }
-
-  checkSoftwareAnswer(answer: string) {
-    const task = this.softwareTasks[this.state.currentTaskIndex];
-    if (answer === task.correctAnswer) {
-      this.updateState({
-        isCorrectGuess: true, feedbackText: task.explanation,
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    } else {
-      this.updateState({
-        isCorrectGuess: false, feedbackText: `Essa não é a resposta certa. Pense no que a ${task.professionName} faz no dia a dia...`,
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    }
-  }
-
-  checkScenario(answer: 'TRABALHO' | 'ESTUDO' | 'LAZER') {
-    const scenario = this.scenarios[this.state.currentTaskIndex];
-    if (scenario.type === answer) {
-      this.updateState({
-        isCorrectGuess: true, feedbackText: scenario.feedback,
-        feedbackHardware: scenario.hardwareDesc, feedbackSoftware: scenario.softwareDesc, showFeedbackModal: true
-      });
-    } else {
-      this.updateState({
-        isCorrectGuess: false, feedbackText: `Na verdade, essa atividade é um momento de ${scenario.type === 'TRABALHO' ? 'Trabalho 💼' : scenario.type === 'ESTUDO' ? 'Estudo 📚' : 'Lazer 🎮'}.`,
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    }
-  }
-
-  checkPhase3Answers() {
-    if (this.state.unassignedItems.length > 0) return;
-
-    const workOk = this.state.workColumn.every(i => i.category === 'TRABALHO');
-    const studyOk = this.state.studyColumn.every(i => i.category === 'ESTUDO');
-    const leisureOk = this.state.leisureColumn.every(i => i.category === 'LAZER');
-
-    if (workOk && studyOk && leisureOk) {
-      this.updateState({
-        isCorrectGuess: true,
-        feedbackText: 'Perfeito! Tudo organizado em seus devidos lugares.',
-        feedbackHardware: '', feedbackSoftware: '', showFeedbackModal: true
-      });
-    } else {
-      this.updateState({ showDragError: true });
-    }
-  }
-
-  nextStep() {
-    this.updateState({ showFeedbackModal: false });
-
-    if (!this.state.isCorrectGuess) {
-      this.reportProgress('failure', false);
-      return;
-    }
-
-    // Logic to advance tasks depending on mission type
-    const oldStage = this.getAbsoluteStage();
-
-    if (this.currentMission.type === 'tool-match') {
-      if (!this.state.isHwSwChallenge && this.state.hwSwChallengeIndex < this.hwSwChallenges.length && (this.state.currentTaskIndex % 2 === 0)) {
-        this.updateState({ isHwSwChallenge: true, currentHwSwChallenge: this.hwSwChallenges[this.state.hwSwChallengeIndex] });
-      } else {
-        if (this.state.isHwSwChallenge) {
-          this.updateState({ isHwSwChallenge: false, hwSwChallengeIndex: this.state.hwSwChallengeIndex + 1 });
-        }
-        if (this.state.currentTaskIndex < this.professions.length - 1) {
-          this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
-          this.loadCurrentMission1Task();
-        } else {
-          this.completeMission();
-        }
-      }
-    } else if (this.currentMission.type === 'software-identify') {
-      if (this.state.currentTaskIndex < this.softwareTasks.length - 1) {
-        this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
-        this.loadSoftwareTask();
-      } else {
-        this.completeMission();
-      }
-    } else if (this.currentMission.type === 'category-sort') {
-      this.updateState({ energyBlocks: this.state.energyBlocks + 1 });
-      if (this.state.currentTaskIndex < this.scenarios.length - 1) {
-        this.updateState({ currentTaskIndex: this.state.currentTaskIndex + 1 });
-      } else {
-        this.completeMission();
-      }
-    } else if (this.currentMission.type === 'drag-drop') {
-      if (this.state.phase3Level < this.phase3Data.length) {
-        this.updateState({ phase3Level: this.state.phase3Level + 1 });
-        this.loadPhase3();
-      } else {
-        this.completeMission();
-      }
-    }
-
-    this.reportProgress('success', this.state.gameFinished, oldStage);
-  }
-
-  private completeMission() {
-    this.updateState({
-      displayMode: 'mission-complete',
-      currentDialogueIndex: 0
+    // Modulo 2: Onde Trabalha? (Tap)
+    const m2Tasks: Task[] = Array(10).fill(null).map((_, i) => {
+      const correct = ['Ambiente de Desenvolvimento (IDE)', 'Estúdio Virtual', 'Plataforma BIM', 'Nuvem AWS', 'Sistema ERP', 'CRM de Vendas', 'Software de Telemedicina', 'Terminal Linux', 'Sistema de Controle de Tráfego', 'Painel de E-commerce'][i];
+      return {
+        type: 'tap',
+        prompt: `Identifique o ambiente de trabalho digital do ${['Desenvolvedor', 'Streamer', 'Arquiteto', 'Engenheiro de Dados', 'Administrador', 'Vendedor', 'Médico Digital', 'SysAdmin', 'Controlador de Voo', 'Gerente de Loja'][i]}:`,
+        options: this.shuffle([correct, 'Rede Social', 'Caixa de E-mail']),
+        correct: correct
+      };
     });
-  }
 
-  updateDragState(unassigned: Phase3Item[], work: Phase3Item[], study: Phase3Item[], leisure: Phase3Item[]) {
-    this.updateState({
-      unassignedItems: unassigned,
-      workColumn: work,
-      studyColumn: study,
-      leisureColumn: leisure
+    // Modulo 3: Ferramenta Certa (Drag - Hardware vs Software)
+    const m3Tasks: Task[] = Array(10).fill(null).map((_, i) => {
+      const isHardware = i % 2 === 0;
+      const item = isHardware ? 
+        ['Monitor UltraWide', 'Placa de Captura', 'Servidor Físico', 'Mouse Vertical', 'Headset'][Math.floor(i/2)] : 
+        ['Sistema Operacional', 'Antivírus', 'Compilador', 'Editor de Imagem', 'Navegador'][Math.floor(i/2)];
+      return {
+        type: 'drag',
+        prompt: 'Classifique a ferramenta utilizada na profissão!',
+        item: item,
+        options: ['Hardware', 'Software'],
+        correct: isHardware ? 'Hardware' : 'Software'
+      };
     });
+
+    // Modulo 4: O Especialista (Drag 3 zones)
+    const m4Tasks: Task[] = Array(10).fill(null).map((_, i) => {
+      const categories = ['Saúde', 'Engenharia', 'Artes'];
+      const catIndex = i % 3;
+      const item = [
+        ['Monitor Cardíaco', 'Software de Raio-X', 'Prontuário Eletrônico', 'Bisturi Ultrassônico'],
+        ['AutoCAD', 'Estação Total GPS', 'Drone de Mapeamento', 'Impressora 3D de Concreto'],
+        ['Mesa Digitalizadora', 'Teclado MIDI', 'Software de Renderização', 'Câmera Mirrorless']
+      ][catIndex][Math.floor(i/3)];
+      return {
+        type: 'drag-3',
+        prompt: 'Em qual área o profissional utiliza esta tecnologia?',
+        item: item,
+        options: categories,
+        correct: categories[catIndex]
+      };
+    });
+
+    this.modules = [
+      { id: 0, title: 'Hardware do Profissional', tasks: this.shuffle(m0Tasks) },
+      { id: 1, title: 'Software na Prática', tasks: this.shuffle(m1Tasks) },
+      { id: 2, title: 'Onde Trabalha?', tasks: this.shuffle(m2Tasks) },
+      { id: 3, title: 'Ferramenta Certa', tasks: this.shuffle(m3Tasks) },
+      { id: 4, title: 'O Especialista', tasks: this.shuffle(m4Tasks) }
+    ];
   }
 
-  private reportProgress(result: 'success' | 'failure', isFinished: boolean, overrideFase?: number) {
-    const fase = overrideFase !== undefined ? overrideFase : this.getAbsoluteStage();
+  loadState() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (saved) {
+      try {
+        this.state = JSON.parse(saved);
+        if (this.state.fase > 4) this.state.fase = 4;
+      } catch (e) {
+        this.saveState();
+      }
+    }
+  }
+
+  saveState() {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+  }
+
+  getCurrentTask(): Task | null {
+    if (this.state.fase >= this.modules.length) return null;
+    const mod = this.modules[this.state.fase];
+    if (this.state.taskId >= mod.tasks.length) return null;
+    return mod.tasks[this.state.taskId];
+  }
+
+  checkAnswer(answer: string): boolean {
+    const task = this.getCurrentTask();
+    if (!task) return false;
     
-    this.progressReporter.report({
-      levelId: `professions-m${this.state.currentMissionIndex}-t${this.state.currentTaskIndex}`,
-      fase: fase,
-      result: result,
-      attempts: 0,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isFinished
-    });
-  }
-
-  getAbsoluteStage(): number {
-    const m1 = this.professions.length + this.hwSwChallenges.length;
-    const m2 = this.softwareTasks.length;
-    const m3 = this.scenarios.length;
-    switch (this.state.currentMissionIndex) {
-      case 0: return this.state.currentTaskIndex;
-      case 1: return m1 + this.state.currentTaskIndex;
-      case 2: return m1 + m2 + this.state.currentTaskIndex;
-      case 3: return m1 + m2 + m3 + (this.state.phase3Level - 1);
-      default: return 0;
+    if (task.correct === answer) {
+      this.state.score += 10;
+      this.saveState();
+      return true;
+    } else {
+      this.state.hearts--;
+      this.saveState();
+      return false;
     }
   }
 
-  getTotalStages(): number {
-    return this.professions.length + this.hwSwChallenges.length
-         + this.softwareTasks.length
-         + this.scenarios.length
-         + this.phase3Data.length;
+  nextTask(): 'next-task' | 'next-module' | 'game-over' | 'finished' {
+    this.state.taskId++;
+    const mod = this.modules[this.state.fase];
+    
+    if (this.state.taskId >= mod.tasks.length) {
+      this.state.fase++;
+      this.state.taskId = 0;
+      this.state.hearts = 3; 
+      this.saveState();
+      return this.state.fase >= this.modules.length ? 'finished' : 'next-module';
+    }
+    
+    this.saveState();
+    return 'next-task';
+  }
+
+  restartModule() {
+    this.state.taskId = 0;
+    this.state.hearts = 3;
+    this.saveState();
   }
 }

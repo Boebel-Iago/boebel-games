@@ -1,175 +1,319 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
-export interface ChallengeItem {
+export interface GameItem {
   id: string;
   emoji: string;
   word: string;
   category: 'food' | 'shape' | 'tech';
 }
 
-const CHALLENGE_ITEMS: ChallengeItem[] = [
-  { id: 'c1', emoji: '🍎', word: 'MAÇÃ', category: 'food' },
-  { id: 'c2', emoji: '🍌', word: 'BANANA', category: 'food' },
-  { id: 'c3', emoji: '🍉', word: 'MELANCIA', category: 'food' },
-  { id: 'c4', emoji: '🍇', word: 'UVA', category: 'food' },
-  { id: 'c5', emoji: '🟦', word: 'QUADRADO', category: 'shape' },
-  { id: 'c6', emoji: '🔴', word: 'CÍRCULO', category: 'shape' },
-  { id: 'c7', emoji: '⭐', word: 'ESTRELA', category: 'shape' },
-  { id: 'c8', emoji: '💛', word: 'CORAÇÃO', category: 'shape' },
-  { id: 'c9', emoji: '📱', word: 'CELULAR', category: 'tech' },
-  { id: 'c10', emoji: '💻', word: 'COMPUTADOR', category: 'tech' },
-  { id: 'c11', emoji: '⌚', word: 'RELÓGIO', category: 'tech' },
-  { id: 'c12', emoji: '📸', word: 'CÂMERA', category: 'tech' },
+const ITEMS: GameItem[] = [
+  { id: 'f1', emoji: '🍎', word: 'MAÇÃ', category: 'food' },
+  { id: 'f2', emoji: '🍌', word: 'BANANA', category: 'food' },
+  { id: 'f3', emoji: '🍉', word: 'MELANCIA', category: 'food' },
+  { id: 'f4', emoji: '🍇', word: 'UVA', category: 'food' },
+  { id: 'f5', emoji: '🍓', word: 'MORANGO', category: 'food' },
+  { id: 'f6', emoji: '🍔', word: 'HAMBÚRGUER', category: 'food' },
+  { id: 'f7', emoji: '🍕', word: 'PIZZA', category: 'food' },
+  
+  { id: 's1', emoji: '🟦', word: 'QUADRADO', category: 'shape' },
+  { id: 's2', emoji: '🔴', word: 'CÍRCULO', category: 'shape' },
+  { id: 's3', emoji: '⭐', word: 'ESTRELA', category: 'shape' },
+  { id: 's4', emoji: '💛', word: 'CORAÇÃO', category: 'shape' },
+  { id: 's5', emoji: '🔺', word: 'TRIÂNGULO', category: 'shape' },
+
+  { id: 't1', emoji: '📱', word: 'CELULAR', category: 'tech' },
+  { id: 't2', emoji: '💻', word: 'COMPUTADOR', category: 'tech' },
+  { id: 't3', emoji: '⌚', word: 'RELÓGIO', category: 'tech' },
+  { id: 't4', emoji: '📸', word: 'CÂMERA', category: 'tech' },
+  { id: 't5', emoji: '🎮', word: 'VIDEOGAME', category: 'tech' },
+  { id: 't6', emoji: '🎧', word: 'FONE', category: 'tech' }
 ];
 
-@Injectable()
-/**
- * TouchLiteracyEngineService
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
-export class TouchLiteracyEngineService {
-  private initialState = {
-    fase: 0,
-    bubbles: [false, false, false, false, false, false],
-    fruitsToDrop: [
-      { id: 'fruit_apple', emoji: '🍎', word: 'MAÇÃ' },
-      { id: 'fruit_banana', emoji: '🍌', word: 'BANANA' },
-      { id: 'fruit_grape', emoji: '🍇', word: 'UVA' },
-      { id: 'fruit_orange', emoji: '🍊', word: 'LARANJA' },
-      { id: 'fruit_watermelon', emoji: '🍉', word: 'MELANCIA' }
-    ],
-    fruitsDropped: 0,
-    shapes: { square: false, triangle: false, circle: false, star: false, heart: false },
-    devices: { phone: false, laptop: false, flashlight: false, tablet: false, camera: false },
-    
-    score: 0,
-    challengeItem: null as ChallengeItem | null,
-    challengeTargetScore: 100,
-    // Phase 5 (Balloons)
-    balloons: [] as any[],
-    phase5Score: 0,
-    phase5Target: 50,
-    phase5CategoryTarget: 'food'
+export interface Balloon {
+  id: string;
+  item: GameItem;
+  x: number; // 0 to 100 percentage
+  createdAt: number;
+}
 
+export interface GameState {
+  currentModuleIndex: number;
+  currentTaskIndex: number;
+  lives: number;
+  taskData: any; // Dynamic data for the current module/task
+  balloons: Balloon[];
+  foodsPopped: number;
+}
+
+const STORAGE_KEY = 'boebel_touch_literacy_state';
+
+@Injectable({ providedIn: 'root' })
+export class TouchLiteracyEngineService {
+  private initialState: GameState = {
+    currentModuleIndex: 0,
+    currentTaskIndex: 0,
+    lives: 3,
+    taskData: null,
+    balloons: [],
+    foodsPopped: 0
   };
 
-  private stateSubject = new BehaviorSubject<any>(this.clone(this.initialState));
+  private stateSubject = new BehaviorSubject<GameState>(this.clone(this.initialState));
   state$ = this.stateSubject.asObservable();
 
-  state() {
+  constructor(private progress: ProgressReporter) {
+    this.loadState();
+  }
+
+  get state(): GameState {
     return this.stateSubject.value;
   }
 
-  reset() {
-    this.stateSubject.next(this.clone(this.initialState));
+  private updateState(newState: Partial<GameState>) {
+    const nextState = { ...this.state, ...newState };
+    this.stateSubject.next(nextState);
+    this.saveState(nextState);
   }
 
-  nextPhase() {
-    const s = this.state();
-    s.fase++;
-    if (s.fase === 4) {
-       this.generateChallengeItem(s);
-    }
-    this.stateSubject.next(s);
-  }
-
-  popBubble(index: number) {
-    const s = this.state();
-    s.bubbles[index] = true;
-    this.stateSubject.next(s);
-  }
-
-  dropFruit() {
-    const s = this.state();
-    s.fruitsDropped++;
-    this.stateSubject.next(s);
-  }
-
-  dropShape(shape: string) {
-    const s = this.state();
-    s.shapes[shape] = true;
-    this.stateSubject.next(s);
-  }
-
-  powerDevice(device: string) {
-    const s = this.state();
-    s.devices[device] = true;
-    this.stateSubject.next(s);
-  }
-
-  private generateChallengeItem(s: any) {
-    const randomIndex = Math.floor(Math.random() * CHALLENGE_ITEMS.length);
-    s.challengeItem = CHALLENGE_ITEMS[randomIndex];
-  }
-
-  processChallengeDrop(category: string): boolean {
-    const s = this.state();
-    if (!s.challengeItem) return false;
-
-    const isCorrect = s.challengeItem.category === category;
-    if (isCorrect) {
-      s.score += 10;
+  private saveState(state: GameState) {
+    if (state.currentModuleIndex >= 5) {
+      localStorage.removeItem(STORAGE_KEY);
     } else {
-      s.score = Math.max(0, s.score - 5);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
+  }
+
+  private loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        this.stateSubject.next(parsed);
+      } catch (e) {
+        this.generateNextTask();
+      }
+    } else {
+      this.generateNextTask();
+    }
+  }
+
+  private clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  private shuffle(array: any[]) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  private getItemsByCategory(cat: 'food'|'shape'|'tech'): GameItem[] {
+    return ITEMS.filter(i => i.category === cat);
+  }
+
+  private getRandomItem(items: GameItem[]): GameItem {
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  generateNextTask() {
+    const s = this.state;
+    if (s.currentModuleIndex >= 5) return;
+
+    let taskData: any = {};
+
+    if (s.currentModuleIndex === 0) {
+      // Tap Practice: 1 target, 2 distractors
+      const shuffled = this.shuffle(ITEMS);
+      const target = shuffled[0];
+      const distractors = shuffled.slice(1, 3);
+      taskData = {
+        target,
+        options: this.shuffle([target, ...distractors]),
+        prompt: `Clique na(o) ${target.word}`
+      };
+    } else if (s.currentModuleIndex === 1) {
+      // Drag to Basket: 1 food, 1 non-food
+      const food = this.getRandomItem(this.getItemsByCategory('food'));
+      const nonFoodCategories = this.shuffle([...this.getItemsByCategory('shape'), ...this.getItemsByCategory('tech')]);
+      const nonFood = nonFoodCategories[0];
+      taskData = {
+        options: this.shuffle([food, nonFood]),
+        prompt: `Arraste a COMIDA para a Cesta!`
+      };
+    } else if (s.currentModuleIndex === 2) {
+      // Silhouette: 1 target shape, 2 wrong shapes
+      const shapes = this.shuffle(this.getItemsByCategory('shape'));
+      const target = shapes[0];
+      const distractors = shapes.slice(1, 3);
+      taskData = {
+        target,
+        options: this.shuffle([target, ...distractors]),
+        prompt: `Arraste a forma correta para a sombra!`
+      };
+    } else if (s.currentModuleIndex === 3) {
+      // Sorting: 1 random item
+      const item = this.getRandomItem(ITEMS);
+      taskData = {
+        target: item,
+        prompt: `Arraste a(o) ${item.word} para a lixeira correta!`
+      };
+    } else if (s.currentModuleIndex === 4) {
+      // Balloon Arcade
+      taskData = {
+        prompt: `ESTOURE APENAS AS COMIDAS!`
+      };
+    }
+
+    this.updateState({ taskData });
+  }
+
+  handleMistake() {
+    const s = this.state;
+    const newLives = s.lives - 1;
     
-    if (s.score < s.challengeTargetScore) {
-      this.generateChallengeItem(s);
+    this.progress.report({
+      levelId: `fase-${s.currentModuleIndex}`,
+      fase: s.currentModuleIndex,
+      result: 'failure',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: false
+    });
+
+    if (newLives <= 0) {
+      // Restart current module
+      this.updateState({
+        currentTaskIndex: 0,
+        lives: 3,
+        foodsPopped: 0,
+        balloons: []
+      });
+      this.generateNextTask();
     } else {
-      // Finished Phase 4, automatically wait for component to transition to Phase 5
+      this.updateState({ lives: newLives });
     }
-    this.stateSubject.next(s);
-    return isCorrect;
+  }
+
+  handleSuccess() {
+    const s = this.state;
+    let nextTask = s.currentTaskIndex + 1;
+    let nextMod = s.currentModuleIndex;
+    
+    // Module 4 uses foodsPopped instead of currentTaskIndex
+    if (s.currentModuleIndex === 4) {
+      const popped = s.foodsPopped + 1;
+      if (popped >= 10) {
+        this.completeModule(4);
+      } else {
+        this.updateState({ foodsPopped: popped });
+      }
+      return;
+    }
+
+    if (nextTask >= 10) {
+      this.completeModule(nextMod);
+    } else {
+      this.updateState({ currentTaskIndex: nextTask });
+      this.generateNextTask();
+    }
+  }
+
+  private completeModule(modIndex: number) {
+    const isLast = modIndex === 4;
+    this.progress.report({
+      levelId: `fase-${modIndex}`,
+      fase: modIndex,
+      result: 'success',
+      attempts: 1,
+      timestamp: new Date().toISOString(),
+      isLastLevel: isLast
+    });
+
+    if (isLast) {
+      this.updateState({
+        currentModuleIndex: 5,
+        currentTaskIndex: 0
+      });
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      this.updateState({
+        currentModuleIndex: modIndex + 1,
+        currentTaskIndex: 0,
+        lives: 3
+      });
+      this.generateNextTask();
+    }
+  }
+
+  // Interactions
+  submitModule0(item: GameItem) {
+    if (item.id === this.state.taskData.target.id) {
+      this.handleSuccess();
+    } else {
+      this.handleMistake();
+    }
+  }
+
+  submitModule1(item: GameItem, target: string) {
+    if (target === 'basket' && item.category === 'food') {
+      this.handleSuccess();
+    } else {
+      this.handleMistake();
+    }
+  }
+
+  submitModule2(item: GameItem, targetId: string) {
+    if (item.id === this.state.taskData.target.id && targetId === 'silhouette') {
+      this.handleSuccess();
+    } else {
+      this.handleMistake();
+    }
+  }
+
+  submitModule3(item: GameItem, binCategory: string) {
+    if (item.category === binCategory) {
+      this.handleSuccess();
+    } else {
+      this.handleMistake();
+    }
   }
 
   // Phase 5 Logic
   spawnBalloon() {
-    const s = this.state();
-    if (s.fase !== 5) return;
-
-    const randomIndex = Math.floor(Math.random() * CHALLENGE_ITEMS.length);
-    const item = CHALLENGE_ITEMS[randomIndex];
-    
-    const balloon = {
-      id: 'b_' + new Date().getTime() + '_' + Math.random(),
-      x: Math.floor(Math.random() * 80) + 10, // 10% to 90%
-      item: item,
-      active: true,
-      color: ['bg-red-400', 'bg-blue-400', 'bg-green-400', 'bg-yellow-400', 'bg-purple-400'][Math.floor(Math.random()*5)]
+    if (this.state.currentModuleIndex !== 4) return;
+    const now = Date.now();
+    const item = this.getRandomItem(ITEMS);
+    const b: Balloon = {
+      id: `b_${now}_${Math.random()}`,
+      item,
+      x: Math.random() * 80 + 10,
+      createdAt: now
     };
     
-    s.balloons.push(balloon);
-    
-    // Cleanup old balloons
-    if (s.balloons.length > 15) {
-      s.balloons.shift();
-    }
-    
-    this.stateSubject.next(s);
+    const balloons = [...this.state.balloons, b].filter(ball => now - ball.createdAt < 6000);
+    this.updateState({ balloons });
   }
 
-  popMovingBalloon(id: string): boolean {
-    const s = this.state();
-    const balloon = s.balloons.find((b: any) => b.id === id);
-    if (!balloon || !balloon.active) return false;
+  popBalloon(id: string) {
+    if (this.state.currentModuleIndex !== 4) return;
+    const s = this.state;
+    const balloon = s.balloons.find(b => b.id === id);
+    if (!balloon) return;
 
-    balloon.active = false;
-    const isCorrect = balloon.item.category === s.phase5CategoryTarget;
-    
-    if (isCorrect) {
-      s.phase5Score += 10;
+    // Remove balloon
+    const balloons = s.balloons.filter(b => b.id !== id);
+    this.updateState({ balloons });
+
+    if (balloon.item.category === 'food') {
+      this.handleSuccess();
     } else {
-      s.phase5Score = Math.max(0, s.phase5Score - 5);
+      this.handleMistake();
     }
-    
-    this.stateSubject.next(s);
-    return isCorrect;
-  }
-
-
-  private clone(obj: any) {
-    return JSON.parse(JSON.stringify(obj));
   }
 }

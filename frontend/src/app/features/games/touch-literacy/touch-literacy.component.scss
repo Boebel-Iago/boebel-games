@@ -1,18 +1,25 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
 @keyframes floatUp {
   0% { transform: translateY(100vh); opacity: 1; }
-  100% { transform: translateY(-30vh); opacity: 0; }
+  100% { transform: translateY(-20vh); opacity: 1; }
 }
-.animate-floatUp {
-  animation: floatUp 7s linear forwards;
+
+.animate-float-up {
+  animation: floatUp 6s linear forwards;
 }
-.balloon-tail {
-  content: '';
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  width: 2px;
-  height: 30px;
-  background-color: #cbd5e1;
-  transform: translateX(-50%);
+
+.basket, .bin, .silhouette {
+  border: 4px dashed #ccc;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background-color: rgba(255,255,255,0.5);
 }

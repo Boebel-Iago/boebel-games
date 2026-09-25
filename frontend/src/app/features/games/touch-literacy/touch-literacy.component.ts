@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TouchLiteracyEngineService } from './engine/touch-literacy-engine.service';
+import { TouchLiteracyEngineService, GameState, GameItem } from './engine/touch-literacy-engine.service';
 import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 import { Subscription } from 'rxjs';
 
@@ -12,17 +12,11 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./touch-literacy.component.scss'],
   providers: [TouchLiteracyEngineService]
 })
-/**
- * TouchLiteracyComponent
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
 export class TouchLiteracyComponent implements OnInit, OnDestroy {
-  state: any;
+  state!: GameState;
   sub!: Subscription;
   balloonInterval: any;
-
-  draggedItem: string | null = null;
+  draggedItem: GameItem | null = null;
 
   constructor(
     public engine: TouchLiteracyEngineService,
@@ -31,8 +25,15 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.engine.state$.subscribe(s => {
+      const prevMod = this.state?.currentModuleIndex;
       this.state = s;
-      this.checkCompletion();
+      
+      if (this.state.currentModuleIndex === 4 && prevMod !== 4) {
+        this.startBalloons();
+      } else if (this.state.currentModuleIndex !== 4 && this.balloonInterval) {
+        clearInterval(this.balloonInterval);
+        this.balloonInterval = null;
+      }
     });
   }
 
@@ -41,124 +42,40 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
     if (this.balloonInterval) clearInterval(this.balloonInterval);
   }
 
-  checkCompletion() {
-    if (this.state.fase === 0) {
-      if (this.state.bubbles.every((b: boolean) => b)) {
-        this.completePhase(false);
-      }
-    } else if (this.state.fase === 1) {
-      if (this.state.fruitsDropped >= this.state.fruitsToDrop.length) {
-        this.completePhase(false);
-      }
-    } else if (this.state.fase === 2) {
-      if (Object.values(this.state.shapes).every(v => v)) {
-        this.completePhase(false);
-      }
-    } else if (this.state.fase === 3) {
-      if (Object.values(this.state.devices).every(v => v)) {
-        this.completePhase(false);
-      }
-    } else if (this.state.fase === 4) {
-      if (this.state.score >= this.state.challengeTargetScore) {
-        this.completePhase(false);
-        this.startBalloons();
-      }
-    } else if (this.state.fase === 5) {
-      if (this.state.phase5Score >= this.state.phase5Target) {
-        if (this.balloonInterval) clearInterval(this.balloonInterval);
-        this.completePhase(true);
-      }
-    }
-  }
-
   startBalloons() {
+    if (this.balloonInterval) clearInterval(this.balloonInterval);
     this.balloonInterval = setInterval(() => {
       this.engine.spawnBalloon();
-    }, 1500);
+    }, 1200);
   }
 
-  onBalloonClick(id: string) {
-    const isCorrect = this.engine.popMovingBalloon(id);
-    if (!isCorrect) {
-      this.reportMistake();
-    }
+  // Common UI helpers
+  get heartsArray() {
+    return Array(3).fill(0).map((_, i) => i < this.state.lives);
   }
 
-  completePhase(isLastLevel: boolean) {
-    this.progress.report({
-      levelId: `fase-${this.state.fase}`,
-      fase: this.state.fase,
-      result: 'success',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
-    });
-    if (!isLastLevel) {
-      setTimeout(() => this.engine.nextPhase(), 1000);
-    } else {
-      setTimeout(() => alert('🎉 Parabéns! Você completou O GRANDE DESAFIO e venceu todos os jogos! 🎉'), 1000);
-    }
-  }
-
-  reportMistake() {
-    this.progress.report({
-      levelId: `fase-${this.state.fase}`,
-      fase: this.state.fase,
-      result: 'failure',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: false
-    });
-  }
-
-  onBubbleClick(index: number) {
-    if (!this.state.bubbles[index]) {
-      this.engine.popBubble(index);
-    }
-  }
-
-  onDragStart(event: DragEvent, item: string) {
+  // Drag and Drop
+  onDragStart(event: DragEvent, item: GameItem) {
     this.draggedItem = item;
-    event.dataTransfer?.setData('text/plain', item);
+    event.dataTransfer?.setData('text/plain', item.id);
   }
 
   onDragOver(event: DragEvent) {
-    event.preventDefault();
+    event.preventDefault(); // allow drop
   }
 
   onDrop(event: DragEvent, target: string) {
     event.preventDefault();
     if (!this.draggedItem) return;
 
-    if (this.state.fase === 1) {
-      if (this.draggedItem.startsWith('fruit_') && target === 'basket') {
-        this.engine.dropFruit();
-      } else {
-        this.reportMistake();
-      }
-    } else if (this.state.fase === 2) {
-      if (this.draggedItem === target) {
-        this.engine.dropShape(target);
-      } else {
-        this.reportMistake();
-      }
-    } else if (this.state.fase === 3) {
-      if (this.draggedItem === 'battery') {
-        if (!this.state.devices[target]) {
-          this.engine.powerDevice(target);
-        }
-      } else {
-        this.reportMistake();
-      }
-    } else if (this.state.fase === 4) {
-      if (this.draggedItem === 'challengeItem') {
-        const isCorrect = this.engine.processChallengeDrop(target);
-        if (!isCorrect) {
-          this.reportMistake();
-        }
-      }
+    if (this.state.currentModuleIndex === 1) {
+      this.engine.submitModule1(this.draggedItem, target);
+    } else if (this.state.currentModuleIndex === 2) {
+      this.engine.submitModule2(this.draggedItem, target);
+    } else if (this.state.currentModuleIndex === 3) {
+      this.engine.submitModule3(this.draggedItem, target);
     }
-    
+
     this.draggedItem = null;
   }
 }

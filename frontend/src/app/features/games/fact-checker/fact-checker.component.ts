@@ -73,4 +73,11 @@ export class FactCheckerComponent {
     this.feedback = null;
     this.engine.resetGame();
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

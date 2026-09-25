@@ -46,4 +46,11 @@ import { BrowserSearchEngineService } from '../../engine/browser-search-engine.s
 })
 export class AnatomyComponent {
   constructor(public engine: BrowserSearchEngineService) {}
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

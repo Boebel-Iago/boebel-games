@@ -129,4 +129,11 @@ export class TechInvestigatorsComponent implements OnInit {
       this.updateState();
     }
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

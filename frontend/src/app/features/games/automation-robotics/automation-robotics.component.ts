@@ -64,4 +64,11 @@ export class AutomationRoboticsComponent implements OnInit {
   answerPhase3(type: 'robot' | 'human') {
     this.engine.answerPhase3(type);
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

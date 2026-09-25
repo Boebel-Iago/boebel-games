@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TicketService, StudentSession } from '../../../core/services/ticket.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { UnpluggedActivityComponent } from './unplugged-activity/unplugged-activ
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SafeUrlPipe, UnpluggedActivityComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SafeUrlPipe, UnpluggedActivityComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -57,6 +57,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Demo mode
   isDemoFullscreen = false;
+  showCreateModal = false;
+  sortOrder: "newest" | "oldest" | "active" = "active";
 
   formatNameTitleCase(name: string): string {
     if (!name) return '';
@@ -263,6 +265,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.ticketService.getGamesByGrade(grade).subscribe(games => this.availableGames = games);
   }
 
+
+  get sortedTickets() {
+    if (!this.tickets) return [];
+    return this.tickets.slice().sort((a, b) => {
+      if (this.sortOrder === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (this.sortOrder === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (this.sortOrder === 'active') return (b.isActive ? 1 : 0) - (a.isActive ? 1 : 0);
+      return 0;
+    });
+  }
+
+  kickStudent(sessionId: string, studentName: string) {
+    if (confirm(`Tem certeza que deseja expulsar o aluno ${studentName}? Ele perderá todo o progresso.`)) {
+      // Direct HTTP delete as it is a quick endpoint
+      this.ticketService.deleteSession(sessionId).subscribe({
+        next: () => console.log('Aluno expulso com sucesso!'),
+        error: (err: any) => alert('Erro ao expulsar aluno.')
+      });
+    }
+  }
+
+  openCreateModal() {
+    this.showCreateModal = true;
+  }
+
+  closeCreateModal() {
+    this.showCreateModal = false;
+    this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null });
+  }
+
   onGenerateTicket() {
     if (this.ticketForm.valid) {
       const payload = {
@@ -277,7 +309,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.errorMessage = '';
           this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null });
-          this.loadTickets(); // Atualiza a lista
+          this.loadTickets();
+          this.closeCreateModal();
         },
         error: (err) => {
           this.errorMessage = err.error?.error || err.error?.message || 'Erro ao gerar o ingresso.';

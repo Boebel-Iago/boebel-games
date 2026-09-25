@@ -71,4 +71,11 @@ export class AuditComponent implements OnInit {
   constructor(public engine: CreatorsEngineService) {}
   get state() { return this.engine.stateValue; }
   get task() { return this.engine.auditTasks[this.state.currentTaskIndex]; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

@@ -29,4 +29,11 @@ export class LicenseCardsComponent {
   constructor(public engine: CreatorsEngineService) {}
   get state() { return this.engine.stateValue; }
   get task() { return this.engine.licenseTasks[this.state.currentTaskIndex]; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

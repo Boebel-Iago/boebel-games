@@ -46,4 +46,11 @@ export class IconMessageActivityComponent implements OnChanges {
       this.wrongIconId = icon.id;
     }
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

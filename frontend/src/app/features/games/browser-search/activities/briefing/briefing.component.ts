@@ -37,4 +37,11 @@ export class BriefingComponent {
   
   get state() { return this.engine.stateValue; }
   get activeMission() { return this.engine.activeMission; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

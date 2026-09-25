@@ -41,4 +41,11 @@ export class ToolMatchComponent {
   
   get state() { return this.engine.stateValue; }
   get profession() { return this.engine.professions[this.state.currentTaskIndex]; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

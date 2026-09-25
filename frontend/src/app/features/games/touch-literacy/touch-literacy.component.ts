@@ -78,4 +78,11 @@ export class TouchLiteracyComponent implements OnInit, OnDestroy {
 
     this.draggedItem = null;
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

@@ -54,4 +54,11 @@ export class PatternActivityComponent implements OnChanges {
       this.wrongOptionId = null;
     }
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

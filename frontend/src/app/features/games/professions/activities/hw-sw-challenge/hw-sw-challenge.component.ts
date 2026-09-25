@@ -36,4 +36,11 @@ import { ProfessionsEngineService } from '../../engine/professions-engine.servic
 export class HwSwChallengeComponent {
   constructor(public engine: ProfessionsEngineService) {}
   get challenge() { return this.engine.stateValue.currentHwSwChallenge; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

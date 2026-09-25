@@ -35,4 +35,11 @@ export class TextShapesComponent {
       this.engine.restartModule();
     }
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

@@ -86,6 +86,11 @@ export class TicketService {
    * @param {string} id ID do ingresso a ser excluído.
    * @returns {Observable<any>} Confirmação da exclusão.
    */
+
+  deleteSession(sessionId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/sessions/${sessionId}`);
+  }
+
   deleteTicket(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/tickets/${id}`, { headers: this.getHeaders() });
   }

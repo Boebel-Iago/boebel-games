@@ -56,4 +56,11 @@ export class CategorySortComponent {
   constructor(public engine: ProfessionsEngineService) {}
   get state() { return this.engine.stateValue; }
   get scenario() { return this.engine.scenarios[this.state.currentTaskIndex]; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

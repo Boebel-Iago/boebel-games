@@ -140,4 +140,11 @@ export class PixelArtComponent implements OnInit {
     });
     this.engine.loseHeart();
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

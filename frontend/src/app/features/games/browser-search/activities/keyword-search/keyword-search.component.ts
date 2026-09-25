@@ -55,4 +55,11 @@ export class KeywordSearchComponent {
   constructor(public engine: BrowserSearchEngineService) {}
   
   get state() { return this.engine.stateValue; }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

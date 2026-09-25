@@ -296,4 +296,11 @@ export class EmergencyEscapeComponent implements OnInit, AfterViewInit, OnDestro
     }
     this.isRunning = false;
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

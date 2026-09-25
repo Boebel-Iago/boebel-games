@@ -67,4 +67,11 @@ export class EthicalDilemmasComponent implements OnInit {
     this.engine.resetGame();
     this.engine.initGame();
   }
+
+  leaveRoom() {
+    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
+  }
 }

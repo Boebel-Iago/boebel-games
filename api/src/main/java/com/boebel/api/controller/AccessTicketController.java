@@ -411,6 +411,19 @@ public class AccessTicketController {
      * Broadcasts the full list of sessions for a given ticket code to all
      * connected WebSocket clients subscribed to that topic.
      */
+    
+    @DeleteMapping("/sessions/{sessionId}")
+    public ResponseEntity<?> kickStudent(@PathVariable java.util.UUID sessionId) {
+        StudentSession session = studentSessionRepository.findById(sessionId).orElse(null);
+        if (session != null) {
+            String ticketCode = session.getTicketCode();
+            studentSessionRepository.delete(session);
+            broadcastSessions(ticketCode);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     private void broadcastSessions(String ticketCode) {
         List<StudentSessionDTO> sessions = studentSessionRepository.findByTicketCode(ticketCode)
                 .stream()

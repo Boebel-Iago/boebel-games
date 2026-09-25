@@ -62,6 +62,13 @@ export class CreatorsEngineService {
   ) {
     const isDemo = sessionStorage.getItem('isDemoMode') === 'true';
     this.contentData = this.content.getFilteredData(isDemo);
+    
+    // Shuffle the tasks so the answers don't follow a predictable true/false pattern
+    this.contentData.licenseTasks = this.shuffleArray([...this.contentData.licenseTasks]);
+    this.contentData.plagiarismTasksModule2 = this.shuffleArray([...this.contentData.plagiarismTasksModule2]);
+    this.contentData.plagiarismTasksModule3 = this.shuffleArray([...this.contentData.plagiarismTasksModule3]);
+    this.contentData.auditTasks = this.shuffleArray([...this.contentData.auditTasks]);
+    
     this.missions = this.content.missions;
   }
 

@@ -1,7 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EthicalDilemmasEngineService } from './engine/ethical-dilemmas-engine.service';
-import { ProgressReporter } from '../../../core/services/progress-reporter.service';
+import { EthicalDilemmasEngineService, TapTask, Drag2Task, Drag3Task, Task } from './engine/ethical-dilemmas-engine.service';
 
 @Component({
   selector: 'app-ethical-dilemmas',
@@ -10,73 +9,62 @@ import { ProgressReporter } from '../../../core/services/progress-reporter.servi
   templateUrl: './ethical-dilemmas.component.html',
   styleUrls: ['./ethical-dilemmas.component.scss']
 })
-/**
- * EthicalDilemmasComponent
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
 export class EthicalDilemmasComponent implements OnInit {
-  engine = inject(EthicalDilemmasEngineService);
-  progress = inject(ProgressReporter);
+  draggedItem: any = null;
 
-  get state() {
-    return this.engine.state();
-  }
+  constructor(public engine: EthicalDilemmasEngineService) {}
 
   ngOnInit() {
-    this.engine.reset();
+    this.engine.initGame();
   }
 
-  completePhase(isLastLevel: boolean) {
-    this.progress.report({
-      levelId: `fase-${this.state.fase}`,
-      fase: this.state.fase,
-      result: 'success',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: isLastLevel
-    });
-    if (!isLastLevel) {
-      this.engine.setFase(this.state.fase + 1);
+  get currentModule() {
+    return this.engine.modules[this.engine.state.moduleIndex];
+  }
+
+  handleTap(correct: boolean) {
+    this.engine.processAnswer(correct);
+  }
+
+  onDragStart(event: DragEvent, item: string) {
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', item);
+      event.dataTransfer.effectAllowed = 'move';
+    }
+    this.draggedItem = item;
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
     }
   }
 
-  reportMistake() {
-    this.progress.report({
-      levelId: `fase-${this.state.fase}`,
-      fase: this.state.fase,
-      result: 'failure',
-      attempts: 1,
-      timestamp: new Date().toISOString(),
-      isLastLevel: false
-    });
-    alert('Oops! Tente novamente.');
+  onDrop(event: DragEvent, zoneIndex: number) {
+    event.preventDefault();
+    const task = this.engine.currentTask;
+    if (task && (task.type === 'drag-2' || task.type === 'drag-3')) {
+      const correct = zoneIndex === (task as any).correctZone;
+      this.engine.processAnswer(correct);
+    }
+    this.draggedItem = null;
   }
 
-  selectOption(correct: boolean) {
-    if (correct) {
-      this.completePhase(false);
-    } else {
-      this.reportMistake();
-    }
+  asTap(task: Task): TapTask {
+    return task as TapTask;
+  }
+  
+  getDragItem(task: Task): string {
+    return (task as Drag2Task | Drag3Task).item;
   }
 
-  selectCard(cardId: number, category: 'good' | 'bad' | null) {
-    this.engine.setCardCategory(cardId, category);
+  getDragZones(task: Task): string[] {
+    return (task as Drag2Task | Drag3Task).zones;
   }
-
-  checkPhase3() {
-    const allAssigned = this.state.cards.every(c => c.category !== null);
-    if (!allAssigned) {
-      alert('Coloque todos os cards em alguma categoria!');
-      return;
-    }
-    const allCorrect = this.state.cards.every(c => c.category === c.correctCategory);
-    if (allCorrect) {
-      this.completePhase(true);
-      alert('Parabéns! Você concluiu o jogo com sucesso e é um ótimo Cidadão Digital!');
-    } else {
-      this.reportMistake();
-    }
+  
+  restart() {
+    this.engine.resetGame();
+    this.engine.initGame();
   }
 }

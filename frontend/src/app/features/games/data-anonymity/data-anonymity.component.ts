@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataAnonymityEngineService } from './engine/data-anonymity-engine.service';
-import { ProgressReporter } from '../../../core/services/progress-reporter.service';
 
 @Component({
   selector: 'app-data-anonymity',
@@ -10,173 +9,66 @@ import { ProgressReporter } from '../../../core/services/progress-reporter.servi
   templateUrl: './data-anonymity.component.html',
   styleUrls: ['./data-anonymity.component.scss']
 })
-/**
- * DataAnonymityComponent
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
-export class DataAnonymityComponent implements OnInit {
-  state$ = this.engine.state$;
-  feedbackMessage = '';
+export class DataAnonymityComponent {
 
-  constructor(
-    public engine: DataAnonymityEngineService,
-    private progress: ProgressReporter
-  ) {}
+  constructor(public engine: DataAnonymityEngineService) {}
 
-  ngOnInit() {}
+  get heartsArray(): number[] {
+    return Array(this.engine.state.hearts).fill(0);
+  }
 
-  // D&D Handlers
-  onDragStart(event: DragEvent, id: string, type: string) {
-    if (event.dataTransfer) {
-       event.dataTransfer.setData('text/plain', JSON.stringify({ id, type }));
-       event.dataTransfer.effectAllowed = 'move';
+  get lostHeartsArray(): number[] {
+    return Array(3 - this.engine.state.hearts).fill(0);
+  }
+
+  get currentModuleLabel(): string {
+    const labels = [
+      'Módulo 1: Dado Pessoal vs Comum',
+      'Módulo 2: O Formulário Seguro',
+      'Módulo 3: O Que é Anonimato?',
+      'Módulo 4: Rastros Digitais',
+      'Módulo 5: Guardião de Privacidade'
+    ];
+    return labels[this.engine.state.currentModuleIndex] || 'Fim de Jogo';
+  }
+
+  get currentInstruction(): string {
+    switch (this.engine.state.currentModuleIndex) {
+      case 0: return 'Toque no destino correto para a informação abaixo:';
+      case 1: return 'Qual dado é PERIGOSO colocar num site de jogos?';
+      case 2: return 'Qual frase protege a identidade da pessoa?';
+      case 3: return 'Esta ação deixa um rastro na internet?';
+      case 4: return 'Onde devemos guardar esta informação?';
+      default: return '';
     }
   }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
+  handleModule1(isSensitive: boolean) {
+    const isCorrect = this.engine.currentTask?.content.isSensitive === isSensitive;
+    this.engine.submitAnswer(isCorrect);
   }
 
-  onDropPhase0(event: DragEvent, dropZone: 'research' | 'private') {
-    event.preventDefault();
-    const dataStr = event.dataTransfer?.getData('text/plain');
-    if (!dataStr) return;
-    
-    let parsed: any;
-    try {
-      parsed = JSON.parse(dataStr);
-    } catch { return; }
-    
-    const { id, type } = parsed;
-
-    const state = this.engine.state;
-    const items = [...state.phase0Items];
-    const itemIndex = items.findIndex(i => i.id === id);
-
-    if (itemIndex > -1) {
-       if (items[itemIndex].type === dropZone) {
-          items[itemIndex].droppedIn = dropZone;
-          this.engine.updateState({ phase0Items: items });
-          this.checkPhase0Completion();
-          this.feedbackMessage = 'Correto! Muito bem!';
-          setTimeout(() => this.feedbackMessage = '', 2000);
-       } else {
-          this.reportMistake();
-          this.feedbackMessage = 'Ops! Pense bem: esse dado é para a pesquisa ou é pessoal?';
-          setTimeout(() => this.feedbackMessage = '', 3000);
-       }
-    }
+  handleModule2(selectedIndex: number) {
+    const isCorrect = this.engine.currentTask?.content.dangerousIndex === selectedIndex;
+    this.engine.submitAnswer(isCorrect);
   }
 
-  checkPhase0Completion() {
-     const state = this.engine.state;
-     if (state.phase0Items.every(i => i.droppedIn === i.type)) {
-        this.completePhase(false);
-     }
+  handleModule3(selectedIndex: number) {
+    const isCorrect = this.engine.currentTask?.content.safeIndex === selectedIndex;
+    this.engine.submitAnswer(isCorrect);
   }
 
-  // Phase 1 & 3
-  onDropId(event: DragEvent) {
-     event.preventDefault();
-     const dataStr = event.dataTransfer?.getData('text/plain');
-     if (!dataStr) return;
-
-     let parsed: any;
-     try {
-       parsed = JSON.parse(dataStr);
-     } catch { return; }
-
-     const { id, type } = parsed;
-     if (type !== 'badge') return;
-
-     const idNum = parseInt(id, 10);
-     const state = this.engine.state;
-     const chars = [...state.characters];
-     const char = chars.find(c => c.id === idNum);
-
-     if (char && !char.idDropped) {
-        char.idDropped = true;
-        this.engine.updateState({
-          characters: chars,
-          privacyBoxCount: state.privacyBoxCount + 1
-        });
-        this.checkPhase1_3Completion();
-     }
+  handleModule4(rastro: boolean) {
+    const isCorrect = this.engine.currentTask?.content.rastro === rastro;
+    this.engine.submitAnswer(isCorrect);
   }
 
-  clickSnack(charId: number) {
-     const state = this.engine.state;
-     const chars = [...state.characters];
-     const char = chars.find(c => c.id === charId);
-
-     if (char && !char.snackClicked) {
-        char.snackClicked = true;
-        this.engine.updateState({
-          characters: chars,
-          snackChartCount: state.snackChartCount + 1
-        });
-        this.checkPhase1_3Completion();
-     }
+  handleModule5(zone: string) {
+    const isCorrect = this.engine.currentTask?.content.zone === zone;
+    this.engine.submitAnswer(isCorrect);
   }
 
-  checkPhase1_3Completion() {
-     const state = this.engine.state;
-     const total = state.characters.length;
-     if (state.privacyBoxCount === total && state.snackChartCount === total) {
-        this.completePhase(state.fase === 3);
-     }
-  }
-
-  // Phase 2
-  censorRow(rowId: number) {
-     const state = this.engine.state;
-     const data = [...state.tableData];
-     const row = data.find(r => r.id === rowId);
-
-     if (row) {
-        if (!row.censored) {
-           row.censored = true;
-           this.engine.updateState({ tableData: data });
-           this.checkPhase2Completion();
-        }
-     }
-  }
-
-  checkPhase2Completion() {
-     const state = this.engine.state;
-     if (state.tableData.every(r => r.censored)) {
-        this.completePhase(false);
-     }
-  }
-
-  completePhase(isLastLevel: boolean) {
-    const currentFase = this.engine.state.fase;
-    this.progress.report({
-       levelId: `fase-${currentFase}`,
-       fase: currentFase,
-       result: 'success',
-       attempts: 1,
-       timestamp: new Date().toISOString(),
-       isLastLevel: isLastLevel
-    });
-    if (!isLastLevel) {
-        setTimeout(() => {
-            this.engine.nextPhase();
-        }, 1500);
-    } else {
-       this.feedbackMessage = 'Parabéns! Você completou o jogo e aprendeu a proteger os dados!';
-    }
-  }
-
-  reportMistake() {
-    this.progress.report({
-       levelId: `fase-${this.engine.state.fase}`,
-       fase: this.engine.state.fase,
-       result: 'failure',
-       attempts: 1,
-       timestamp: new Date().toISOString(),
-       isLastLevel: false
-    });
+  restartGame() {
+    this.engine.resetGame();
   }
 }

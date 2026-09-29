@@ -292,7 +292,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   closeCreateModal() {
     this.showCreateModal = false;
-    this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null });
+    this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null, ticketName: '', notes: '' });
   }
 
   onGenerateTicket() {
@@ -302,13 +302,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         expirationHours: Number(this.ticketForm.value.expirationHours),
         maxPlayersPerSession: Number(this.ticketForm.value.maxPlayersPerSession),
         grade: String(this.ticketForm.value.grade),
-        gameId: Number(this.ticketForm.value.gameId)
+        gameId: Number(this.ticketForm.value.gameId),
+        ticketName: this.ticketForm.value.ticketName || '',
+        notes: this.ticketForm.value.notes || ''
       };
 
       this.ticketService.generateTicket(payload).subscribe({
         next: (response) => {
           this.errorMessage = '';
-          this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null });
+          this.ticketForm.reset({ maxUses: 1, expirationHours: 24, maxPlayersPerSession: 1, grade: '', gameId: null, ticketName: '', notes: '' });
           this.loadTickets();
           this.closeCreateModal();
         },

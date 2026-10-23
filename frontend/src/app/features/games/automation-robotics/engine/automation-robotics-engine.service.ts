@@ -2,19 +2,26 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
-export interface RoboticsTask {
+export interface WorkEvolutionTask {
   id: number;
   module: number;
   phase: number;
-  category: string;
+  era: string;
   badge: string;
   title: string;
-  scenario: string;
-  details?: { label: string; value: string; icon?: string }[];
-  codeBlock?: string[];
+  historicalContext: string;
+  comparison?: {
+    pastLabel: string;
+    pastValue: string;
+    pastIcon: string;
+    modernLabel: string;
+    modernValue: string;
+    modernIcon: string;
+  };
+  timelineSteps?: { step: string; period: string; tech: string }[];
   question: string;
   options: { id: string; text: string; isCorrect: boolean }[];
-  explanation: string;
+  didacticExplanation: string;
 }
 
 export interface GameState {
@@ -35,1085 +42,1095 @@ export class AutomationRoboticsEngineService {
     return Math.max(0, (this.state.module * 200) + (this.state.phase * 20) - (this.state.deathCount * 20));
   }
 
-  // 5 Modules x 10 Tasks = 50 Tasks
-  public tasks: RoboticsTask[][] = [
-    // MÓDULO 1: Linha de Montagem Industrial & Sequenciamento Lógico
+  // 5 Módulos x 10 Fases = 50 Desafios sobre "A Evolução do Trabalho: Do Manual ao Digital"
+  public tasks: WorkEvolutionTask[][] = [
+    // MÓDULO 1: O Trabalho Antigo e a Era do Esforço Físico (Manual)
     [
       {
         id: 1,
         module: 0,
         phase: 0,
-        category: 'Linha de Montagem',
-        badge: 'Veículo Elétrico',
-        title: 'Montagem Automatizada de Chassi Elétrico',
-        scenario: 'Uma fábrica 100% robotizada precisa montar a base de um carro elétrico sem intervenção manual. As estações de trabalho utilizam braços mecânicos industriais e solda a laser.',
-        details: [
-          { label: 'Peça Base', value: 'Chassi de Alumínio Reforçado', icon: '🚗' },
-          { label: 'Componente Crítico', value: 'Pacote de Baterias de 400V', icon: '🔋' },
-          { label: 'Exigência Técnica', value: 'Instalação elétrica antes da vedação inferior', icon: '⚡' }
-        ],
-        question: 'Qual é a sequência lógica correta da esteira automatizada para garantir segurança?',
+        era: 'Era Manual',
+        badge: 'Comunicação',
+        title: 'Os Escribas e a Cópia de Livros à Mão',
+        historicalContext: 'Na Idade Média, antes da imprensa e dos computadores, um único exemplar da Bíblia ou de um livro de ciências levava até 3 anos de trabalho ininterrupto de um escriba, usando pena de ganso e tinta vegetal.',
+        comparison: {
+          pastLabel: 'Trabalho Manual (Século XIV)',
+          pastValue: '1 livro a cada 3 anos copiado pena por pena',
+          pastIcon: '🪶',
+          modernLabel: 'Trabalho Digital (Hoje)',
+          modernValue: 'Milhões de cópias digitais em 1 segundo via download',
+          modernIcon: '📱'
+        },
+        question: 'Qual era o principal fator que limitava a velocidade e a circulação do conhecimento na era manual?',
         options: [
-          { id: 'a', text: '1. Soldagem do Chassi → 2. Instalação da Bateria → 3. Conexão do Chicote Elétrico → 4. Teste de Carga e Vedação', isCorrect: true },
-          { id: 'b', text: '1. Teste de Carga e Vedação → 2. Instalação da Bateria → 3. Soldagem do Chassi → 4. Conexão do Chicote', isCorrect: false },
-          { id: 'c', text: '1. Instalação da Bateria → 2. Soldagem do Chassi → 3. Teste de Carga → 4. Conexão do Chicote Elétrico', isCorrect: false },
-          { id: 'd', text: '1. Conexão do Chicote Elétrico → 2. Vedação → 3. Soldagem do Chassi → 4. Instalação da Bateria', isCorrect: false }
+          { id: 'a', text: 'O ritmo do trabalho dependia exclusivamente da resistência física das mãos e da visão dos escribas', isCorrect: true },
+          { id: 'b', text: 'Porque os reis proibiam que os livros fossem lidos durante o dia', isCorrect: false },
+          { id: 'c', text: 'Porque as pessoas do passado preferiam não ler nada para descansar os olhos', isCorrect: false },
+          { id: 'd', text: 'Porque a internet medieval caía frequentemente com chuvas fortes', isCorrect: false }
         ],
-        explanation: 'A estrutura mecânica (chassi) deve ser soldada primeiro; em seguida acomoda-se a bateria e os cabos de alta tensão; por fim, realiza-se o teste elétrico e a vedação hermética protetora.'
+        didacticExplanation: 'Na Era Manual, a produção dependia do limite muscular e biológico dos trabalhadores. Por isso, livros eram artigos raros e caríssimos guardados sob chave.'
       },
       {
         id: 2,
         module: 0,
         phase: 1,
-        category: 'Linha de Montagem',
-        badge: 'Nanotecnologia',
-        title: 'Fabricação Automatizada de Microchips (3nm)',
-        scenario: 'Em uma sala limpa de semicondutores, robôs de litografia ultravioleta extrema (EUV) produzem wafers de silício com precisão atômica.',
-        details: [
-          { label: 'Material', value: 'Disco de Silício Cristalino (Wafer)', icon: '💿' },
-          { label: 'Contaminação Máx.', value: 'Zero partículas de poeira', icon: '🛡️' }
-        ],
-        question: 'Qual ordem de etapas o sistema SCADA da fábrica deve disparar?',
+        era: 'Era Manual',
+        badge: 'Agricultura',
+        title: 'A Colheita de Trigo com Foice Manual',
+        historicalContext: 'Durante milhares de anos, a humanidade dependeu da foice e da enxada para colher grãos. Uma família inteira trabalhava de sol a sol por semanas para colher um único hectare de trigo.',
+        comparison: {
+          pastLabel: 'Esforço Físico Manual',
+          pastValue: 'Foice rústica de ferro e braços cansados',
+          pastIcon: '🌾',
+          modernLabel: 'Agricultura Automatizada',
+          modernValue: 'Colheitadeira autônoma com GPS e sensores de grãos',
+          modernIcon: '🚜'
+        },
+        question: 'Como a tecnologia transformou o significado do trabalho no campo?',
         options: [
-          { id: 'a', text: 'Polimento Químico → Deposição de Filme → Fotolitografia UV → Gravação e Dopagem → Encapsulamento', isCorrect: true },
-          { id: 'b', text: 'Encapsulamento → Gravação → Polimento Químico → Deposição de Filme → Fotolitografia UV', isCorrect: false },
-          { id: 'c', text: 'Fotolitografia UV → Encapsulamento → Polimento Químico → Deposição de Filme → Gravação', isCorrect: false },
-          { id: 'd', text: 'Deposição de Filme → Encapsulamento → Polimento Químico → Gravação e Dopagem → Fotolitografia', isCorrect: false }
+          { id: 'a', text: 'Poupou o ser humano do esgotamento físico extremo e aumentou a produção de alimentos para alimentar bilhões de pessoas', isCorrect: true },
+          { id: 'b', text: 'Fez com que os seres humanos parassem de comer pães e cereais', isCorrect: false },
+          { id: 'c', text: 'Destruiu a agricultura e fez a comida nascer direto nos supermercados', isCorrect: false },
+          { id: 'd', text: 'Obrigou os agricultores a empurrarem os tratores com as próprias mãos', isCorrect: false }
         ],
-        explanation: 'O disco é polido e coberto por um filme fino antes de receber a luz UV que desenha os circuitos. Depois da gravação dos transistores, ele é fatiado e encapsulado.'
+        didacticExplanation: 'O trabalho humano evoluiu: o agricultor deixou de ser um feixe de força braçal para se tornar um gestor técnico de máquinas inteligentes e sustentabilidade.'
       },
       {
         id: 3,
         module: 0,
         phase: 2,
-        category: 'Linha de Montagem',
-        badge: 'Aeroespacial',
-        title: 'Integração de Satélite CubeSat',
-        scenario: 'Um nanossatélite universitário está sendo montado por robôs para garantir isolamento eletrostático antes do lançamento em órbita baixa.',
-        details: [
-          { label: 'Missão', value: 'Monitoramento de Desmatamento da Amazônia', icon: '🛰️' },
-          { label: 'Sub-sistemas', value: 'Painéis Solares, Antena UHF, Bateria e Câmera RGB', icon: '📡' }
-        ],
-        question: 'Para evitar curto-circuito na placa-mãe durante o acoplamento robótico, qual deve ser a ordem?',
+        era: 'Era Manual',
+        badge: 'Construção',
+        title: 'Corte e Transporte de Pedras sem Guindastes',
+        historicalContext: 'Para erguer catedrais góticas e pirâmides, blocos de pedra de 5 toneladas eram erguidos por roldanas de madeira giradas por dezenas de homens suando em esteiras de tração humana.',
+        comparison: {
+          pastLabel: 'Força Muscular Bruta',
+          pastValue: 'Centenas de operários puxando cordas de cânhamo',
+          pastIcon: '🧱',
+          modernLabel: 'Guindaste Eletro-hidráulico',
+          modernValue: '1 operador sentado controlando joystick com sensores de carga',
+          modernIcon: '🏗️'
+        },
+        question: 'O que as ferramentas mecânicas e automáticas proporcionaram aos trabalhadores da construção civil?',
         options: [
-          { id: 'a', text: 'Fixar Placa-mãe no Chassi → Conectar Câmera/Sensores → Acoplar Bateria com Trava Desligada → Fixar Painéis Solares', isCorrect: true },
-          { id: 'b', text: 'Ligar Bateria com Carga Máxima → Conectar Sensores com Placa Energizada → Parafusar Chassi → Painéis Solares', isCorrect: false },
-          { id: 'c', text: 'Colocar Painéis Solares no Sol → Ligar Cabos ao Vivo → Parafusar no Chassi → Instalar Câmera', isCorrect: false },
-          { id: 'd', text: 'Instalar Bateria Aberta → Fixar Painéis Solares → Testar no Vácuo → Encaixar Placa-mãe por Último', isCorrect: false }
+          { id: 'a', text: 'Redução dramática de acidentes fatais, hérnias e lesões físicas incapacitantes nos operários', isCorrect: true },
+          { id: 'b', text: 'Obrigaram os prédios a serem feitos apenas de plástico inflável', isCorrect: false },
+          { id: 'c', text: 'Fizeram as construções demorarem 10 vezes mais tempo para ficarem prontas', isCorrect: false },
+          { id: 'd', text: 'Impediram que seres humanos entrassem nos canteiros de obras', isCorrect: false }
         ],
-        explanation: 'Equipamentos aeroespaciais exigem que a eletrônica e os sensores estejam estruturados e aterrados antes que a fonte de energia (baterias) seja integrada de forma segura e desligada.'
+        didacticExplanation: 'As máquinas vieram para assumir o esforço lesivo e o perigo iminente. A tecnologia existe para preservar a integridade física da vida humana.'
       },
       {
         id: 4,
         module: 0,
         phase: 3,
-        category: 'Linha de Montagem',
-        badge: 'Biotecnologia',
-        title: 'Manufatura de Prótese Biônica Inteligente',
-        scenario: 'Uma linha de braços robóticos fabrica próteses de mão mioelétricas acionadas por sinais musculares do usuário.',
-        details: [
-          { label: 'Sensores', value: 'Eletrodos Mioelétricos de Superfície (EMG)', icon: '🦾' },
-          { label: 'Atuadores', value: 'Micro-servomotores com redução planetária', icon: '⚙️' }
-        ],
-        question: 'Em que sequência a célula robótica deve proceder para montar os dedos articulados?',
+        era: 'Era Manual',
+        badge: 'Transporte',
+        title: 'O Correio a Cavalo (Pony Express)',
+        historicalContext: 'Em 1860, para levar uma carta da Califórnia até o Missouri nos EUA, jovens cavaleiros trocavam de cavalo galopando a cada 15 km, enfrentando nevascas e tempestades por 10 dias seguidos.',
+        comparison: {
+          pastLabel: 'Pony Express (1860)',
+          pastValue: '10 dias para enviar uma folha de papel a cavalo',
+          pastIcon: '🐎',
+          modernLabel: 'Fibra Óptica e Satélites',
+          modernValue: 'Menos de 1 segundo para enviar dados ao redor do planeta',
+          modernIcon: '🌐'
+        },
+        question: 'Qual foi a invenção tecnológica que encerrou as atividades do correio a cavalo em apenas dois dias?',
         options: [
-          { id: 'a', text: 'Impressão da Estrutura de Titânio → Instalação dos Tendões e Motores → Calibração de Força → Capa de Silicone Protetora', isCorrect: true },
-          { id: 'b', text: 'Capa de Silicone Protetora → Impressão de Titânio → Calibração de Força → Instalação dos Motores', isCorrect: false },
-          { id: 'c', text: 'Calibração de Força sem Motores → Capa de Silicone → Instalação dos Tendões → Estrutura de Titânio', isCorrect: false },
-          { id: 'd', text: 'Instalação dos Tendões no Ar → Capa de Silicone → Impressão da Estrutura → Teste com Usuário', isCorrect: false }
+          { id: 'a', text: 'O Telégrafo elétrico, que transmitia mensagens por pulsos elétricos instantâneos através de fios', isCorrect: true },
+          { id: 'b', text: 'Cavalos mais velozes trazidos de outros continentes', isCorrect: false },
+          { id: 'c', text: 'Pombos-correio treinados para carregar malas pesadas', isCorrect: false },
+          { id: 'd', text: 'A proibição do envio de cartas pelo governo', isCorrect: false }
         ],
-        explanation: 'Não é possível instalar motores sem esqueleto físico (titânio), e a calibração de força só pode ser feita com os motores conectados, antes de selar a prótese com silicone protetor.'
+        didacticExplanation: 'Quando a primeira linha de telégrafo transcontinental foi completada em outubro de 1861, o Pony Express encerrou suas operações imediatamente: o elétron viajou na velocidade da luz!'
       },
       {
         id: 5,
         module: 0,
         phase: 4,
-        category: 'Linha de Montagem',
-        badge: 'Logística',
-        title: 'Célula de Montagem de Drone de Entrega',
-        scenario: 'Drones hexacópteros autônomos para transporte de medicamentos em regiões isoladas estão na linha de montagem.',
-        details: [
-          { label: 'Componentes', value: 'Frame de Carbono, 6 Motores Brushless, ESCs, GPS e Bússola', icon: '🚁' }
-        ],
-        question: 'Qual etapa NÃO PODE acontecer antes de os Controladores Eletrônicos de Velocidade (ESCs) serem instalados?',
+        era: 'Era Manual',
+        badge: 'Alimentação',
+        title: 'A Fabricação do Pão em Fornos de Barro a Lenha',
+        historicalContext: 'Padeiros antigos acordavam às 2 da manhã para sovar à mão dezenas de quilos de massa pesada e controlar a temperatura de fornos a lenha sentindo o calor com o dorso da mão.',
+        comparison: {
+          pastLabel: 'Sova e Forno a Lenha',
+          pastValue: 'Horas de esforço físico nos braços e fumaça constante',
+          pastIcon: '🥖',
+          modernLabel: 'Panificação Industrial',
+          modernValue: 'Batedeiras espirais automatizadas e fornos com controle PID',
+          modernIcon: '🍞'
+        },
+        question: 'O que a automação trouxe para a alimentação humana em larga escala?',
         options: [
-          { id: 'a', text: 'Ligar e testar a rotação dos motores elétricos Brushless', isCorrect: true },
-          { id: 'b', text: 'Parafusar o trem de pouso de fibra de carbono', isCorrect: false },
-          { id: 'c', text: 'Pintar o logotipo da equipe de resgate no frame', isCorrect: false },
-          { id: 'd', text: 'Instalar a gaveta de transporte de vacinas', isCorrect: false }
+          { id: 'a', text: 'Padronização de higiene estrita, controle microbiológico e produção contínua para abastecer as cidades', isCorrect: true },
+          { id: 'b', text: 'Fez com que os pães ficassem frios para sempre', isCorrect: false },
+          { id: 'c', text: 'Eliminou o fermento e a farinha da receita', isCorrect: false },
+          { id: 'd', text: 'Substituiu o alimento real por fotos de comida na tela do celular', isCorrect: false }
         ],
-        explanation: 'Motores elétricos brushless não funcionam com corrente contínua direta; eles dependem exclusivamente dos ESCs para converter energia em pulsos trifásicos sincronizados.'
+        didacticExplanation: 'A automação dos alimentos permitiu que normas sanitárias fossem aplicadas com rigor, garantindo que milhões de famílias tenham acesso a pão fresco e seguro diariamente.'
       },
       {
         id: 6,
         module: 0,
         phase: 5,
-        category: 'Linha de Montagem',
-        badge: 'Dispositivos Móveis',
-        title: 'Montagem Automatizada de Smartphones',
-        scenario: 'A esteira de alta velocidade monta 30 telas de smartphone por minuto utilizando visão computacional e braços SCARA.',
-        details: [
-          { label: 'Gargalo Identificado', value: 'Braço robótico colando tela sobre bateria descarregada sem teste', icon: '📱' }
-        ],
-        question: 'Onde ocorreu o erro de sequenciamento no processo automatizado?',
+        era: 'Era Manual',
+        badge: 'Indústria Têxtil',
+        title: 'O Tear Manual de Madeira na Idade Média',
+        historicalContext: 'Para tecer um lençol ou cobertor, uma tecelã passava a lançadeira de madeira de um lado para o outro centenas de milhares de vezes com os pés nos pedais durante semanas.',
+        comparison: {
+          pastLabel: 'Tear Manual',
+          pastValue: 'Semanas de trabalho para alguns metros de tecido',
+          pastIcon: '🧶',
+          modernLabel: 'Tear a Jato de Ar Digital',
+          modernValue: 'Milhares de metros por hora guiados por computador',
+          modernIcon: '🧵'
+        },
+        question: 'Por que antes da Revolução Industrial as pessoas comuns tinham apenas uma ou duas trocas de roupa para a vida toda?',
         options: [
-          { id: 'a', text: 'A vedação adesiva da tela ocorreu antes da bancada de teste funcional de componentes internos', isCorrect: true },
-          { id: 'b', text: 'A tela foi limpa com soprador ionizado antes da montagem', isCorrect: false },
-          { id: 'c', text: 'A câmera foi parafusada antes da carcaça externa ser fechada', isCorrect: false },
-          { id: 'd', text: 'O chip NFC foi posicionado próximo à tampa traseira', isCorrect: false }
+          { id: 'a', text: 'Porque o tecido manual era extremamente caro e demandava meses de esforço para ser fabricado', isCorrect: true },
+          { id: 'b', text: 'Porque a moda antiga proibia trocar de camisa mais de uma vez ao ano', isCorrect: false },
+          { id: 'c', text: 'Porque não existiam tintas coloridas na natureza', isCorrect: false },
+          { id: 'd', text: 'Porque as pessoas preferiam andar embrulhadas em folhas de árvores', isCorrect: false }
         ],
-        explanation: 'Se a tela OLED for selada com cola impermeável antes dos testes elétricos de placa e bateria, qualquer falha interna inutilizará o aparelho inteiro, gerando refugo.'
+        didacticExplanation: 'Roupas eram bens herdados de geração em geração. A automação dos teares democratizou o vestuário e permitiu que roupas e calçados se tornassem acessíveis a toda a população.'
       },
       {
         id: 7,
         module: 0,
         phase: 6,
-        category: 'Linha de Montagem',
-        badge: 'Energia Limpa',
-        title: 'Automatização de Módulos Fotovoltaicos',
-        scenario: 'Robôs stringer soldam células solares de silício policristalino em trilhas conectadas para formar painéis de 500W.',
-        details: [
-          { label: 'Processo Crítico', value: 'Laminação a vácuo com EVA e vidro temperado', icon: '☀️' }
-        ],
-        question: 'Em que momento a laminação térmica com filme EVA deve ser disparada?',
+        era: 'Era Manual',
+        badge: 'Metais',
+        title: 'O Ferreiro e a Forja a Carvão',
+        historicalContext: 'Ferreiros moldavam pregos, ferraduras e ferramentas batendo repetidamente um martelo de ferro de 4 kg contra uma bigorna incandescente sob calor sufocante.',
+        comparison: {
+          pastLabel: 'Forja Manual a Martelo',
+          pastValue: 'Prego por prego forjado individualmente no fogo',
+          pastIcon: '🔨',
+          modernLabel: 'Laminação e Estampagem Automatizada',
+          modernValue: 'Milhares de parafusos e peças usinadas por minuto com precisão CNC',
+          modernIcon: '⚙️'
+        },
+        question: 'Qual é a principal diferença de precisão entre a produção artesanal manual e a usinagem CNC moderna?',
         options: [
-          { id: 'a', text: 'Após a soldagem das trilhas de células e inspeção por eletroluminescência (raio-X)', isCorrect: true },
-          { id: 'b', text: 'Antes de posicionar as células solares sobre a esteira', isCorrect: false },
-          { id: 'c', text: 'Depois de parafusar a moldura de alumínio externa', isCorrect: false },
-          { id: 'd', text: 'Durante o transporte final na carreta de entrega', isCorrect: false }
+          { id: 'a', text: 'As máquinas CNC cortam com precisão de milésimos de milímetro (mícrons), permitindo que peças se encaixem perfeitamente', isCorrect: true },
+          { id: 'b', text: 'As peças manuais do ferreiro eram exatamente idênticas até nos átomos', isCorrect: false },
+          { id: 'c', text: 'O ferreiro conseguia enxergar os átomos a olho nu enquanto martelava', isCorrect: false },
+          { id: 'd', text: 'A usinagem moderna só consegue cortar pedaços tortos de metal', isCorrect: false }
         ],
-        explanation: 'A laminação funde o vidro e as células em bloco sólido irreversível. Por isso, a inspeção de microfissuras por eletroluminescência precisa ocorrer obrigatoriamente antes da fusão.'
+        didacticExplanation: 'Antes das máquinas de precisão, duas peças nunca eram iguais; cada parafuso só cabia na sua própria porca feita à mão! A padronização tecnológica permitiu a existência de motores e aviões.'
       },
       {
         id: 8,
         module: 0,
         phase: 7,
-        category: 'Linha de Montagem',
-        badge: 'Robótica Doméstica',
-        title: 'Linha de Montagem de Robôs Aspiradores',
-        scenario: 'O robô aspirador precisa de sensores infravermelhos antiqueda nas bordas inferiores para não rolar escadas.',
-        details: [
-          { label: 'Falha de Montagem', value: 'Robô caindo no primeiro degrau durante teste de fábrica', icon: '🧹' }
-        ],
-        question: 'Ao investigar a telemetria do teste, qual falha de sequenciamento foi detectada?',
+        era: 'Era Manual',
+        badge: 'Navegação',
+        title: 'As Galés Movidas a Remos de Prisioneiros',
+        historicalContext: 'Na antiguidade e no Renascimento, navios militares chamados galés cruzavam o Mar Mediterrâneo impulsionados pela força física de centenas de homens remando no porão escuro.',
+        comparison: {
+          pastLabel: 'Propulsão Humana a Remos',
+          pastValue: 'Centenas de pessoas esgotadas pelo cansaço físico extremo',
+          pastIcon: '🚣',
+          modernLabel: 'Navio Porta-Contêineres',
+          modernValue: 'Motores a turbina e propulsão limpa operados por uma tripulação de 20 pessoas',
+          modernIcon: '🚢'
+        },
+        question: 'O que a máquina a vapor e os motores a combustão significaram para a história da dignidade humana no trabalho?',
         options: [
-          { id: 'a', text: 'A calibração dos sensores de desnível foi executada com a esteira nivelada sem simular degraus', isCorrect: true },
-          { id: 'b', text: 'O motor de sucção tinha potência acima de 2000 Pa', isCorrect: false },
-          { id: 'c', text: 'As cerdas giratórias eram feitas de nylon flexível', isCorrect: false },
-          { id: 'd', text: 'A bateria de lítio foi carregada a 100% antes do envio', isCorrect: false }
+          { id: 'a', text: 'Ajudaram a abolir o uso de seres humanos como simples "motores biológicos" descartáveis', isCorrect: true },
+          { id: 'b', text: 'Fizeram com que as viagens de navio passassem a durar 50 anos', isCorrect: false },
+          { id: 'c', text: 'Obrigaram os navios a andarem apenas em rios secos', isCorrect: false },
+          { id: 'd', text: 'Aumentaram o número de pessoas que precisavam remar barcos gigantes', isCorrect: false }
         ],
-        explanation: 'Calibrar sensores de abismo/queda em superfície totalmente plana faz com que o robô aprenda o chão plano como leitura segura, falhando ao detectar desníveis reais.'
+        didacticExplanation: 'A substituição da força muscular de remadores por energia térmica e mecânica foi um dos maiores passos para a libertação humana do trabalho forçado.'
       },
       {
         id: 9,
         module: 0,
         phase: 8,
-        category: 'Linha de Montagem',
-        badge: 'Turbinas Eólicas',
-        title: 'Pás de Gerador Eólico em Resina de Vidro',
-        scenario: 'Robôs gantry de 60 metros aplicam camadas de fibra e infusão de resina sob vácuo em pás de energia eólica offshore.',
-        details: [
-          { label: 'Dimensão', value: 'Pá de 85 metros de comprimento', icon: '💨' }
-        ],
-        question: 'Qual etapa garante que não haverá bolhas de ar enfraquecendo a estrutura interna?',
+        era: 'Era Manual',
+        badge: 'Conservação',
+        title: 'A Colheita de Gelo em Lagos Congelados',
+        historicalContext: 'No século XIX, antes da invenção da geladeira, homens serravam blocos de gelo gigantes em lagos gelados no inverno e transportavam em carroças forradas de serragem até as cidades.',
+        comparison: {
+          pastLabel: 'Corte Manual de Gelo',
+          pastValue: 'Serras manuais no gelo com risco de afogamento em água congelante',
+          pastIcon: '🧊',
+          modernLabel: 'Refrigeração por Compressor',
+          modernValue: 'Geladeiras em todos os lares conservando remédios e alimentos com energia elétrica',
+          modernIcon: '❄️'
+        },
+        question: 'Como a invenção da refrigeração mecânica e digital impactou a saúde das populações?',
         options: [
-          { id: 'a', text: 'Desgaseificação e teste de pressão negativa de vácuo antes da injeção da resina', isCorrect: true },
-          { id: 'b', text: 'Pintura externa vermelha na ponta da pá', isCorrect: false },
-          { id: 'c', text: 'Instalação do sensor de vento anenômetro na base', isCorrect: false },
-          { id: 'd', text: 'Polimento manual das pontas com lixa d\'água', isCorrect: false }
+          { id: 'a', text: 'Evitou intoxicações alimentares em massa e possibilitou o transporte global de vacinas e remédios que exigem cadeia de frio', isCorrect: true },
+          { id: 'b', text: 'Fez com que a água do mundo inteiro evaporasse instantaneamente', isCorrect: false },
+          { id: 'c', text: 'Obrigou as pessoas a comerem apenas comida estragada', isCorrect: false },
+          { id: 'd', text: 'Impediu que os cientistas criassem microscópios', isCorrect: false }
         ],
-        explanation: 'O processo de infusão por vácuo remove todo o ar entre os tecidos de fibra de vidro antes da entrada da resina, garantindo rigidez mecânica máxima contra tempestades.'
+        didacticExplanation: 'A conservação térmica por compressores e sensores automáticos salvou centenas de milhões de vidas contra bactérias em alimentos e viabilizou a distribuição de vacinas pelo mundo.'
       },
       {
         id: 10,
         module: 0,
         phase: 9,
-        category: 'Linha de Montagem',
-        badge: 'Vacinas & Saúde',
-        title: 'Envasamento Automatizado de Medicamentos',
-        scenario: 'Robôs delta operam dentro de cabine estéril envasando frascos de vacina com dosagem micrométrica.',
-        details: [
-          { label: 'Velocidade', value: '300 frascos por minuto', icon: '💉' }
-        ],
-        question: 'Qual é o fluxo à prova de contaminação microbiológica que os robôs devem seguir?',
+        era: 'Era Manual',
+        badge: 'Síntese da Era Manual',
+        title: 'O Conceito Fundamental: O Que é o Trabalho?',
+        historicalContext: 'O ser humano é a única espécie do planeta que constrói ferramentas para transformar o ambiente natural, buscando abrigo, saúde, alimentação e bem-estar coletivo.',
+        comparison: {
+          pastLabel: 'Ferramentas Primitivas',
+          pastValue: 'Pau, pedra lascada, fogo e força muscular',
+          pastIcon: '🪵',
+          modernLabel: 'Ferramentas Digitais',
+          modernValue: 'Supercomputadores, satélites, robôs e inteligência artificial',
+          modernIcon: '💡'
+        },
+        question: 'De acordo com a história do trabalho, qual é o papel essencial das ferramentas criadas pela humanidade?',
         options: [
-          { id: 'a', text: 'Esterilização por Calor Seco → Dosagem Líquida → Aplicação da Rolha de Borracha → Lacração com Alumínio → Inspeção por Câmera', isCorrect: true },
-          { id: 'b', text: 'Dosagem Líquida → Esterilização Térmica a 250°C do Líquido → Lacração → Aplicação da Rolha', isCorrect: false },
-          { id: 'c', text: 'Lacração com Alumínio → Dosagem com Agulha Furando o Metal → Esterilização com Pano', isCorrect: false },
-          { id: 'd', text: 'Aplicação da Rolha → Dosagem por Cima → Lavagem com Sabão → Inspeção Visual', isCorrect: false }
+          { id: 'a', text: 'Ampliar a capacidade humana, poupar esforço braçal perigoso e resolver problemas complexos da sociedade', isCorrect: true },
+          { id: 'b', text: 'Destruir a criatividade e fazer os seres humanos pararem de pensar', isCorrect: false },
+          { id: 'c', text: 'Garantir que o trabalho seja o mais pesado e cansativo possível', isCorrect: false },
+          { id: 'd', text: 'Isolar as pessoas para que ninguém mais converse na vida real', isCorrect: false }
         ],
-        explanation: 'O frasco deve ser esterilizado antes do líquido entrar. Uma vez envasado, a rolha de vedação fecha o frasco imediatamente, sendo travada com anel de alumínio inviolável.'
+        didacticExplanation: 'Desde a primeira pedra lascada até o algoritmo de IA, toda ferramenta criada pela engenharia humana tem o mesmo propósito: transformar a natureza para melhorar a vida das pessoas!'
       }
     ],
 
-    // MÓDULO 2: Sensores e Lógica Condicional SE / ENTÃO
+    // MÓDULO 2: O Túnel do Tempo das Profissões que Desapareceram ou Mudaram
     [
       {
         id: 11,
         module: 1,
         phase: 0,
-        category: 'Sensores & Atuadores',
-        badge: 'Rover Marciano',
-        title: 'Navegação em Terreno Rochoso',
-        scenario: 'O Rover está explorando a cratera Jezero em Marte. O tempo de envio de comando da Terra é de 14 minutos, então ele precisa decidir de forma 100% autônoma.',
-        details: [
-          { label: 'Sensor Ultrassônico Dianteiro', value: '18 cm (Rocha pontiaguda)', icon: '📡' },
-          { label: 'Inclinômetro Giroscópico', value: 'Inclinação segura (3°)', icon: '🧭' },
-          { label: 'Sensor de Linha Térmica', value: 'Passagem livre à Esquerda', icon: '⬅️' }
-        ],
-        question: 'Com base no firmware `SE (distancia_frente < 30cm) ENTÃO`, qual ação lógica deve ser disparada?',
+        era: 'Profissões do Passado',
+        badge: 'Iluminação',
+        title: 'O Acendedor de Lampiões',
+        historicalContext: 'Até o início do século XX, homens caminhavam pelas ruas ao entardecer com uma vara comprida acendendo postes de gás um a um, e voltavam de madrugada para apagá-los.',
+        comparison: {
+          pastLabel: 'Profissão Extinta',
+          pastValue: 'Acendedor de Lampiões (Trabalho noturno manual poste por poste)',
+          pastIcon: '🏮',
+          modernLabel: 'Automação Moderna',
+          modernValue: 'Sensor LDR (fotocélula) que acende as luzes de LED sozinho ao anoitecer',
+          modernIcon: '💡'
+        },
+        question: 'Qual sensor tecnológico substituiu a necessidade de uma pessoa acender os postes da cidade manualmente?',
         options: [
-          { id: 'a', text: 'Parar motores dianteiros → Girar 45° para a Esquerda → Retomar avanço a 0,5 m/s', isCorrect: true },
-          { id: 'b', text: 'Acelerar velocidade máxima à frente para empurrar a rocha', isCorrect: false },
-          { id: 'c', text: 'Desligar todos os sensores e entrar em modo de hibernação profunda', isCorrect: false },
-          { id: 'd', text: 'Girar continuamente em 360° sem sair do lugar', isCorrect: false }
+          { id: 'a', text: 'O sensor de luminosidade (LDR / Fotocélula), que mede a luz natural do sol e ativa a eletricidade automaticamente', isCorrect: true },
+          { id: 'b', text: 'Um sensor de temperatura que só liga quando neva na cidade', isCorrect: false },
+          { id: 'c', text: 'Um microfone que ouve quando as pessoas pedem para a luz acender', isCorrect: false },
+          { id: 'd', text: 'Um sensor de peso que sente os carros passando embaixo do poste', isCorrect: false }
         ],
-        explanation: 'Com obstáculo crítico a menos de 30 cm, a prioridade máxima é frenagem para evitar impacto, seguida de rotação para o lado identificado como livre pelos sensores laterais.'
+        didacticExplanation: 'Os postes modernos têm pequenas fotocélulas no topo. Quando o sol se põe, a resistência elétrica varia e o circuito liga os LEDs instantaneamente em toda a cidade.'
       },
       {
         id: 12,
         module: 1,
         phase: 1,
-        category: 'Sensores & Atuadores',
-        badge: 'AGV Hospitalar',
-        title: 'Veículo Autônomo em Corredor de UTI',
-        scenario: 'Um robô de transporte hospitalar autônomo está levando medicamentos urgentes pela rota central.',
-        details: [
-          { label: 'Sensor LiDAR 360°', value: 'Pessoa cruzando a 1,2 metro na frente', icon: '🚶' },
-          { label: 'Sensor de Fita Magnética', value: 'Trilha do chão alinhada (Erro = 0)', icon: '🧲' }
-        ],
-        question: 'Qual instrução condicional respeita o protocolo de segurança hospitalar?',
+        era: 'Profissões do Passado',
+        badge: 'Telecomunicações',
+        title: 'A Telefonista de Mesa de Cabos',
+        historicalContext: 'Quando alguém queria ligar para outra pessoa, precisava falar com a telefonista na central. Ela pegava um cabo com plugue de cobre e encaixava manualmente no buraco correspondente à casa do destinatário.',
+        comparison: {
+          pastLabel: 'Profissão Extinta',
+          pastValue: 'Telefonista conectando cabos físicos à mão na central',
+          pastIcon: '☎️',
+          modernLabel: 'Automação Moderna',
+          modernValue: 'Roteadores e comutação digital automática por pacotes de dados',
+          modernIcon: '📶'
+        },
+        question: 'Se as ligações ainda fossem conectadas à mão como em 1920, o que aconteceria hoje com bilhões de celulares?',
         options: [
-          { id: 'a', text: 'SE (obstaculo_dinamico < 2m) ENTÃO { frear_suave(); acender_led_azul_aviso(); aguardar_desobstrucao(); }', isCorrect: true },
-          { id: 'b', text: 'SE (obstaculo_dinamico < 2m) ENTÃO { tocar_sirene_120dB(); acelerar_para_desviar(); }', isCorrect: false },
-          { id: 'c', text: 'SE (trilha_alinhada) ENTÃO { ignorar_sensores_lidar(); continuar_sem_parar(); }', isCorrect: false },
-          { id: 'd', text: 'SE (pessoa_detectada) ENTÃO { dar_re_em_velocidade_maxima(); }', isCorrect: false }
+          { id: 'a', text: 'Seria impossível conectar tantas chamadas; a população inteira do planeta teria que trabalhar conectando cabos!', isCorrect: true },
+          { id: 'b', text: 'As conversas ficariam mais rápidas porque as pessoas corriam para plugar os fios', isCorrect: false },
+          { id: 'c', text: 'A internet funcionaria sem fios usando apenas a mente das telefonistas', isCorrect: false },
+          { id: 'd', text: 'Nenhum telefone celular tocaria durante a noite', isCorrect: false }
         ],
-        explanation: 'Em ambiente hospitalar, o robô deve desacelerar suavemente sem ruídos estridentes que assustem pacientes, aguardando a passagem da pessoa enquanto sinaliza visualmente.'
+        didacticExplanation: 'Com bilhões de conexões por segundo no mundo, a comutação automática digital é o único meio viável de telecomunicação existente.'
       },
       {
         id: 13,
         module: 1,
         phase: 2,
-        category: 'Sensores & Atuadores',
-        badge: 'Braço Soldador',
-        title: 'Soldagem Automatizada de Tubulações de Petróleo',
-        scenario: 'Um manipulador robótico de 6 eixos está soldando flanges em alta temperatura.',
-        details: [
-          { label: 'Sensor Pirométrico Óptico', value: 'Temperatura na tocha = 1.650 °C (Limite: 1.400 °C)', icon: '🔥' },
-          { label: 'Sensor de Fluxo de Gás Argônio', value: 'Vazão Normal de Proteção', icon: '💨' }
-        ],
-        question: 'O controlador do braço identifica o superaquecimento. Qual é a conduta do atuador?',
+        era: 'Profissões do Passado',
+        badge: 'Cálculo e Espaço',
+        title: 'O Computador Humano da NASA',
+        historicalContext: 'Nas décadas de 1940 a 1960, a palavra "computador" era o título de um cargo de pessoas (principalmente mulheres matemáticas, como Katherine Johnson) que calculavam órbitas de foguetes a lápis.',
+        comparison: {
+          pastLabel: 'Profissão Antiga',
+          pastValue: 'Salas inteiras de pessoas calculando equações diferenciais à mão por semanas',
+          pastIcon: '🧮',
+          modernLabel: 'Computação Eletrônica',
+          modernValue: 'Microprocessadores executando bilhões de operações matemáticas por segundo',
+          modernIcon: '💻'
+        },
+        question: 'Por que a criação dos computadores eletrônicos foi crucial para a exploração espacial moderna?',
         options: [
-          { id: 'a', text: 'SE (temperatura > limite) ENTÃO { cortar_arco_eletrico(); afastar_tocha(50mm); acionar_resfriamento(); }', isCorrect: true },
-          { id: 'b', text: 'SE (temperatura > limite) ENTÃO { aumentar_potencia_eletrica(); soldar_mais_rapido(); }', isCorrect: false },
-          { id: 'c', text: 'SE (temperatura > limite) ENTÃO { cortar_fluxo_de_gas_argonio_imediatamente(); }', isCorrect: false },
-          { id: 'd', text: 'SE (temperatura > limite) ENTÃO { reiniciar_computador_do_robo(); }', isCorrect: false }
+          { id: 'a', text: 'Porque foguetes modernos exigem cálculos de trajetória e manobra de propulsão recalculados em milissegundos', isCorrect: true },
+          { id: 'b', text: 'Porque os astronautas não queriam levar lápis e borracha para o espaço', isCorrect: false },
+          { id: 'c', text: 'Porque computadores eletrônicos pesam 50 toneladas e servem de âncora', isCorrect: false },
+          { id: 'd', text: 'Porque as calculadoras humanas se recusaram a olhar para a Lua', isCorrect: false }
         ],
-        explanation: 'Para evitar derretimento da tocha de solda e deformação do metal base, deve-se interromper o arco elétrico instantaneamente e recuar o cabeçote robótico com refrigeração ativa.'
+        didacticExplanation: 'A astronave Apollo 11 só conseguiu pousar na Lua porque o AGC (Apollo Guidance Computer) corrigia a queima dos motores 100 vezes por segundo, velocidade inalcançável no papel.'
       },
       {
         id: 14,
         module: 1,
         phase: 3,
-        category: 'Sensores & Atuadores',
-        badge: 'Drone Agrícola',
-        title: 'Pulverização Seletiva em Lavoura de Milho',
-        scenario: 'Um drone autônomo sobrevoa plantações analisando índice de vegetação por câmera multiespectral.',
-        details: [
-          { label: 'Câmera NDVI', value: 'Detectada praga na coordenada (X:45, Y:89)', icon: '🌿' },
-          { label: 'Sensor de Vento Pitot', value: 'Rajada lateral de 45 km/h (Limite de deriva: 25 km/h)', icon: '💨' }
-        ],
-        question: 'Com base nas regras de preservação ambiental e evitar contaminação por deriva do vento:',
+        era: 'Profissões do Passado',
+        badge: 'Rotina Matinal',
+        title: 'O Despertador Humano ("Knocker-Up")',
+        historicalContext: 'Na Inglaterra industrial, antes do relógio despertador ser barato, operários contratavam pessoas chamadas "Knocker-uppers" que batiam nas janelas com varas compridas de bambu ou atiravam ervilhas secas para acordá-los.',
+        comparison: {
+          pastLabel: 'Profissão Extinta',
+          pastValue: 'Pessoa andando pelas ruas frias batendo nas janelas dos clientes',
+          pastIcon: '🦯',
+          modernLabel: 'Automação Moderna',
+          modernValue: 'Alarmes com chip de quartzo, smartphones e assistentes virtuais',
+          modernIcon: '⏰'
+        },
+        question: 'O que substituiu o despertador humano e tornou a rotina das pessoas autônoma?',
         options: [
-          { id: 'a', text: 'SE (vento > 25 km/h) ENTÃO { suspender_bicos_pulverizacao(); registrar_ponto_gps(); retornar_base(); }', isCorrect: true },
-          { id: 'b', text: 'SE (vento > 25 km/h) ENTÃO { abrir_todos_os_bicos_no_maximo_para_compensar(); }', isCorrect: false },
-          { id: 'c', text: 'SE (praga_detectada) ENTÃO { ignorar_vento_e_pulverizar_assim_mesmo(); }', isCorrect: false },
-          { id: 'd', text: 'SE (vento_alto) ENTÃO { desligar_motores_do_drone_em_pleno_voo(); }', isCorrect: false }
+          { id: 'a', text: 'Relógios mecânicos acessíveis e, mais tarde, o oscilador eletrônico de quartzo nos celulares', isCorrect: true },
+          { id: 'b', text: 'Galo cantando gravado em fitas de áudio cassete', isCorrect: false },
+          { id: 'c', text: 'Cachorros treinados para latir em horários específicos', isCorrect: false },
+          { id: 'd', text: 'Canhões atirando pólvora no centro da cidade a cada 1 hora', isCorrect: false }
         ],
-        explanation: 'Pulverizar com vento forte espalha defensivos para rios e áreas vizinhas (deriva química). O robô deve salvar a coordenada geográfica da praga e abortar a aspersão.'
+        didacticExplanation: 'A microeletrônica miniaturizou relógios de precisão atômica para dentro de qualquer chip, permitindo que cada cidadão programe seus alarmes com um toque.'
       },
       {
         id: 15,
         module: 1,
         phase: 4,
-        category: 'Sensores & Atuadores',
-        badge: 'Seguidor de Linha',
-        title: 'Calibração PID de Robô Seguidor de Pista',
-        scenario: 'Robô de transporte em fábrica segue uma faixa preta no piso branco usando dois sensores infravermelhos (Sensor Esquerdo e Sensor Direito).',
-        details: [
-          { label: 'Sensor Esquerdo (IR)', value: 'Detecta BRANCO (Refletância 95%)', icon: '⚪' },
-          { label: 'Sensor Direito (IR)', value: 'Detecta PRETO (Refletância 12%)', icon: '⚫' }
-        ],
-        question: 'O robô está saindo da linha para a esquerda. Qual ajuste diferencial nos motores deve ser feito?',
+        era: 'Profissões do Passado',
+        badge: 'Lazer e Esportes',
+        title: 'O Menino Arrumador de Pinos de Boliche ("Pinsetter")',
+        historicalContext: 'Nas pistas de boliche antigas, crianças e adolescentes trabalhavam no fundo da pista recolhendo bolas de 7 kg e reposicionando os 10 pinos de madeira pesados manualmente após cada jogada.',
+        comparison: {
+          pastLabel: 'Trabalho Infantil Perigoso',
+          pastValue: 'Jovens arriscando levar boladas pesadas na canela para recolocar pinos',
+          pastIcon: '🎳',
+          modernLabel: 'Mecânica Automatizada',
+          modernValue: 'Elevador mecânico com garras que varre a pista e arma os pinos em 3 segundos',
+          modernIcon: '⚙️'
+        },
+        question: 'Por que a automação das pistas de boliche foi considerada um avanço social importante?',
         options: [
-          { id: 'a', text: 'Acelerar Motor Esquerdo e Frear/Reduzir Motor Direito para curva corretiva à Direita', isCorrect: true },
-          { id: 'b', text: 'Acelerar Motor Direito e Parar Motor Esquerdo para forçar curva à Esquerda', isCorrect: false },
-          { id: 'c', text: 'Parar ambos os motores e acionar buzina de socorro', isCorrect: false },
-          { id: 'd', text: 'Inverter os motores para andar de marcha à ré em linha reta', isCorrect: false }
+          { id: 'a', text: 'Eliminou uma atividade de risco físico que frequentemente explorava mão de obra infantil', isCorrect: true },
+          { id: 'b', text: 'Fez com que as bolas de boliche ficassem quadradas', isCorrect: false },
+          { id: 'c', text: 'Impediu que as pessoas continuassem praticando o esporte', isCorrect: false },
+          { id: 'd', text: 'Obrigou os jogadores a jogarem sem sapatos especiais', isCorrect: false }
         ],
-        explanation: 'Para virar à direita e centralizar a linha, o motor da esquerda precisa girar mais rápido que o da direita (tração diferencial típica de robôs móveis).'
+        didacticExplanation: 'Muitas profissões extintas eram degradantes ou perigosas para crianças e adolescentes. A automação mecânica assumiu o trabalho repetitivo, protegendo a infância.'
       },
       {
         id: 16,
         module: 1,
         phase: 5,
-        category: 'Sensores & Atuadores',
-        badge: 'Carro Autônomo',
-        title: 'Frenagem Autônoma de Emergência (AEB)',
-        scenario: 'Um veículo autônomo está em via pública a 50 km/h quando uma bola de futebol entra na pista repentinamente.',
-        details: [
-          { label: 'Radar de Onda Milimétrica', value: 'Objeto em aproximação a 15 metros', icon: '📡' },
-          { label: 'Câmera de Visão Computacional', value: 'Identificada silhueta de criança correndo atrás da bola', icon: '🏃' }
-        ],
-        question: 'Qual deve ser o tempo de resposta e prioridade do algoritmo de controle?',
+        era: 'Profissões do Passado',
+        badge: 'Gráfica & Imprensa',
+        title: 'O Operador de Linotipo e o Tipógrafo de Chumbo',
+        historicalContext: 'Para imprimir o jornal de amanhã, tipógrafos montavam cada frase letra por letra, fundindo chumbo derretido tóxico a 300°C na máquina linotipo em salas barulhentas.',
+        comparison: {
+          pastLabel: 'Tipografia de Chumbo Quente',
+          pastValue: 'Inalação diária de fumaça de chumbo e horas para diagramar 1 página',
+          pastIcon: '📰',
+          modernLabel: 'Editoração Eletrônica Digital',
+          modernValue: 'Softwares de design, PDF e impressoras a laser ecológicas',
+          modernIcon: '🖥️'
+        },
+        question: 'Como a era digital transformou a vida dos profissionais que trabalham com jornais e livros?',
         options: [
-          { id: 'a', text: 'Acionar imediatamente freio regenerativo + ABS nas 4 rodas e tensionar cintos de segurança dos passageiros', isCorrect: true },
-          { id: 'b', text: 'Esperar 3 segundos para confirmar se a criança realmente vai alcançar a bola', isCorrect: false },
-          { id: 'c', text: 'Tocar a buzina e manter a velocidade de 50 km/h', isCorrect: false },
-          { id: 'd', text: 'Desligar o sistema autônomo e pedir que o motorista assuma o volante imediatamente', isCorrect: false }
+          { id: 'a', text: 'Eliminou a intoxicação por chumbo pesado e permitiu que designers e jornalistas publiquem conteúdos com liberdade criativa', isCorrect: true },
+          { id: 'b', text: 'Acabou com todas as notícias do mundo', isCorrect: false },
+          { id: 'c', text: 'Proibiu o uso de letras e palavras na internet', isCorrect: false },
+          { id: 'd', text: 'Fez as pessoas escreverem com cinzas de carvão', isCorrect: false }
         ],
-        explanation: 'Em situações com pedestres em risco de atropelamento, o sistema autônomo deve agir em milissegundos com frenagem máxima pré-colisão, sem tempo hábil para transferência humana.'
+        didacticExplanation: 'A editoração digital substituiu o perigoso manuseio de ligas tóxicas de chumbo fundido por softwares visuais, tornando o trabalho gráfico seguro, limpo e infinitamente mais rápido.'
       },
       {
         id: 17,
         module: 1,
         phase: 6,
-        category: 'Sensores & Atuadores',
-        badge: 'Separador Óptico',
-        title: 'Triagem Automatizada de Reciclagem',
-        scenario: 'Uma esteira de lixo eletrônico passa por sensor infravermelho de espectroscopia que identifica tipos de polímeros e metais.',
-        details: [
-          { label: 'Leitura Espectral', value: 'Material identificado: Cobre Puro (Cu) de alto valor comercial', icon: '🥉' },
-          { label: 'Posição na Esteira', value: 'A 20 cm do bico de ar comprimido nº 4', icon: '💨' }
-        ],
-        question: 'Qual fórmula de temporização o atuador pneumático deve computar para ejetar a peça?',
+        era: 'Profissões do Passado',
+        badge: 'Fábrica e Cultura',
+        title: 'O Leitor de Fábrica de Charutos ("El Lector")',
+        historicalContext: 'Em fábricas antigas de charutos em Cuba e no Brasil, trabalhadores contratavam um orador que subia em um tablado alto e lia jornais, romances e livros clássicos para aliviar o tédio do trabalho repetitivo manual.',
+        comparison: {
+          pastLabel: 'Profissão Antiga',
+          pastValue: 'Uma pessoa lendo em voz alta por 8 horas seguidas na fábrica',
+          pastIcon: '📖',
+          modernLabel: 'Mídia Digital',
+          modernValue: 'Podcasts, audiolivros, rádio web e streaming no smartphone',
+          modernIcon: '🎧'
+        },
+        question: 'Qual inovação tecnológica descentralizou o acesso a notícias e histórias para qualquer trabalhador?',
         options: [
-          { id: 'a', text: 'Tempo_Disparo = Distância (20cm) / Velocidade_Esteira (m/s)', isCorrect: true },
-          { id: 'b', text: 'Tempo_Disparo = Peso_do_Cobre * Tamanho_da_Esteira', isCorrect: false },
-          { id: 'c', text: 'Tempo_Disparo = Sempre 10 segundos fixos independente da velocidade', isCorrect: false },
-          { id: 'd', text: 'Tempo_Disparo = Temperatura_do_Ar comprimido / 2', isCorrect: false }
+          { id: 'a', text: 'A difusão do rádio, dos reprodutores portáteis de áudio e, atualmente, dos podcasts e fones de ouvido', isCorrect: true },
+          { id: 'b', text: 'A invenção de óculos que leem a mente das pessoas', isCorrect: false },
+          { id: 'c', text: 'A proibição de conversar durante o almoço', isCorrect: false },
+          { id: 'd', text: 'O fim dos livros e das histórias narradas', isCorrect: false }
         ],
-        explanation: 'Em automação de esteiras com bicos ejetores de ar, o instante exato do sopro é o tempo cinemático de deslocamento da peça da câmera até o bico (t = d / v).'
+        didacticExplanation: 'A transmissão de áudio digital permitiu que o conhecimento e o entretenimento se tornassem individuais e portáteis para qualquer pessoa a qualquer hora.'
       },
       {
         id: 18,
         module: 1,
         phase: 7,
-        category: 'Sensores & Atuadores',
-        badge: 'Robô Submarino',
-        title: 'Inspeção de Tubulações no Fundo do Mar',
-        scenario: 'Um veículo submarino autônomo (AUV) inspeciona cabos de fibra óptica a 2.000 metros de profundidade no oceano.',
-        details: [
-          { label: 'Sensor de Pressão Hidrostática', value: '200 bar (Pressão normal de profundidade)', icon: '🌊' },
-          { label: 'Sensor de Umidade Interna do Casco', value: 'ATENÇÃO: Gotas de água detectadas no compartimento de baterias!', icon: '⚠️' }
-        ],
-        question: 'Qual subrotina crítica de emergência deve sobrepor qualquer outra tarefa?',
+        era: 'Profissões do Passado',
+        badge: 'Trânsito Urbano',
+        title: 'O Guarda Sinaleiro de Trânsito com Placa Manual',
+        historicalContext: 'Nos cruzamentos das grandes cidades em 1910, policiais ficavam em pedestais girando manivelas com placas "PARE" e "SIGA" para evitar que carruagens e os primeiros carros batessem.',
+        comparison: {
+          pastLabel: 'Controle Manual com Risco',
+          pastValue: 'Policial no meio do cruzamento engolindo fumaça tóxica de escapamentos',
+          pastIcon: '👮',
+          modernLabel: 'Semáforo Inteligente',
+          modernValue: 'Controlador eletrônico sincronizado por sensores de laço indutivo e IA',
+          modernIcon: '🚦'
+        },
+        question: 'Qual vantagem o semáforo automatizado inteligente traz para o trânsito moderno?',
         options: [
-          { id: 'a', text: 'Despressurizar tanques de lastro, soltar pesos de emergência e subir imediatamente à superfície', isCorrect: true },
-          { id: 'b', text: 'Ligar holofotes máximos e continuar tirando fotos do cabo', isCorrect: false },
-          { id: 'c', text: 'Aumentar a velocidade das hélices e descer para 3.000 metros', isCorrect: false },
-          { id: 'd', text: 'Ignorar o alerta, pois água do mar é rica em minerais condutores', isCorrect: false }
+          { id: 'a', text: 'Ajusta os tempos de verde e vermelho em tempo real medindo a quantidade de carros pelos sensores no asfalto', isCorrect: true },
+          { id: 'b', text: 'Faz com que todos os carros batam ao mesmo tempo no cruzamento', isCorrect: false },
+          { id: 'c', text: 'Desliga todas as luzes quando o trânsito está muito engarrafado', isCorrect: false },
+          { id: 'd', text: 'Manda todos os motoristas descerem e empurrarem os veículos', isCorrect: false }
         ],
-        explanation: 'Água salgada em contato com baterias de alta densidade energética causa curto-circuito catastrófico e incêndio químico. O AUV deve abortar a missão e emergir para resgate.'
+        didacticExplanation: 'Os semáforos modernos utilizam "laços indutivos" (fios sob o asfalto que detectam metal) e câmeras de IA para calcular a "Onda Verde", reduzindo engarrafamentos automaticamente.'
       },
       {
         id: 19,
         module: 1,
         phase: 8,
-        category: 'Sensores & Atuadores',
-        badge: 'Braço Paletizador',
-        title: 'Sensor de Torque e Célula de Carga em Armazém',
-        scenario: 'Um robô paletizador ergue caixas de vidro cristal que pesam até 15 kg.',
-        details: [
-          { label: 'Célula de Carga da Garra', value: 'Peso medido: 48 kg (Carga triplicada acima do limite)', icon: '⚖️' },
-          { label: 'Sensor de Vácuo das Ventosas', value: 'Vedação em 40% (Risco iminente de descolar no ar)', icon: '💨' }
-        ],
-        question: 'Qual é o comportamento seguro programado no PLC do braço?',
+        era: 'Profissões do Passado',
+        badge: 'Operação Predial',
+        title: 'O Ascensorista de Alavanca Mecânica',
+        historicalContext: 'Antigamente, elevadores eram operados por uma pessoa que puxava alavancas de cobre pesadas para alinhar o piso da cabine exatamente com a soleira do andar.',
+        comparison: {
+          pastLabel: 'Ascensorista de Alavanca',
+          pastValue: 'Nivelamento manual com risco de degrau perigoso para os passageiros',
+          pastIcon: '🚪',
+          modernLabel: 'Elevador Microprocessado',
+          modernValue: 'Sensor de efeito Hall e inversor de frequência com parada milimétrica suave',
+          modernIcon: '🛗'
+        },
+        question: 'O que tornou os elevadores seguros para que qualquer pessoa aperte um botão sem risco?',
         options: [
-          { id: 'a', text: 'Não elevar o braço mecânico, soltar a caixa no chão e emitir alerta sonoro de sobrepeso', isCorrect: true },
-          { id: 'b', text: 'Girar o braço com força máxima para arremessar a caixa no caminhão', isCorrect: false },
-          { id: 'c', text: 'Aumentar a velocidade para terminar antes que a ventosa solte', isCorrect: false },
-          { id: 'd', text: 'Desligar a bomba de ar para a caixa cair de 2 metros de altura', isCorrect: false }
+          { id: 'a', text: 'Sensores de nivelamento magnético, travas eletromecânicas de porta e circuitos lógicos de segurança redundantes', isCorrect: true },
+          { id: 'b', text: 'Tirar o chão do elevador para as pessoas pularem no andar certo', isCorrect: false },
+          { id: 'c', text: 'Fazer o elevador andar apenas quando estiver vazio', isCorrect: false },
+          { id: 'd', text: 'Amarrar cordas de elástico na cabine', isCorrect: false }
         ],
-        explanation: 'Quando o peso excede a capacidade estrutural ou o vácuo da ventosa não é estanque, elevar a peça pode causar acidentes graves aos operadores ou quebra de maquinário.'
+        didacticExplanation: 'Os elevadores modernos são robôs verticais! Eles possuem sensores magnéticos que medem a posição com precisão milimétrica e nunca abrem a porta se a cabine não estiver perfeitamente alinhada.'
       },
       {
         id: 20,
         module: 1,
         phase: 9,
-        category: 'Sensores & Atuadores',
-        badge: 'Estufa Inteligente',
-        title: 'Automação Climática Agrícola com IoT',
-        scenario: 'Uma estufa hidropônica automatizada controla janelas zenitais, névoa e exaustores para cultivo de morangos.',
-        details: [
-          { label: 'Sensor DHT22 (Umidade)', value: '88% (Muito alta, risco de fungos)', icon: '💧' },
-          { label: 'Sensor de Temperatura', value: '34 °C (Acima do ideal de 24°C)', icon: '🌡️' },
-          { label: 'Sensor Pluviométrico Externo', value: 'SEM CHUVA (Céu limpo)', icon: '☀️' }
-        ],
-        question: 'Qual combinação de atuadores resolve simultaneamente o calor e o excesso de umidade?',
+        era: 'Profissões do Passado',
+        badge: 'Lição Fundamental',
+        title: 'Por Que as Máquinas Assumem Certos Trabalhos?',
+        historicalContext: 'Ao analisar as profissões que sumiram, percebemos um padrão claro: a tecnologia substitui tarefas que são Perigosas, Repetitivas ou Fisicamente Esgotantes (conhecidas na robótica como os "3 D\'s": Dirty, Dull, Dangerous).',
+        comparison: {
+          pastLabel: 'Trabalho Mecânico e Físico',
+          pastValue: 'A pessoa era forçada a agir como uma engrenagem sem usar sua mente criativa',
+          pastIcon: '⚙️',
+          modernLabel: 'Trabalho Intelectual e Humano',
+          modernValue: 'O ser humano supervisiona, programa, inova e cuida das relações sociais',
+          modernIcon: '🌱'
+        },
+        question: 'Qual é a conclusão verdadeira sobre o impacto da tecnologia nas profissões?',
         options: [
-          { id: 'a', text: 'Abrir janelas do teto + Ligar ventiladores exaustores + Desligar nebulização de água', isCorrect: true },
-          { id: 'b', text: 'Fechar todas as janelas + Ligar aquecedores elétricos + Ligar mais água', isCorrect: false },
-          { id: 'c', text: 'Apagar as luzes da estufa e trancar as portas por 24 horas', isCorrect: false },
-          { id: 'd', text: 'Ligar aspersores de água fria com janelas lacradas', isCorrect: false }
+          { id: 'a', text: 'A tecnologia não acaba com o trabalho humano; ela liberta as pessoas do esforço perigoso e repetitivo e cria novas profissões mais criativas', isCorrect: true },
+          { id: 'b', text: 'As máquinas vieram para destruir todas as profissões e fazer as pessoas sumirem', isCorrect: false },
+          { id: 'c', text: 'O ser humano nunca mais precisará estudar nada na vida', isCorrect: false },
+          { id: 'd', text: 'O trabalho manual do passado era perfeito e ninguém nunca se machucava', isCorrect: false }
         ],
-        explanation: 'Para resfriar e secar a estufa sem chuva lá fora, abrem-se os respiradouros e ativam-se os exaustores para expelir o ar quente e úmido acumulado, cortando a irrigação por névoa.'
+        didacticExplanation: 'Excelente! Essa é a grande lição: as máquinas assumem a repetição mecânica para que os seres humanos possam se dedicar ao que nos torna únicos: criatividade, empatia, arte e resolução de problemas.'
       }
     ],
 
-    // MÓDULO 3: Inspetor de Código & Depuração de Bugs
+    // MÓDULO 3: A Linha do Tempo das Ferramentas (Do Braço ao Algoritmo)
     [
       {
         id: 21,
         module: 2,
         phase: 0,
-        category: 'Depuração de Código',
-        badge: 'Loop Infinito',
-        title: 'Robô Travado no Canto da Parede',
-        scenario: 'O robô de limpeza do laboratório entrou em um canto e ficou batendo na parede sem sair do lugar.',
-        codeBlock: [
-          '1: ENQUANTO (sensor_frente == BLOQUEADO) FAÇA',
-          '2:   girar_para_direita(10_graus)',
-          '3:   // Falta ler o sensor novamente dentro do loop!',
-          '4: FIM_ENQUANTO',
-          '5: avancar()'
+        era: 'Linha do Tempo',
+        badge: 'Escrita',
+        title: 'Evolução da Escrita e Registro',
+        historicalContext: 'Veja como a ferramenta humana para guardar ideias evoluiu ao longo de milhares de anos:',
+        timelineSteps: [
+          { step: '1. Tabuleta de Argila', period: '3000 a.C.', tech: 'Cunha de madeira prensando barro úmido' },
+          { step: '2. Papiro e Pena', period: 'Século VIII', tech: 'Tinta vegetal e folhas de papiro/pergaminho' },
+          { step: '3. Máquina de Escrever', period: '1870', tech: 'Mecanismo de tipos de ferro e fita entintada' },
+          { step: '4. Editor de Texto em Nuvem', period: 'Hoje', tech: 'Processamento digital com salvamento instantâneo e IA' }
         ],
-        question: 'Por que o robô nunca sai do loop de rotação?',
+        question: 'Qual é o salto evolutivo trazido pelo editor de texto digital em relação à máquina de escrever mecânica?',
         options: [
-          { id: 'a', text: 'A variável `sensor_frente` nunca é re-lida dentro do laço de repetição, mantendo o valor travado', isCorrect: true },
-          { id: 'b', text: 'Porque o motor da direita está com a voltagem invertida na linha 5', isCorrect: false },
-          { id: 'c', text: 'Porque o comando `girar_para_direita` desliga a placa-mãe', isCorrect: false },
-          { id: 'd', text: 'Porque o robô não tem memória RAM suficiente para 10 graus', isCorrect: false }
+          { id: 'a', text: 'Possibilidade de apagar, reorganizar, corrigir ortografia e compartilhar com qualquer pessoa do mundo sem gastar papel', isCorrect: true },
+          { id: 'b', text: 'O texto digital fica mais pesado que o papel e precisa de guindaste para carregar', isCorrect: false },
+          { id: 'c', text: 'A máquina de escrever era mais rápida porque tinha fita de tecido colorido', isCorrect: false },
+          { id: 'd', text: 'No computador as letras se apagam sozinhas a cada 5 minutos', isCorrect: false }
         ],
-        explanation: 'Em lógica de programação para robôs, se você não atualizar a leitura do sensor dentro do bloco de repetição `ENQUANTO`, a condição permanecerá verdadeira eternamente (loop infinito).'
+        didacticExplanation: 'Com o editor digital, a escrita deixou de ser um ato mecânico fixo no papel para se tornar um processo fluido de edição e colaboração em tempo real.'
       },
       {
         id: 22,
         module: 2,
         phase: 1,
-        category: 'Depuração de Código',
-        badge: 'Operador Invertido',
-        title: 'Portão Automático Esmagando Caixas',
-        scenario: 'Um portão de segurança de armazém deve fechar apenas quando a área estiver completamente desocupada.',
-        codeBlock: [
-          '1: SE (sensor_presenca == VERDADEIRO) ENTÃO',
-          '2:   fechar_portao_hidraulico()',
-          '3: SENÃO',
-          '4:   manter_portao_aberto()',
-          '5: FIM_SE'
+        era: 'Linha do Tempo',
+        badge: 'Cálculo',
+        title: 'Evolução da Matemática Aplicada',
+        historicalContext: 'A contagem começou com marcas em ossos e pedras, evoluindo até os supercomputadores modernos:',
+        timelineSteps: [
+          { step: '1. Ábaco de Contas', period: 'Antiguidade', tech: 'Pedras e varetas de madeira para somar' },
+          { step: '2. Régua de Cálculo', period: '1620', tech: 'Escalas logarítmicas de precisão' },
+          { step: '3. Calculadora Mecânica', period: '1940', tech: 'Engrenagens acionadas por manivela (Curta)' },
+          { step: '4. Processador Eletrônico', period: 'Hoje', tech: 'Transistores microscópicos calculando em nano-segundos' }
         ],
-        question: 'Onde está o erro grave de lógica que causa acidentes no portão?',
+        question: 'O que viabilizou a transição das engrenagens mecânicas pesadas para os celulares finos de hoje?',
         options: [
-          { id: 'a', text: 'O operador condicional está invertido: o portão fecha quando detecta alguém em vez de manter aberto!', isCorrect: true },
-          { id: 'b', text: 'A palavra `SENÃO` deveria ser escrita em inglês (`ELSE`)', isCorrect: false },
-          { id: 'c', text: 'O sensor de presença deveria ser substituído por um termômetro', isCorrect: false },
-          { id: 'd', text: 'Falta colocar um ponto e vírgula na linha 5', isCorrect: false }
+          { id: 'a', text: 'A invenção do transistor de silício, que substituiu engrenagens físicas por chaves elétricas microscópicas', isCorrect: true },
+          { id: 'b', text: 'Engrenagens feitas de madeira transparente', isCorrect: false },
+          { id: 'c', text: 'A diminuição do tamanho dos números matemáticos', isCorrect: false },
+          { id: 'd', text: 'O uso de baterias de sabão em pó', isCorrect: false }
         ],
-        explanation: 'A lógica correta de segurança em portas automáticas é: `SE (sensor == VERDADEIRO) ENTÃO manter_aberto() SENÃO fechar_portao()`. O código fez exatamente o oposto!'
+        didacticExplanation: 'O transistor é a maior invenção do século XX! Em vez de engrenagens de ferro girando para somar 1+1, o transistor usa elétrons abrindo e fechando circuitos na velocidade da luz.'
       },
       {
         id: 23,
         module: 2,
         phase: 2,
-        category: 'Depuração de Código',
-        badge: 'Erro de Escopo',
-        title: 'Elevador de Carga Subindo sem Parada',
-        scenario: 'O elevador de pallets ultrapassou o 3º andar e quase bateu no teto da fábrica.',
-        codeBlock: [
-          '1: andar_atual = 1',
-          '2: ENQUANTO (andar_atual != 3) FAÇA',
-          '3:   subir_motor(1_metro)',
-          '4:   // O contador `andar_atual` não é incrementado aqui!',
-          '5: FIM_ENQUANTO',
-          '6: frear_motor()'
+        era: 'Linha do Tempo',
+        badge: 'Energia',
+        title: 'Evolução da Iluminação Noturna',
+        historicalContext: 'A noite sempre foi um desafio para o trabalho humano. Veja como dominamos a luz:',
+        timelineSteps: [
+          { step: '1. Fogueira e Tocha', period: 'Pré-história', tech: 'Madeira e gordura animal fumegante' },
+          { step: '2. Vela de Cera', period: 'Idade Média', tech: 'Pavio de algodão com chama fraca e instável' },
+          { step: '3. Lâmpada Incandescente', period: '1879', tech: 'Filamento de tungstênio aquecido por eletricidade (Edison)' },
+          { step: '4. LED Inteligente IoT', period: 'Hoje', tech: 'Semicondutor de estado sólido dimerizável por smartphone' }
         ],
-        question: 'Qual linha precisa ser adicionada dentro do laço para o elevador saber que mudou de andar?',
+        question: 'Por que a lâmpada de LED é 90% mais eficiente que a lâmpada incandescente antiga?',
         options: [
-          { id: 'a', text: '`andar_atual = ler_sensor_de_andar()` logo após a linha 3', isCorrect: true },
-          { id: 'b', text: '`subir_motor(100_metros)` na linha 1', isCorrect: false },
-          { id: 'c', text: '`andar_atual = 0` na linha 5', isCorrect: false },
-          { id: 'd', text: '`apagar_luz_do_andar()` na linha 4', isCorrect: false }
+          { id: 'a', text: 'Porque o LED transforma energia quase que exclusivamente em luz, enquanto a incandescente desperdiçava 90% da energia em calor', isCorrect: true },
+          { id: 'b', text: 'Porque a lâmpada de LED usa vaga-lumes vivos presos no vidro', isCorrect: false },
+          { id: 'c', text: 'Porque a lâmpada incandescente precisava de querosene para funcionar', isCorrect: false },
+          { id: 'd', text: 'Porque o LED só acende quando está frio', isCorrect: false }
         ],
-        explanation: 'Sem atualizar a variável `andar_atual` com o sensor de fim de curso ou leitura de pavimento, a variável permanece valendo 1, e a condição `!= 3` continuará para sempre.'
+        didacticExplanation: 'As lâmpadas antigas funcionavam esquentando um arame até ficar vermelho de calor. O LED é física quântica pura: elétrons saltando de camada e emitindo fótons sem esquentar!'
       },
       {
         id: 24,
         module: 2,
         phase: 3,
-        category: 'Depuração de Código',
-        badge: 'Comparação Fraca',
-        title: 'Termostato de Cauterização Robótica',
-        scenario: 'Um sistema de corte térmico precisa atingir exatamente entre 200°C e 220°C para selar plástico biodegradável.',
-        codeBlock: [
-          '1: temp = ler_sensor_temperatura()',
-          '2: SE (temp > 200 OU temp < 220) ENTÃO',
-          '3:   ativar_resistencia_aquecimento()',
-          '4: FIM_SE'
+        era: 'Linha do Tempo',
+        badge: 'Locomoção',
+        title: 'Evolução do Transporte Terrestre',
+        historicalContext: 'Das primeiras rodas de pedra até os veículos autônomos elétricos:',
+        timelineSteps: [
+          { step: '1. Carro de Tração Animal', period: '3500 a.C.', tech: 'Cavalos e bois puxando rodas de madeira' },
+          { step: '2. Locomotiva a Vapor', period: '1804', tech: 'Caldeira a carvão gerando pressão mecânica' },
+          { step: '3. Automóvel a Combustão', period: '1908', tech: 'Motor a gasolina produzido em linha de montagem (Ford T)' },
+          { step: '4. Veículo Elétrico Autônomo', period: 'Hoje', tech: 'Baterias de lítio, motores de imã permanente, câmeras e IA' }
         ],
-        question: 'Por que o aquecedor fica ligado até queimar o plástico mesmo a 500°C?',
+        question: 'Qual é o grande salto ecológico e tecnológico dos veículos elétricos modernos?',
         options: [
-          { id: 'a', text: 'O operador lógico `OU` torna a condição SEMPRE verdadeira para qualquer número!', isCorrect: true },
-          { id: 'b', text: 'Porque o número 200 é maior que o número 220', isCorrect: false },
-          { id: 'c', text: 'Porque o sensor lê a temperatura em Fahrenheit em vez de Celsius', isCorrect: false },
-          { id: 'd', text: 'Porque falta ligar a ventoinha na linha 1', isCorrect: false }
+          { id: 'a', text: 'Zero emissão local de gases poluentes e frenagem regenerativa que devolve energia para a bateria', isCorrect: true },
+          { id: 'b', text: 'Eles não precisam de pneus nem de asfalto para andar', isCorrect: false },
+          { id: 'c', text: 'Eles andam mais devagar que uma tartaruga para economizar', isCorrect: false },
+          { id: 'd', text: 'Funcionam apenas quando estão conectados a um fio preso na tomada da casa', isCorrect: false }
         ],
-        explanation: 'A expressão `(temp > 200 OU temp < 220)` é sempre verdadeira! Exemplo: 500°C é > 200 (verdade); 10°C é < 220 (verdade). Para definir um intervalo fechado, deve-se usar o operador `E` (`E lógico`).'
+        didacticExplanation: 'Veículos elétricos têm rendimento energético de mais de 90% (contra 25% dos motores a explosão) e são computadores sobre rodas capazes de desviar de obstáculos por sensores.'
       },
       {
         id: 25,
         module: 2,
         phase: 4,
-        category: 'Depuração de Código',
-        badge: 'Ordem de Operações',
-        title: 'Braço Robótico Soltando Peça no Vazio',
-        scenario: 'O manipulador robótico pega uma caixa na bancada A e deveria deixá-la na bancada B.',
-        codeBlock: [
-          '1: mover_para(bancada_A)',
-          '2: fechar_garra()',
-          '3: abrir_garra()',
-          '4: mover_para(bancada_B)',
-          '5: comemorar_sucesso()'
+        era: 'Linha do Tempo',
+        badge: 'Memória',
+        title: 'Evolução do Armazenamento de Dados',
+        historicalContext: 'Onde a humanidade guarda suas memórias, livros, fotos e descobertas científicas:',
+        timelineSteps: [
+          { step: '1. Papiro e Papel', period: 'Antiguidade', tech: 'Fibras vegetais vulneráveis a mofo e fogo' },
+          { step: '2. Cartão Perfurado', period: '1890', tech: 'Furos em cartolina lidos por agulhas elétricas' },
+          { step: '3. Disquete Magnético', period: '1980', tech: 'Disco plástico flexível que guardava 1,44 Megabytes' },
+          { step: '4. Nuvem / SSD NVMe', period: 'Hoje', tech: 'Memória Flash microscópica guardando Terabytes em um chaveiro' }
         ],
-        question: 'Por que a caixa cai e quebra na bancada A antes mesmo do robô se mover?',
+        question: 'Quantos disquetes antigos de 1,44 MB seriam necessários para guardar 1 único jogo moderno de 70 GB?',
         options: [
-          { id: 'a', text: 'O comando `abrir_garra()` foi chamado na linha 3 antes de o robô se deslocar para a bancada B na linha 4', isCorrect: true },
-          { id: 'b', text: 'Porque a garra não tem dedos de borracha antiderrapante', isCorrect: false },
-          { id: 'c', text: 'Porque o comando `mover_para` só funciona de ré', isCorrect: false },
-          { id: 'd', text: 'Porque falta ligar o Wi-Fi do braço mecânico na linha 2', isCorrect: false }
+          { id: 'a', text: 'Quase 50.000 disquetes! Uma pilha de mais de 150 metros de altura!', isCorrect: true },
+          { id: 'b', text: 'Apenas 2 disquetes cabem o jogo inteiro com folga', isCorrect: false },
+          { id: 'c', text: 'Nenhum, porque os computadores antigos tinham mais espaço que os de hoje', isCorrect: false },
+          { id: 'd', text: 'Meio disquete seria suficiente', isCorrect: false }
         ],
-        explanation: 'Erro clássico de fluxo de execução sequencial (pipeline). A garra abriu imediatamente após fechar. O correto seria: `mover_para(B)` e só então `abrir_garra()`.'
+        didacticExplanation: 'A miniaturização do armazenamento digital é astronômica: um chip menor que uma unha guarda hoje o equivalente a milhões de livros de uma biblioteca inteira!'
       },
       {
         id: 26,
         module: 2,
         phase: 5,
-        category: 'Depuração de Código',
-        badge: 'Conversão de Unidade',
-        title: 'Sonda Marciana Mars Climate Orbiter Bug',
-        scenario: 'Inspirado no erro real da NASA em 1999: O algoritmo do robô calcula o impulso de frenagem em Newton, mas a biblioteca recebe Libras-força.',
-        codeBlock: [
-          '1: forca_newtons = calcular_forca_frenagem() // Retorna 1000 N',
-          '2: acionar_propulsor(forca_newtons) // Espera valor em Libras (lbf)',
-          '3: // 1 Libra-força vale ~4.45 Newtons'
+        era: 'Linha do Tempo',
+        badge: 'Saúde',
+        title: 'Evolução da Medicina e Diagnóstico',
+        historicalContext: 'Como os médicos investigavam o corpo humano através das eras:',
+        timelineSteps: [
+          { step: '1. Sangria e Palpação', period: 'Século XVII', tech: 'Tentativas empíricas sem enxergar o interior do corpo' },
+          { step: '2. Estetoscópio de Madeira', period: '1816', tech: 'Tubo acústico para ouvir batimentos cardíacos' },
+          { step: '3. Raio-X Analógico', period: '1895', tech: 'Radiação ionizante revelada em filme químico' },
+          { step: '4. Ressonância Magnética + IA', period: 'Hoje', tech: 'Campos magnéticos tridimensionais com detecção de tumores por IA' }
         ],
-        question: 'O que aconteceu com a frenagem do robô devido à falta de conversão de unidades?',
+        question: 'Como a Inteligência Artificial auxilia os médicos nos exames de imagem modernos?',
         options: [
-          { id: 'a', text: 'O robô freou com quase 4,5 vezes mais força do que o necessário, errando completamente o pouso', isCorrect: true },
-          { id: 'b', text: 'O robô não se mexeu porque Newtons não existem no espaço', isCorrect: false },
-          { id: 'c', text: 'O motor entrou em pane elétrica por excesso de combustível', isCorrect: false },
-          { id: 'd', text: 'A gravidade do planeta se anulou com os cálculos', isCorrect: false }
+          { id: 'a', text: 'Identificando padrões e lesões minúsculas em segundos que poderiam passar despercebidas ao olho cansado', isCorrect: true },
+          { id: 'b', text: 'Substituindo o médico e mandando o paciente operar a si mesmo', isCorrect: false },
+          { id: 'c', text: 'Apagando as fotos do exame para economizar espaço no hospital', isCorrect: false },
+          { id: 'd', text: 'Pintando os ossos de cores fluorescentes', isCorrect: false }
         ],
-        explanation: 'Passar 1.000 como argumento para uma função que espera libras aplicou 1.000 lbf (~4.450 N), ou seja, uma desaceleração extrema e descontrolada por falta de conversão de tipos/unidades.'
+        didacticExplanation: 'A IA atua como uma "segunda opinião ultra-atenta": ela compara o exame do paciente com milhões de exames do mundo todo, auxiliando o médico a fechar um diagnóstico precoce.'
       },
       {
         id: 27,
         module: 2,
         phase: 6,
-        category: 'Depuração de Código',
-        badge: 'Filtro de Ruído',
-        title: 'Leitura Falsa do Sensor Ultrassônico',
-        scenario: 'O robô móvel fica dando solavancos e freando no ar mesmo com o corredor 100% vazio.',
-        codeBlock: [
-          '1: leitura = ler_ultrassonico()',
-          '2: SE (leitura < 50) ENTÃO // Às vezes o sensor dá pico de eco com valor 0',
-          '3:   frear_bruscamente()',
-          '4: FIM_SE'
+        era: 'Linha do Tempo',
+        badge: 'Construção',
+        title: 'Evolução do Desenho Técnico de Projetos',
+        historicalContext: 'Engenheiros e arquitetos projetando pontes e edifícios:',
+        timelineSteps: [
+          { step: '1. Prancheta e Esquadro', period: '1960', tech: 'Desenhos manuais a nanquim sobre papel manteiga' },
+          { step: '2. CAD 2D', period: '1985', tech: 'Linhas vetoriais desenhadas na tela do computador' },
+          { step: '3. Modelagem 3D (BIM)', period: '2010', tech: 'Edifícios virtuais com física de peso e materiais' },
+          { step: '4. Gêmeos Digitais (Digital Twins)', period: 'Hoje', tech: 'Réplicas virtuais conectadas a sensores reais via IoT' }
         ],
-        question: 'Como os engenheiros de software eliminam esses picos de ruído elétrico?',
+        question: 'O que um "Gêmeo Digital" (Digital Twin) permite fazer em uma ponte antes que ela seja construída?',
         options: [
-          { id: 'a', text: 'Aplicar uma média móvel de 3 a 5 leituras antes de tomar a decisão de frenagem', isCorrect: true },
-          { id: 'b', text: 'Aumentar a velocidade do robô para 100 km/h', isCorrect: false },
-          { id: 'c', text: 'Desligar o sensor ultrassônico e usar uma bússola magnética', isCorrect: false },
-          { id: 'd', text: 'Pintar o sensor com tinta spray preta para absorver som', isCorrect: false }
+          { id: 'a', text: 'Simular terremotos, tempestades e peso do trânsito no computador para corrigir falhas antes de gastar cimento real', isCorrect: true },
+          { id: 'b', text: 'Fazer a ponte sumir no mundo real para ninguém passar', isCorrect: false },
+          { id: 'c', text: 'Obrigar os carros a voarem por cima do rio', isCorrect: false },
+          { id: 'd', text: 'Pintar a ponte de preto e branco no papel', isCorrect: false }
         ],
-        explanation: 'Sensores físicos reais sofrem com ecos espúrios e interferências eletromagnéticas. O uso de filtros passa-baixa, média móvel ou medianas evita ações falsas por leituras corrompidas pontuais.'
+        didacticExplanation: 'Com simulações digitais, engenheiros testam o colapso estrutural milhares de vezes virtualmente, garantindo que pontes e aviões reais nasçam com risco zero de engenharia.'
       },
       {
         id: 28,
         module: 2,
         phase: 7,
-        category: 'Depuração de Código',
-        badge: 'Divisão por Zero',
-        title: 'Cálculo de Consumo de Bateria do Drone',
-        scenario: 'O computador de voo do drone travou durante a decolagem e caiu na grama.',
-        codeBlock: [
-          '1: distancia_percorrida = 0 // Robô acabou de ligar',
-          '2: energia_gasta = 50 Joules',
-          '3: eficiencia = energia_gasta / distancia_percorrida',
-          '4: mostrar_no_painel(eficiencia)'
+        era: 'Linha do Tempo',
+        badge: 'Comércio',
+        title: 'Evolução das Transações Comerciais',
+        historicalContext: 'A troca de bens e valor na sociedade:',
+        timelineSteps: [
+          { step: '1. Escambo Direto', period: '5000 a.C.', tech: 'Troca de sacos de trigo por ovelhas ou sal' },
+          { step: '2. Moedas de Metal', period: '600 a.C.', tech: 'Ouro e prata cunhados com peso fixo garantido pelo Estado' },
+          { step: '3. Cédula de Papel e Cheque', period: 'Século XVII', tech: 'Títulos de crédito emitidos por bancos centrais' },
+          { step: '4. Pagamento Instantâneo (PIX)', period: 'Hoje', tech: 'Assinaturas criptográficas autenticadas em servidores em 2 segundos' }
         ],
-        question: 'Qual exceção matemática fatal paralisou o processador do drone?',
+        question: 'Qual tecnologia garante que uma transferência PIX não possa ser fraudada ou duplicada?',
         options: [
-          { id: 'a', text: 'Erro de Divisão por Zero na linha 3 (impossível dividir qualquer número por 0)', isCorrect: true },
-          { id: 'b', text: 'Erro de raiz quadrada de número negativo na linha 1', isCorrect: false },
-          { id: 'c', text: 'Erro de falta de memória RAM para guardar o número 50', isCorrect: false },
-          { id: 'd', text: 'Erro de bateria fraca na linha 4', isCorrect: false }
+          { id: 'a', text: 'Criptografia assimétrica de chaves públicas/privadas e redes bancárias auditadas pelo Banco Central', isCorrect: true },
+          { id: 'b', text: 'Um funcionário que corre a pé com o dinheiro até o outro banco', isCorrect: false },
+          { id: 'c', text: 'Moedas de chocolate derretidas no computador', isCorrect: false },
+          { id: 'd', text: 'Fotocópias de notas de dinheiro enviadas por WhatsApp', isCorrect: false }
         ],
-        explanation: 'Na matemática e em qualquer processador computacional, a divisão por zero é uma operação indefinida que lança uma exceção de parada imediata (Crash / Kernel Panic).'
+        didacticExplanation: 'O dinheiro moderno é pura matemática computacional! A criptografia matemática garante que o valor sai de uma conta e entra na outra sem que ninguém possa clonar a transação.'
       },
       {
         id: 29,
         module: 2,
         phase: 8,
-        category: 'Depuração de Código',
-        badge: 'Condição de Corrida',
-        title: 'Dois Robôs AGV na Mesma Encruzilhada',
-        scenario: 'Dois robôs transportadores de caixas colidiram no cruzamento central de um centro de distribuição.',
-        codeBlock: [
-          '// Ambos os robôs executaram este código ao mesmo tempo:',
-          '1: SE (cruzamento_livre == VERDADEIRO) ENTÃO',
-          '2:   esperar(0.5_segundos) // Tempo de checagem do outro',
-          '3:   ocupar_cruzamento()',
-          '4: FIM_SE'
+        era: 'Linha do Tempo',
+        badge: 'Música',
+        title: 'Evolução da Produção Musical',
+        historicalContext: 'Como a arte do som foi gravada e distribuída ao longo dos séculos:',
+        timelineSteps: [
+          { step: '1. Partitura de Papel', period: 'Século XI', tech: 'Música só existia quando músicos tocavam ao vivo' },
+          { step: '2. Fonógrafo de Cera', period: '1877', tech: 'Agulha gravando ranhuras em cilindro de cera (Edison)' },
+          { step: '3. Disco de Vinil e Fita Cassete', period: 'Século XX', tech: 'Ondas analógicas moldadas em plástico PVC' },
+          { step: '4. DAWs e Streaming Digital', period: 'Hoje', tech: 'Áudio digital amostrado a 44.100 vezes por segundo (PCM)' }
         ],
-        question: 'Como resolver esse conflito concorrente de acesso ao mesmo recurso físico?',
+        question: 'O que o formato digital MP3/Streaming permitiu para os artistas independentes?',
         options: [
-          { id: 'a', text: 'Implementar um semáforo digital (Mutex/Lock) com ordem de prioridade estrita de passagem', isCorrect: true },
-          { id: 'b', text: 'Acelerar os dois robôs para ver qual chega primeiro na batida', isCorrect: false },
-          { id: 'c', text: 'Remover os sensores e mandar os robôs andarem vendados', isCorrect: false },
-          { id: 'd', text: 'Desligar a conexão de rede entre os dois robôs', isCorrect: false }
+          { id: 'a', text: 'Gravar um álbum inteiro em um notebook no quarto e lançar mundialmente sem precisar de gravadoras gigantes', isCorrect: true },
+          { id: 'b', text: 'Proibiu as pessoas de ouvirem instrumentos como violão e piano', isCorrect: false },
+          { id: 'c', text: 'Fez com que os cantores perdessem a voz para sempre', isCorrect: false },
+          { id: 'd', text: 'Obrigou as músicas a terem apenas 5 segundos de duração', isCorrect: false }
         ],
-        explanation: 'Esse problema é chamado de "Condição de Corrida" (Race Condition). A solução em robótica e sistemas distribuídos é o uso de travas mútuas (Mutex) e gerenciamento de prioridade central.'
+        didacticExplanation: 'A tecnologia digital democratizou a produção cultural. Hoje qualquer jovem com um computador e criatividade tem acesso aos mesmos sintetizadores dos grandes estúdios!'
       },
       {
         id: 30,
         module: 2,
         phase: 9,
-        category: 'Depuração de Código',
-        badge: 'Transbordamento de Pilha',
-        title: 'Busca em Labirinto com Recursão Infinita',
-        scenario: 'O algoritmo de mapeamento SLAM do robô aspirador começou a esquentar o chip até desligar por superaquecimento.',
-        codeBlock: [
-          '1: FUNCAO explorar_sala(posicao):',
-          '2:   mover_para(posicao)',
-          '3:   retornar explorar_sala(posicao) // Chama a si mesma com o mesmo valor!',
-          '4: FIM_FUNCAO'
+        era: 'Linha do Tempo',
+        badge: 'Síntese das Eras',
+        title: 'As Quatro Revoluções do Trabalho',
+        historicalContext: 'Os historiadores dividem a transformação do trabalho em 4 grandes saltos:',
+        timelineSteps: [
+          { step: 'Indústria 1.0', period: '1780', tech: 'Vapor e tear mecânico (fim do esforço puramente muscular)' },
+          { step: 'Indústria 2.0', period: '1870', tech: 'Eletricidade e linha de montagem em série (Fordismo)' },
+          { step: 'Indústria 3.0', period: '1970', tech: 'Eletrônica, computadores e primeiros robôs programáveis' },
+          { step: 'Indústria 4.0', period: 'Hoje', tech: 'Internet das Coisas (IoT), IA, computação em nuvem e Cobots' }
         ],
-        question: 'Qual é o defeito estrutural desta função recursiva?',
+        question: 'O que caracteriza a atual "Indústria 4.0" em relação às revoluções do passado?',
         options: [
-          { id: 'a', text: 'Falta um caso base de parada e a chamada recursiva repete a mesma posição sem progresso', isCorrect: true },
-          { id: 'b', text: 'Falta colocar o robô virado de costas para o sol', isCorrect: false },
-          { id: 'c', text: 'A palavra `FUNCAO` não é aceita em robótica avançada', isCorrect: false },
-          { id: 'd', text: 'O robô precisa de uma vassoura maior para funcionar', isCorrect: false }
+          { id: 'a', text: 'A conexão inteligente entre o mundo físico e o mundo digital, onde máquinas se comunicam em rede e aprendem', isCorrect: true },
+          { id: 'b', text: 'A volta da tração animal para puxar esteiras nas fábricas', isCorrect: false },
+          { id: 'c', text: 'A proibição do uso de energia elétrica nas indústrias', isCorrect: false },
+          { id: 'd', text: 'O abandono de todos os computadores para usar apenas folhas de papel', isCorrect: false }
         ],
-        explanation: 'Toda função recursiva precisa obrigatoriamente de uma condição de término (caso base) e de avançar para um novo estado. Do contrário, esgota a memória de pilha (Stack Overflow).'
+        didacticExplanation: 'Na Indústria 4.0, as fábricas são ecossistemas interconectados: sensores, robôs e pessoas colaboram conectados pela nuvem para produzir com sustentabilidade e customização.'
       }
     ],
 
-    // MÓDULO 4: Indústria 4.0, IA e Decisão Ética Humano-Máquina
+    // MÓDULO 4: A Era Digital e os Robôs Modernos (O Que a Máquina Faz Melhor?)
     [
       {
         id: 31,
         module: 3,
         phase: 0,
-        category: 'Ética & Sociedade',
-        badge: 'Cirurgia Robótica',
-        title: 'Intervenção Cirúrgica Assistida por IA',
-        scenario: 'Durante uma microcirurgia cardíaca guiada por braço robótico, a visão computacional detecta uma variação anatômica rara não prevista no prontuário do paciente.',
-        details: [
-          { label: 'IA Sugere', value: 'Manter incisão programada com margem de 1 mm', icon: '🤖' },
-          { label: 'Cirurgião Humano', value: 'Percebe risco de romper vaso sanguíneo atípico', icon: '👨‍⚕️' }
-        ],
-        question: 'Segundo as normas internacionais de Robótica Médica e Cobots, quem detém a autoridade final?',
+        era: 'Era Digital',
+        badge: 'Precisão vs Criatividade',
+        title: 'Onde o Robô Supera o Ser Humano?',
+        historicalContext: 'Em uma fábrica de microchips, peças microscópicas de silício precisam ser manipuladas com tolerância de nanômetros no escuro.',
+        question: 'Qual característica das máquinas é insuperável para a biologia humana?',
         options: [
-          { id: 'a', text: 'O cirurgião humano deve assumir o controle manual imediatamente (Princípio Human-in-the-Loop)', isCorrect: true },
-          { id: 'b', text: 'O robô deve ignorar o médico, pois computadores nunca erram cálculos mecânicos', isCorrect: false },
-          { id: 'c', text: 'Deve-se desligar os aparelhos da sala e esperar o conselho de ética votar', isCorrect: false },
-          { id: 'd', text: 'O robô deve acelerar a cirurgia para terminar em menos tempo', isCorrect: false }
+          { id: 'a', text: 'Precisão micrométrica sem tremores musculares, velocidade de repetição e imunidade à fadiga', isCorrect: true },
+          { id: 'b', text: 'Capacidade de chorar de emoção com uma obra de arte', isCorrect: false },
+          { id: 'c', text: 'Sentir compaixão por um colega de trabalho machucado', isCorrect: false },
+          { id: 'd', text: 'Criar uma receita de bolo inovadora misturando memórias de infância', isCorrect: false }
         ],
-        explanation: 'Em sistemas críticos de saúde e segurança da vida, a IA e a robótica são ferramentas de ampliação sensorial. A decisão ética e a autoridade de abortar são sempre do profissional humano.'
+        didacticExplanation: 'Máquinas não piscam, não tremem e não se cansam após 10 horas repetindo o mesmo gesto. Por isso elas são ideais para tarefas que exigem precisão cirúrgica contínua.'
       },
       {
         id: 32,
         module: 3,
         phase: 1,
-        category: 'Ética & Sociedade',
-        badge: 'Impacto Social',
-        title: 'Automação Total em Linha de Calçados',
-        scenario: 'Uma fábrica substituiu 200 postos de costura manual repetitiva por 10 células robóticas de alta velocidade.',
-        details: [
-          { label: 'Ganho da Empresa', value: 'Aumento de 300% na produtividade e zero lesões por esforço repetitivo (LER)', icon: '📈' },
-          { label: 'Desafio Social', value: '200 trabalhadores locais sem qualificação em programação ou mecânica', icon: '👥' }
-        ],
-        question: 'Qual é a política de responsabilidade social e corporativa recomendada na Indústria 4.0?',
+        era: 'Era Digital',
+        badge: 'Ambientes Hostis',
+        title: 'Robôs em Locais Onde a Vida Humana Não Resiste',
+        historicalContext: 'Na usina de Chernobyl e em vulcões ativos, robôs são enviados para desativar bombas, medir radiação e recolher lava incandescente.',
+        question: 'Por que o uso de robôs móveis nesses cenários é uma conquista humanitária?',
         options: [
-          { id: 'a', text: 'Criar programas de requalificação profissional (upskilling) para operação, manutenção e controle de qualidade dos robôs', isCorrect: true },
-          { id: 'b', text: 'Proibir por lei qualquer tipo de máquina para que o trabalho continue sendo manual e cansativo', isCorrect: false },
-          { id: 'c', text: 'Demitir todos sem aviso prévio e ignorar a comunidade local', isCorrect: false },
-          { id: 'd', text: 'Fazer os trabalhadores competirem em velocidade contra os braços mecânicos', isCorrect: false }
+          { id: 'a', text: 'Porque preserva a vida humana, evitando que pessoas sofram contaminação letal por radiação ou calor extremo', isCorrect: true },
+          { id: 'b', text: 'Porque os robôs gostam de tomar banho de lava quente', isCorrect: false },
+          { id: 'c', text: 'Porque humanos não conseguem andar em superfícies de terra', isCorrect: false },
+          { id: 'd', text: 'Porque os robôs conseguem respirar debaixo da terra sem ar', isCorrect: false }
         ],
-        explanation: 'A automação deve libertar os seres humanos de trabalhos insalubres e perigosos. A transição justa exige capacitação para as novas funções de suporte tecnológico e supervisão.'
+        didacticExplanation: 'A robótica de resgate e ambientes inóspitos cumpre a mais nobre missão da tecnologia: assumir o perigo de morte para que nenhum pai ou mãe de família perca a vida.'
       },
       {
         id: 33,
         module: 3,
         phase: 2,
-        category: 'Ética & Sociedade',
-        badge: 'Privacidade & IA',
-        title: 'Robôs com Câmeras em Espaços Públicos',
-        scenario: 'Robôs autônomos de segurança patrulham praças públicas gravando rostos de todas as pessoas que passam.',
-        details: [
-          { label: 'Tecnologia', value: 'Reconhecimento Facial em Tempo Real conectado à nuvem', icon: '📹' },
-          { label: 'Legislação', value: 'LGPD (Lei Geral de Proteção de Dados)', icon: '⚖️' }
-        ],
-        question: 'Qual medida garante a conformidade do robô com as leis de privacidade infantil e cidadania digital?',
+        era: 'Era Digital',
+        badge: 'O Fator Humano',
+        title: 'Onde o Ser Humano é Absolutamente Insubstituível?',
+        historicalContext: 'Um hospital pediátrico comprou robôs modernos para triagem e transporte de remédios. Porém, uma criança de 6 anos está assustada e chorando antes de tomar uma injeção.',
+        question: 'Qual atitude profissional NENHUM robô ou inteligência artificial consegue executar de verdade?',
         options: [
-          { id: 'a', text: 'Processar dados na borda (Edge Computing) com anonimização/borramento automático de rostos sem guardar bancos biométricos', isCorrect: true },
-          { id: 'b', text: 'Vender as imagens dos rostos dos cidadãos para empresas de publicidade', isCorrect: false },
-          { id: 'c', text: 'Publicar ao vivo as imagens em redes sociais abertas para qualquer pessoa ver', isCorrect: false },
-          { id: 'd', text: 'Guardar os dados biométricos de todas as crianças para sempre sem avisar os pais', isCorrect: false }
+          { id: 'a', text: 'Empatia genuína, acolhimento afetivo, abraço caloroso e sensibilidade para confortar uma dor emocional', isCorrect: true },
+          { id: 'b', text: 'Medir a temperatura com sensor infravermelho em 1 segundo', isCorrect: false },
+          { id: 'c', text: 'Calcular a dose de antibiótico com base no peso corporal', isCorrect: false },
+          { id: 'd', text: 'Guardar o prontuário no banco de dados digital do hospital', isCorrect: false }
         ],
-        explanation: 'A privacidade por padrão (Privacy by Design) exige que sistemas robóticos em locais públicos processem apenas detecção de anomalias sem armazenar identidades e dados pessoais desnecessários.'
+        didacticExplanation: 'Robôs podem simular vozes amigáveis, mas não sentem amor, compaixão ou dor. O cuidado humano, o afeto e a sensibilidade ética são exclusividades da nossa humanidade.'
       },
       {
         id: 34,
         module: 3,
         phase: 3,
-        category: 'Ética & Sociedade',
-        badge: 'Segurança Física',
-        title: 'Cobots (Robôs Colaborativos) sem Grade de Proteção',
-        scenario: 'Antigamente, robôs industriais pesados ficavam trancados em jaulas de aço. Hoje, Cobots trabalham ombro a ombro com humanos.',
-        details: [
-          { label: 'Norma ISO/TS 15066', value: 'Segurança para Robôs Colaborativos', icon: '🤝' },
-          { label: 'Recurso de Proteção', value: 'Sensores de força nas juntas e superfícies macias arredondadas', icon: '🛡️' }
-        ],
-        question: 'O que o Cobot deve fazer obrigatoriamente se um humano encostar nele acidentalmente?',
+        era: 'Era Digital',
+        badge: 'Cobots',
+        title: 'O Conceito de Cobot: Robôs Colaborativos',
+        historicalContext: 'Na montadora aeroespacial, a operadora Maria trabalha lado a lado com um braço robótico articulado sem grades ou gaiolas de proteção.',
+        question: 'Qual é o papel do robô e o papel do ser humano no modelo colaborativo (Cobot)?',
         options: [
-          { id: 'a', text: 'Parar instantaneamente o movimento com frenagem por desacoplamento mecânico de força', isCorrect: true },
-          { id: 'b', text: 'Empurrar o humano com força para desobstruir o caminho', isCorrect: false },
-          { id: 'c', text: 'Acelerar o movimento para tentar desviar da pessoa em alta velocidade', isCorrect: false },
-          { id: 'd', text: 'Ignorar o contato físico até a peça cair no chão', isCorrect: false }
+          { id: 'a', text: 'O robô segura o motor pesado de 40 kg sem cansaço, enquanto Maria posiciona os cabos delicados com destreza e inspeção visual crítica', isCorrect: true },
+          { id: 'b', text: 'O robô manda na fábrica e Maria obedece calada sem pensar', isCorrect: false },
+          { id: 'c', text: 'Maria carrega o robô nas costas para ele não gastar bateria', isCorrect: false },
+          { id: 'd', text: 'O robô faz tudo e Maria fica dormindo no sofá da fábrica', isCorrect: false }
         ],
-        explanation: 'A grande revolução dos robôs colaborativos (Cobots) é o monitoramento contínuo de torque em cada junta. Qualquer toque inesperado acima de limiares mínimos corta a força motriz na hora.'
+        didacticExplanation: 'Cobots são projetados para somar forças: a força mecânica e precisão da máquina aliadas à sensibilidade tátil, julgamento e inteligência adaptativa do ser humano.'
       },
       {
         id: 35,
         module: 3,
         phase: 4,
-        category: 'Ética & Sociedade',
-        badge: 'Viés Algorítmico',
-        title: 'Seleção Automatizada de Currículos por IA',
-        scenario: 'Uma grande corporação treinou uma IA para triar engenheiros de automação analisando os contratados dos últimos 20 anos.',
-        details: [
-          { label: 'Problema Descoberto', value: 'A IA passou a rejeitar currículos excelentes de mulheres e minorias', icon: '⚠️' }
-        ],
-        question: 'Por que o robô de software tomou decisões discriminatórias?',
+        era: 'Era Digital',
+        badge: 'Arte e Criatividade',
+        title: 'A IA Gerativa e a Criatividade Humana',
+        historicalContext: 'Programas de IA conseguem gerar imagens, poesias e músicas analisando bilhões de exemplos criados pela humanidade ao longo da história.',
+        question: 'O que diferencia a criação de um artista humano da resposta gerada por uma IA?',
         options: [
-          { id: 'a', text: 'Porque o banco de dados histórico do passado tinha preconceitos e a IA apenas replicou os padrões humanos antigos', isCorrect: true },
-          { id: 'b', text: 'Porque computadores odeiam tecnologia inclusiva', isCorrect: false },
-          { id: 'c', text: 'Porque o arquivo do currículo estava em formato PDF em vez de papel', isCorrect: false },
-          { id: 'd', text: 'Porque o processador do servidor estava operando a 100°C', isCorrect: false }
+          { id: 'a', text: 'O artista humano cria a partir de suas vivências reais, dores, alegrias, memórias e sentimentos que a IA não possui', isCorrect: true },
+          { id: 'b', text: 'A IA tem sentimentos mais puros que qualquer ser humano', isCorrect: false },
+          { id: 'c', text: 'Os seres humanos só conseguem desenhar quadrados cinzas', isCorrect: false },
+          { id: 'd', text: 'A IA inventou as cores do arco-íris sozinha', isCorrect: false }
         ],
-        explanation: 'Inteligências Artificiais aprendem com dados históricos. Se o passado tinha preconceito ou falta de diversidade, a IA institucionaliza esse viés como regra sem auditoria humana contínua.'
+        didacticExplanation: 'A IA reorganiza padrões estatísticos do passado. O artista humano expressa a alma, a cultura e a experiência viva. A IA é um pincel inteligente, o criador é o humano!'
       },
       {
         id: 36,
         module: 3,
         phase: 5,
-        category: 'Ética & Sociedade',
-        badge: 'Descarte e E-Lixo',
-        title: 'Ciclo de Vida e Sustentabilidade de Robôs Velhos',
-        scenario: 'Uma montadora automotiva comprou 50 robôs novos e precisa dar destino a 50 braços robóticos com 15 anos de uso.',
-        details: [
-          { label: 'Composição', value: 'Cobre, ímãs de neodímio, placas eletrônicas e alumínio fundido', icon: '♻️' }
-        ],
-        question: 'Qual é o destino correto desses equipamentos segundo a Economia Circular?',
+        era: 'Era Digital',
+        badge: 'Big Data',
+        title: 'Análise de Milhões de Dados em Segundos (Big Data)',
+        historicalContext: 'Meteorologistas precisam prever a chegada de um furacão analisando dados de 5.000 estações meteorológicas, 50 satélites e boias marítimas simultaneamente.',
+        question: 'Por que os cientistas precisam de supercomputadores para esse trabalho?',
         options: [
-          { id: 'a', text: 'Remanufatura de peças, doação para centros de pesquisa/escolas técnicas e reciclagem certificada de metais pesados', isCorrect: true },
-          { id: 'b', text: 'Jogar tudo em um terreno baldio ou queimar para tirar o cobre com fumaça tóxica', isCorrect: false },
-          { id: 'c', text: 'Afundar os robôs no rio para servir de abrigo para peixes', isCorrect: false },
-          { id: 'd', text: 'Enterrar no pátio da fábrica sem nenhum isolamento do solo', isCorrect: false }
+          { id: 'a', text: 'Porque um cérebro humano levaria centenas de anos para calcular à mão tantas variáveis de vento, pressão e temperatura', isCorrect: true },
+          { id: 'b', text: 'Porque os meteorologistas têm preguiça de olhar pela janela', isCorrect: false },
+          { id: 'c', text: 'Porque o furacão só se move quando o computador manda', isCorrect: false },
+          { id: 'd', text: 'Porque os satélites só funcionam se tiverem jogos instalados', isCorrect: false }
         ],
-        explanation: 'Equipamentos de automação contêm metais nobres e terras raras valiosas, além de componentes poluentes. O descarte ecológico correto envolve desmontagem técnica e reaproveitamento.'
+        didacticExplanation: 'O Big Data é a capacidade de processar volumes monumentais de informação em segundos, permitindo que governos evacuem cidades costeiras e salvem milhares de vidas.'
       },
       {
         id: 37,
         module: 3,
         phase: 6,
-        category: 'Ética & Sociedade',
-        badge: 'Cibersegurança',
-        title: 'Ataque Hacker a Redes de Automação (Stuxnet)',
-        scenario: 'Um sistema de controle SCADA de uma usina hidrelétrica foi infectado por um malware que tenta acelerar as turbinas sem limites.',
-        details: [
-          { label: 'Alvo', value: 'Controladores Lógicos Programáveis (CLPs) industriais', icon: '💻' },
-          { label: 'Risco', value: 'Ruptura física de tubulações de alta pressão', icon: '💥' }
-        ],
-        question: 'Qual princípio de arquitetura de segurança industrial protege a usina contra hackers?',
+        era: 'Era Digital',
+        badge: 'Decisão Ética',
+        title: 'O Limite da Máquina: Julgamento Moral e Justiça',
+        historicalContext: 'Um tribunal estuda usar um software para decidir se uma pessoa acusada de furto de alimento deve ir para a prisão ou receber assistência social.',
+        question: 'Por que juristas e filósofos alertam que um algoritmo NUNCA deve dar a sentença final?',
         options: [
-          { id: 'a', text: 'Isolamento de rede com Air-Gap, redundância física de freios mecânicos e autenticação forte com chaveiro criptográfico', isCorrect: true },
-          { id: 'b', text: 'Conectar todos os robôs industriais ao Wi-Fi público sem senha para facilitar acesso', isCorrect: false },
-          { id: 'c', text: 'Usar a senha padrão `admin123` em todos os computadores de comando', isCorrect: false },
-          { id: 'd', text: 'Desligar os antivírus para o computador da fábrica rodar mais rápido', isCorrect: false }
+          { id: 'a', text: 'Porque a máquina não compreende o contexto humano, a dignidade, o arrependimento e pode carregar preconceitos ocultos nos dados históricos', isCorrect: true },
+          { id: 'b', text: 'Porque os computadores não sabem ler palavras escritas em português', isCorrect: false },
+          { id: 'c', text: 'Porque o réu pode roubar o teclado do computador do juiz', isCorrect: false },
+          { id: 'd', text: 'Porque a eletricidade do tribunal é muito cara', isCorrect: false }
         ],
-        explanation: 'A segurança cibernética em infraestruturas críticas exige que sistemas de controle industrial não fiquem expostos à internet pública (redes isoladas) e tenham travas físicas analógicas independentes.'
+        didacticExplanation: 'A justiça não é uma equação matemática fria. Ela exige bom senso, empatia, escuta e compreensão da história de vida — atributos exclusivos da consciência humana.'
       },
       {
         id: 38,
         module: 3,
         phase: 7,
-        category: 'Ética & Sociedade',
-        badge: 'Veículo Autônomo',
-        title: 'O Dilema do Bonde (Trolley Problem) na Vida Real',
-        scenario: 'Um carro autônomo em pista molhada sofre aquaplanagem e não tem espaço de frenagem suficiente.',
-        details: [
-          { label: 'Cenário', value: 'Obstáculo intransponível à frente ou desvio em direção a poste lateral', icon: '🚗' }
-        ],
-        question: 'Como os comitês de ética em engenharia de tráfego determinam o comportamento dos algoritmos?',
+        era: 'Era Digital',
+        badge: 'Educação Digital',
+        title: 'O Papel do Professor na Era dos Vídeos e Tutoriais',
+        historicalContext: 'Hoje qualquer aluno pode assistir a vídeos no YouTube ou perguntar dúvidas para uma inteligência artificial em segundos.',
+        question: 'Diante de tanta informação disponível na internet, por que a figura do professor é mais importante do que nunca?',
         options: [
-          { id: 'a', text: 'Minimização do dano com desaceleração contínua máxima, sem julgar o valor ou idade de vidas humanas', isCorrect: true },
-          { id: 'b', text: 'A IA deve escolher bater na pessoa que tiver menos dinheiro ou seguidores', isCorrect: false },
-          { id: 'c', text: 'O carro deve proteger o dono do veículo a qualquer custo, mesmo ferindo pedestres', isCorrect: false },
-          { id: 'd', text: 'O algoritmo deve sortear uma direção jogando uma moeda virtual', isCorrect: false }
+          { id: 'a', text: 'Porque o professor ensina a pensar criticamente, a filtrar verdades de mentiras, inspira valores éticos e apoia o aluno em seus momentos de dificuldade', isCorrect: true },
+          { id: 'b', text: 'Porque os computadores odeiam ensinar crianças', isCorrect: false },
+          { id: 'c', text: 'Porque as escolas precisam de alguém para apagar a lousa de giz', isCorrect: false },
+          { id: 'd', text: 'Porque os vídeos do YouTube são todos falsificados por robôs', isCorrect: false }
         ],
-        explanation: 'As diretrizes internacionais proíbem que carros autônomos façam discriminação de pessoas por perfil. A regra ética fundamental é aplicar força de frenagem máxima na trajetória prevista de menor energia.'
+        didacticExplanation: 'Informação não é sabedoria! Ter dados no celular não significa saber usá-los para o bem. O educador é o mentor que guia o estudante a transformar dados em cidadania e conhecimento real.'
       },
       {
         id: 39,
         module: 3,
         phase: 8,
-        category: 'Ética & Sociedade',
-        badge: 'Exploração Espacial',
-        title: 'Proteção Planetária em Missões Espaciais',
-        scenario: 'Uma sonda robótica vai pousar em Europa (lua de Júpiter), onde existe um oceano líquido subterrâneo que pode conter vida microbiana.',
-        details: [
-          { label: 'Diretriz COSPAR', value: 'Proteção Planetária Classe IV', icon: '🪐' }
-        ],
-        question: 'Por que os robôs espaciais são desinfetados com calor e radiação antes do lançamento?',
+        era: 'Era Digital',
+        badge: 'Segurança e Manutenção',
+        title: 'Quem Cuida das Máquinas quando Elas Falham?',
+        historicalContext: 'Em uma fábrica totalmente robotizada, um rolamento aquece, um sensor quebra ou um cabo se rompe e toda a linha de produção para.',
+        question: 'Quem é essencial para diagnosticar problemas inesperados e manter os sistemas funcionando?',
         options: [
-          { id: 'a', text: 'Para evitar que bactérias da Terra contaminem o oceano extraterrestre e matem ou mascarem vida alienígena nativa', isCorrect: true },
-          { id: 'b', text: 'Para que as fotos tiradas pela câmera fiquem mais nítidas e brilhantes', isCorrect: false },
-          { id: 'c', text: 'Para a sonda não pegar chuva durante a viagem de foguete', isCorrect: false },
-          { id: 'd', text: 'Para o metal do robô não enferrujar no vácuo do espaço', isCorrect: false }
+          { id: 'a', text: 'Técnicos e engenheiros humanos de manutenção e mecatrônica com raciocínio investigativo apurado', isCorrect: true },
+          { id: 'b', text: 'Ninguém, as máquinas se consertam por mágica sem peças de reposição', isCorrect: false },
+          { id: 'c', text: 'A fábrica deve ser jogada no lixo e reconstruída do zero', isCorrect: false },
+          { id: 'd', text: 'Basta desligar a luz que o robô cura seus circuitos sozinho', isCorrect: false }
         ],
-        explanation: 'O protocolo ético de Proteção Planetária visa preservar mundos intocados. Se levarmos micróbios terrestres resistentes, podemos destruir ecossistemas biológicos antes mesmo de conhecê-los.'
+        didacticExplanation: 'Quanto mais tecnologia uma sociedade tem, mais necessários são os profissionais capacitados para instalar, calibrar, programar, proteger contra hackers e consertar o maquinário.'
       },
       {
         id: 40,
         module: 3,
         phase: 9,
-        category: 'Ética & Sociedade',
-        badge: 'Trabalho do Futuro',
-        title: 'O Papel do Engenheiro Humano no Futuro Automatizado',
-        scenario: 'Se os robôs montam carros, separam remédios e pilotam aviões, o que os humanos farão?',
-        details: [
-          { label: 'Competências do Século XXI', value: 'Criatividade, Empatia, Filosofia e Arquitetura de Sistemas', icon: '🧠' }
-        ],
-        question: 'Qual área do conhecimento humano se torna MAIS valiosa com o avanço da robótica?',
+        era: 'Era Digital',
+        badge: 'Síntese da Cooperação',
+        title: 'A Grande Síntese: Humanos + Tecnologia',
+        historicalContext: 'Kasparov, campeão mundial de xadrez que perdeu para o supercomputador Deep Blue, descobriu mais tarde que uma equipe de "Humano mediano + Computador mediano" vencia tanto o melhor humano sozinho quanto o melhor computador sozinho!',
+        question: 'O que esse fenômeno histórico comprovou sobre o futuro do trabalho?',
         options: [
-          { id: 'a', text: 'Pensamento crítico, resolução de problemas inéditos, ética e trabalho em equipe colaborativo', isCorrect: true },
-          { id: 'b', text: 'Decorar números de telefone de memória sem usar internet', isCorrect: false },
-          { id: 'c', text: 'Trabalhar 24 horas por dia sem dormir igual a uma máquina elétrica', isCorrect: false },
-          { id: 'd', text: 'Fazer contas de multiplicação simples com lápis mais rápido que uma calculadora', isCorrect: false }
+          { id: 'a', text: 'A maior força de produtividade e inteligência nasce da PARCERIA colaborativa entre o cérebro humano e o poder de processamento da máquina', isCorrect: true },
+          { id: 'b', text: 'Humanos e computadores devem ser inimigos eternos em guerra constante', isCorrect: false },
+          { id: 'c', text: 'O ser humano deve parar de aprender para deixar o computador pensar por ele', isCorrect: false },
+          { id: 'd', text: 'Os jogos de computador deveriam ser banidos das escolas', isCorrect: false }
         ],
-        explanation: 'Máquinas são excelentes em tarefas repetitivas, velocidade de cálculo e precisão milimétrica. O que torna os humanos insubstituíveis é a imaginação, a empatia e o discernimento ético.'
+        didacticExplanation: 'Essa é a regra de ouro da tecnologia moderna: a inteligência combinada (Inteligência Aumentada) é sempre superior ao isolamento. A máquina é a alavanca da mente humana!'
       }
     ],
 
-    // MÓDULO 5: Programação de Rota e Otimização com Loops
+    // MÓDULO 5: O Futuro do Trabalho e as Novas Profissões
     [
       {
         id: 41,
         module: 4,
         phase: 0,
-        category: 'Rotas & Algoritmos',
-        badge: 'Armazém Logístico',
-        title: 'Trajetória em Linha Reta com Coleta',
-        scenario: 'Um robô móvel AGV precisa andar por um corredor de 6 metros, coletando 1 pacote a cada metro.',
-        details: [
-          { label: 'Meta de Otimização', value: 'Não repetir comandos manualmente', icon: '📦' }
-        ],
-        question: 'Qual algoritmo compacto em blocos resolve a tarefa no menor número de linhas?',
+        era: 'Profissões do Futuro',
+        badge: 'Inteligência Artificial',
+        title: 'Engenheiro(a) de Prompts e Curador de IA',
+        historicalContext: 'Profissionais especializados em formular instruções precisas, semânticas e contextuais para que modelos de IA gerem diagnósticos, códigos e soluções científicas sem alucinações.',
+        question: 'Qual habilidade fundamental um(a) Engenheiro(a) de Prompts precisa ter?',
         options: [
-          { id: 'a', text: 'REPITA 6 VEZES { avancar(1m); coletar_pacote(); }', isCorrect: true },
-          { id: 'b', text: 'avancar(6m); coletar_pacote(); // Só coleta o último!', isCorrect: false },
-          { id: 'c', text: 'coletar_pacote(); avancar(6m); // Coleta sem andar', isCorrect: false },
-          { id: 'd', text: 'REPITA 1 VEZ { avancar(6m); girar(360); }', isCorrect: false }
+          { id: 'a', text: 'Domínio profundo da língua, lógica rigorosa, clareza de pensamento e capacidade de testar hipóteses com senso crítico', isCorrect: true },
+          { id: 'b', text: 'Falar apenas em código binário (zeros e uns) com a tela', isCorrect: false },
+          { id: 'c', text: 'Saber digitar sem olhar para o teclado com luvas de ferro', isCorrect: false },
+          { id: 'd', text: 'Apertar a tecla ENTER o mais forte possível', isCorrect: false }
         ],
-        explanation: 'O laço `REPITA 6 VEZES` executa o par de comandos (andar 1m e pegar pacote) seis vezes consecutivas, garantindo que nenhum item fique para trás com código limpo.'
+        didacticExplanation: 'Para extrair o melhor de uma IA, é preciso saber fazer as perguntas certas! A clareza de comunicação e o raciocínio analítico são as maiores ferramentas dessa nova profissão.'
       },
       {
         id: 42,
         module: 4,
         phase: 1,
-        category: 'Rotas & Algoritmos',
-        badge: 'Padrão Quadrado',
-        title: 'Patrulha Perimetral em Circuito Fechado',
-        scenario: 'O robô vigia deve patrulhar as 4 laterais de um galpão quadrado de 10 metros e voltar ao ponto de partida.',
-        details: [
-          { label: 'Geometria', value: 'Polígono regular de 4 lados iguais e ângulos de 90°', icon: '⏹️' }
-        ],
-        question: 'Qual é o programa ótimo para completar a volta de patrulha?',
+        era: 'Profissões do Futuro',
+        badge: 'Ciberdefesa',
+        title: 'Especialista em Cibersegurança e Defesa Digital',
+        historicalContext: 'Com hospitais, bancos e cidades conectados em rede, criminosos virtuais tentam invadir sistemas para sequestrar dados ou paralisar serviços essenciais.',
+        question: 'Qual é a missão diária de um(a) especialista em cibersegurança?',
         options: [
-          { id: 'a', text: 'REPITA 4 VEZES { avancar(10m); girar_direita(90); }', isCorrect: true },
-          { id: 'b', text: 'REPITA 3 VEZES { avancar(10m); girar_direita(90); }', isCorrect: false },
-          { id: 'c', text: 'REPITA 4 VEZES { avancar(10m); girar_direita(180); }', isCorrect: false },
-          { id: 'd', text: 'avancar(40m); girar_direita(90);', isCorrect: false }
+          { id: 'a', text: 'Descobrir vulnerabilidades antes dos criminosos, implementar criptografia forte e proteger a privacidade dos cidadãos', isCorrect: true },
+          { id: 'b', text: 'Espalhar vírus em todos os computadores da escola', isCorrect: false },
+          { id: 'c', text: 'Postar as senhas dos diretores de hospitais na internet', isCorrect: false },
+          { id: 'd', text: 'Proibir as pessoas de usarem computadores', isCorrect: false }
         ],
-        explanation: 'Um quadrado possui 4 lados de 10m e 4 curvas de 90° (4 x 90° = 360°, voltando à orientação original).'
+        didacticExplanation: 'São os guardiões do mundo digital! Eles usam matemática avançada e análise comportamental para proteger redes elétricas, satélites e prontuários médicos contra ataques.'
       },
       {
         id: 43,
         module: 4,
         phase: 2,
-        category: 'Rotas & Algoritmos',
-        badge: 'Desvio de Obstáculo',
-        title: 'Manobra de Contorno de Estante Bloqueada',
-        scenario: 'O robô está em frente a uma estante que caiu bloqueando o corredor direto.',
-        details: [
-          { label: 'Obstáculo', value: 'Bloqueio de 2 metros à frente', icon: '🚧' },
-          { label: 'Desvio Seguro', value: 'Corredor lateral livre à esquerda', icon: '↩️' }
-        ],
-        question: 'Qual algoritmo em zigue-zague desvia do obstáculo e retoma a rota original?',
+        era: 'Profissões do Futuro',
+        badge: 'Aeroespacial & Campo',
+        title: 'Operador(a) e Piloto de Drones de Alta Precisão',
+        historicalContext: 'Drones realizam reflorestamento lançando sementes inteligentes em áreas desmatadas e entregam bolsas de sangue em aldeias ribeirinhas isoladas.',
+        question: 'O que essa nova profissão exige do operador além de saber pilotar pelo controle?',
         options: [
-          { id: 'a', text: 'girar_esquerda(90) → avancar(2m) → girar_direita(90) → avancar(4m) → girar_direita(90) → avancar(2m) → girar_esquerda(90)', isCorrect: true },
-          { id: 'b', text: 'avancar(4m) direto através da estante de metal', isCorrect: false },
-          { id: 'c', text: 'girar_esquerda(180) → voltar_para_a_casa_inicial()', isCorrect: false },
-          { id: 'd', text: 'girar_direita(90) → avancar(50m) sem parar', isCorrect: false }
+          { id: 'a', text: 'Conhecimento de meteorologia, leitura de sensores multiespectrais, manutenção mecatrônica e legislação do espaço aéreo', isCorrect: true },
+          { id: 'b', text: 'Saber atirar pedras em outros drones no ar', isCorrect: false },
+          { id: 'c', text: 'Voar apenas com os olhos vendados', isCorrect: false },
+          { id: 'd', text: 'Pintar o drone com glitter brilhante', isCorrect: false }
         ],
-        explanation: 'Essa manobra contorna o obstáculo pela esquerda, ultrapassa-o na paralela e retorna ao alinhamento do corredor original mantendo a orientação inicial.'
+        didacticExplanation: 'Pilotar drones profissionais é uma carreira técnica que une aviação, agronomia, geografia e robótica para salvar vidas e restaurar biomas degradados.'
       },
       {
         id: 44,
         module: 4,
         phase: 3,
-        category: 'Rotas & Algoritmos',
-        badge: 'Varredura Zig-Zag',
-        title: 'Mapeamento Completo de Terreno (Lawnmower Pattern)',
-        scenario: 'O drone agrícola precisa cobrir uma área retangular de 3 faixas paralelas para tirar fotos de alta resolução.',
-        details: [
-          { label: 'Padrão', value: 'Vai pela faixa 1, vira, volta pela faixa 2, vira, vai pela faixa 3', icon: '🌾' }
-        ],
-        question: 'Qual algoritmo realiza essa varredura sem deixar áreas sem fotografar?',
+        era: 'Profissões do Futuro',
+        badge: 'Sustentabilidade',
+        title: 'Engenheiro(a) de Energias Renováveis e Cidades Inteligentes',
+        historicalContext: 'Cidades modernas gerenciam painéis solares, usinas eólicas e carros elétricos por meio de redes inteligentes (Smart Grids) para zerar a emissão de carbono.',
+        question: 'Qual é o papel desse profissional no combate às mudanças climáticas?',
         options: [
-          { id: 'a', text: 'avancar(100m) → girar_dir(90) → avancar(10m) → girar_dir(90) → avancar(100m) → girar_esq(90) → avancar(10m) → girar_esq(90) → avancar(100m)', isCorrect: true },
-          { id: 'b', text: 'avancar(300m) em círculos concêntricos fechados', isCorrect: false },
-          { id: 'c', text: 'REPITA 10 VEZES { girar_dir(360); }', isCorrect: false },
-          { id: 'd', text: 'ficar parado no mesmo ponto tirando 100 fotos do mesmo chão', isCorrect: false }
+          { id: 'a', text: 'Projetar sistemas automatizados que aproveitem a energia limpa do sol e dos ventos sem desperdício e com armazenamento em baterias', isCorrect: true },
+          { id: 'b', text: 'Queimar mais carvão mineral para fazer fumaça', isCorrect: false },
+          { id: 'c', text: 'Desligar a eletricidade de todos os hospitais do mundo', isCorrect: false },
+          { id: 'd', text: 'Pintar os telhados de preto para esquentar o planeta', isCorrect: false }
         ],
-        explanation: 'O padrão "cortador de grama" alterna curvas para a direita e para a esquerda entre as passadas paralelas, cobrindo 100% da superfície de forma geométrica.'
+        didacticExplanation: 'A transição para energia limpa depende de algoritmos e automação: saber a que hora direcionar energia solar das casas para a rede exige engenharia digital de ponta!'
       },
       {
         id: 45,
         module: 4,
         phase: 4,
-        category: 'Rotas & Algoritmos',
-        badge: 'Loops Aninhados',
-        title: 'Preenchimento de Grade 3x3 com Loops Aninhados',
-        scenario: 'Um braço robótico de impressão 3D precisa depositar pontos de solda em uma matriz de 3 linhas por 3 colunas.',
-        details: [
-          { label: 'Total de Pontos', value: '9 pontos de solda espaçados em 5 cm', icon: '🖨️' }
-        ],
-        question: 'Qual estrutura de laços aninhados realiza a tarefa com perfeição matemática?',
+        era: 'Profissões do Futuro',
+        badge: 'Ética Digital',
+        title: 'Auditor(a) de Ética Algorítmica e Direitos Digitais',
+        historicalContext: 'Bancos e empresas usam algoritmos para conceder empréstimos, selecionar empregados e ranquear notícias nas redes sociais.',
+        question: 'O que faz um(a) Auditor(a) de Ética de Algoritmos?',
         options: [
-          { id: 'a', text: 'REPITA 3 VEZES (para cada linha) { REPITA 3 VEZES (para cada coluna) { soldar_ponto(); avancar_coluna(5cm); } descer_linha(5cm); voltar_ao_inicio_da_linha(); }', isCorrect: true },
-          { id: 'b', text: 'REPITA 9 VEZES { soldar_ponto(); descer_linha(100m); }', isCorrect: false },
-          { id: 'c', text: 'soldar_ponto(); avancar_coluna(45cm); // Só faz 1 ponto', isCorrect: false },
-          { id: 'd', text: 'REPITA 1 VEZ { soldar_tudo_de_uma_vez(); }', isCorrect: false }
+          { id: 'a', text: 'Verifica se os códigos de computador não contêm preconceitos ocultos, viés discriminatório ou manipulação nociva aos cidadãos', isCorrect: true },
+          { id: 'b', text: 'Ensina os computadores a insultarem as pessoas na internet', isCorrect: false },
+          { id: 'c', text: 'Apaga todas as redes sociais para ninguém se comunicar', isCorrect: false },
+          { id: 'd', text: 'Garante que os robôs dominem o mundo sem regras', isCorrect: false }
         ],
-        explanation: 'Loops aninhados (um laço de repetição dentro de outro) são a base de varredura bidimensional em matrizes, processamento de imagens e fabricação digital.'
+        didacticExplanation: 'Essa carreira une Direito, Filosofia e Ciência da Computação para garantir que a tecnologia sirva à justiça social e respeite a dignidade e a diversidade humana.'
       },
       {
         id: 46,
         module: 4,
         phase: 5,
-        category: 'Rotas & Algoritmos',
-        badge: 'Sensor como Gatilho',
-        title: 'Avançar até Parede e Virar',
-        scenario: 'O robô não sabe o tamanho exato da sala (armazém dinâmico com caixas móveis).',
-        details: [
-          { label: 'Instrução Condicional', value: 'Não usar distância fixa em metros', icon: '📏' }
-        ],
-        question: 'Qual estrutura baseada em eventos sensoriais é a mais segura?',
+        era: 'Profissões do Futuro',
+        badge: 'Saúde Avançada',
+        title: 'Desenvolvedor(a) de Próteses Biônicas e Exoesqueletos',
+        historicalContext: 'Pessoas com deficiência física e operários que carregam peso usam exoesqueletos robóticos e mãos biônicas que leem impulsos elétricos cerebrais.',
+        question: 'Qual campo interdisciplinar combina biologia, medicina e robótica nessa área?',
         options: [
-          { id: 'a', text: 'REPITA_ATE_QUE (sensor_distancia < 20cm) { avancar(10cm); } girar_direita(90);', isCorrect: true },
-          { id: 'b', text: 'avancar(1000m); // Anda às cegas rezando para não bater', isCorrect: false },
-          { id: 'c', text: 'girar_direita(90); esperar_30_segundos();', isCorrect: false },
-          { id: 'd', text: 'REPITA 500 VEZES { avancar(100m); desligar_sensores(); }', isCorrect: false }
+          { id: 'a', text: 'A Engenharia Biomédica e Biomecatrônica, que une eletrodos neurais à mecânica fina de motores e polímeros flexíveis', isCorrect: true },
+          { id: 'b', text: 'A confecção de sapatos de madeira pesada', isCorrect: false },
+          { id: 'c', text: 'O estudo de fósseis de dinossauros extintos', isCorrect: false },
+          { id: 'd', text: 'A pintura manual com giz de cera', isCorrect: false }
         ],
-        explanation: 'O laço condicional `REPITA_ATE_QUE` (ou `WHILE NOT`) permite navegação adaptativa em ambientes desconhecidos, parando assim que o sensor detectar aproximação da parede.'
+        didacticExplanation: 'A robótica reabilitativa devolve a marcha e o movimento para pessoas que perderam membros, permitindo que voltem a abraçar, caminhar e trabalhar com autonomia.'
       },
       {
         id: 47,
         module: 4,
         phase: 6,
-        category: 'Rotas & Algoritmos',
-        badge: 'Otimização Dijkstra',
-        title: 'Cálculo do Caminho Mais Curto (Shortest Path)',
-        scenario: 'O robô no ponto A precisa chegar ao ponto B. Existem duas rotas possíveis no mapa fabril.',
-        details: [
-          { label: 'Rota 1 (Pelo Pátio Externo)', value: '12 metros, sem pedestres, velocidade 2 m/s (Tempo: 6 segundos)', icon: '🟢' },
-          { label: 'Rota 2 (Pelo Corredor Interno)', value: '6 metros, tráfego intenso de empilhadeiras, velocidade 0,5 m/s (Tempo: 12 segundos)', icon: '🔴' }
-        ],
-        question: 'Se o objetivo do algoritmo A* (A-Star) é entregar a peça no MENOR TEMPO:',
+        era: 'Profissões do Futuro',
+        badge: 'Economia Circular',
+        title: 'Especialista em Mineração Urbana e E-Lixo',
+        historicalContext: 'Milhões de celulares e computadores são descartados por ano. Um smartphone contém ouro, prata, cobre, platina e lítio em proporções maiores que uma mina mineral no solo.',
+        question: 'O que o(a) especialista em mineração urbana faz para proteger a natureza?',
         options: [
-          { id: 'a', text: 'Escolher a Rota 1 (Pátio Externo), pois gasta 6 segundos contra 12 segundos da Rota 2', isCorrect: true },
-          { id: 'b', text: 'Escolher a Rota 2 apenas porque a distância em metros é menor, ignorando a lentidão', isCorrect: false },
-          { id: 'c', text: 'Ficar parado entre as duas rotas esperando as empilhadeiras irem embora', isCorrect: false },
-          { id: 'd', text: 'Andar de marcha à ré na Rota 2', isCorrect: false }
+          { id: 'a', text: 'Desenvolve robôs de desmontagem automatizada para recuperar metais nobres de placas velhas e reintroduzi-los na indústria', isCorrect: true },
+          { id: 'b', text: 'Joga os aparelhos eletrônicos velhos dentro dos rios e oceanos', isCorrect: false },
+          { id: 'c', text: 'Queima pilhas e baterias em fogueiras no quintal de casa', isCorrect: false },
+          { id: 'd', text: 'Enterra celulares com lixo orgânico na terra úmida', isCorrect: false }
         ],
-        explanation: 'Em algoritmos de roteamento inteligentes (como o GPS ou robôs de armazém), o peso das arestas do grafo leva em conta o tempo de viagem (custo real) e não apenas a distância geométrica pura.'
+        didacticExplanation: 'A Economia Circular e a robótica de reciclagem evitam a devastação de florestas para minerar metais raros, extraindo matérias-primas direto do lixo eletrônico descartado.'
       },
       {
         id: 48,
         module: 4,
         phase: 7,
-        category: 'Rotas & Algoritmos',
-        badge: 'Docking Automatizado',
-        title: 'Acoplamento Preciso na Estação de Recarga',
-        scenario: 'A bateria do robô atingiu 10%. Ele localizou a estação de recarga por um farol infravermelho.',
-        details: [
-          { label: 'Alinhamento Fino', value: 'Os pinos de contato elétrico exigem precisão milimétrica de ±2 mm', icon: '🔌' }
-        ],
-        question: 'Qual é o algoritmo de aproximação final que evita danos aos conectores?',
+        era: 'Profissões do Futuro',
+        badge: 'Realidade Virtual',
+        title: 'Arquiteto(a) de Mundos Virtuais e Ambientes Imersivos',
+        historicalContext: 'Médicos treinam cirurgias complexas, bombeiros simulam resgates em chamas e estudantes visitam o interior de células humanas em Realidade Virtual (VR).',
+        question: 'Por que o treinamento de profissionais em simuladores virtuais 3D revolucionou o aprendizado?',
         options: [
-          { id: 'a', text: 'Reduzir velocidade para 0,05 m/s → Alinhar mira laser com o alvo → Inserir contato com monitoramento de corrente elétrica', isCorrect: true },
-          { id: 'b', text: 'Acelerar a 10 m/s para bater com força na tomada e travar no impacto', isCorrect: false },
-          { id: 'c', text: 'Desligar os freios a 5 metros de distância e deixar o robô deslizar solto', isCorrect: false },
-          { id: 'd', text: 'Girar em círculo contínuo soltando faíscas até encostar', isCorrect: false }
+          { id: 'a', text: 'Permite errar, testar e aperfeiçoar habilidades complexas centenas de vezes com segurança total antes de agir no mundo real', isCorrect: true },
+          { id: 'b', text: 'Porque os simuladores são apenas para jogar videogame e não ensinam nada sério', isCorrect: false },
+          { id: 'c', text: 'Porque aprender na vida real sem treino nunca causou nenhum acidente', isCorrect: false },
+          { id: 'd', text: 'Porque a realidade virtual faz os bombeiros esquecerem como apagar fogo', isCorrect: false }
         ],
-        explanation: 'O docking autônomo (como nas naves espaciais da ISS e robôs industriais) utiliza controle de velocidade em rampa desacelerada e telemetria de precisão antes do contato elétrico de alta corrente.'
+        didacticExplanation: 'Pilotos de avião, cirurgiões e astronautas treinam em simuladores por meses. A simulação imersiva transforma o erro em aprendizado seguro e sem vítimas.'
       },
       {
         id: 49,
         module: 4,
         phase: 8,
-        category: 'Rotas & Algoritmos',
-        badge: 'Recursão em Labirinto',
-        title: 'Algoritmo de Mão Direita (Wall Following)',
-        scenario: 'O robô de busca está em um labirinto desconhecido sem mapa prévio e sem GPS.',
-        details: [
-          { label: 'Estratégia Clássica', value: 'Regra de Manter a Mão na Parede Direita', icon: '🧱' }
-        ],
-        question: 'Qual é o conjunto de regras do robô em cada cruzamento do labirinto?',
+        era: 'Profissões do Futuro',
+        badge: 'Educação para o Futuro',
+        title: 'Como se Preparar para as Profissões que Ainda Nem Existem?',
+        historicalContext: 'Estudos apontam que 65% das crianças que estão hoje na escola trabalharão em profissões que ainda não foram inventadas.',
+        question: 'Qual é a melhor preparação que um(a) estudante de 12 anos pode desenvolver hoje?',
         options: [
-          { id: 'a', text: 'SE (lado direito livre) ENTÃO virar_direita() SENÃO SE (frente livre) ENTÃO avancar() SENÃO virar_esquerda()', isCorrect: true },
-          { id: 'b', text: 'Escolher qualquer direção aleatória jogando dados no computador', isCorrect: false },
-          { id: 'c', text: 'Sempre virar para trás e voltar para a entrada do labirinto', isCorrect: false },
-          { id: 'd', text: 'Ficar buzinando parado no mesmo lugar', isCorrect: false }
+          { id: 'a', text: 'Aprender a aprender, ter curiosidade, desenvolver pensamento crítico, saber colaborar em equipe e dominar a cidadania digital', isCorrect: true },
+          { id: 'b', text: 'Decorar de memória listas telefônicas sem entender o que elas significam', isCorrect: false },
+          { id: 'c', text: 'Ter medo da tecnologia e se recusar a usar computadores', isCorrect: false },
+          { id: 'd', text: 'Acreditar em tudo o que vê nas redes sociais sem checar a fonte', isCorrect: false }
         ],
-        explanation: 'A regra da mão direita garante matematicamente a saída de qualquer labirinto com paredes conectadas (labirintos simplesmente conexos), priorizando sempre virar à direita quando houver abertura.'
+        didacticExplanation: 'Ferramentas mudam a cada 5 anos. Quem aprende a pensar criticamente, a ter curiosidade científica e a trabalhar com empatia estará pronto para qualquer profissão do futuro!'
       },
       {
         id: 50,
         module: 4,
         phase: 9,
-        category: 'Rotas & Algoritmos',
-        badge: 'O Grande Mestre',
-        title: 'Missão Final: Fábrica 100% Autônoma Sincronizada',
-        scenario: 'Desafio Master: Você deve despachar a frota inteira de robôs AGVs, braços de montagem e drones de entrega em perfeita harmonia.',
-        details: [
-          { label: 'Status da Rede', value: '50 máquinas conectadas via 5G Industrial e IoT', icon: '🌐' },
-          { label: 'Critério de Vitória', value: 'Zero acidentes, 100% de eficiência e sincronização total', icon: '🏆' }
-        ],
-        question: 'Qual é a regra de ouro que coroa o verdadeiro Engenheiro de Automação e Robótica?',
+        era: 'Profissões do Futuro',
+        badge: 'Grande Conclusão',
+        title: 'A Mensagem da Linha do Tempo do Trabalho',
+        historicalContext: 'Da enxada de pedra ao satélite em órbita, a história humana é a história de transformar o esforço biológico em inteligência, arte e colaboração social.',
+        question: 'Qual é a mensagem final que resume toda a evolução do trabalho humano?',
         options: [
-          { id: 'a', text: 'Automação inteligente combina código sem bugs, respeito à segurança humana e uso da tecnologia para melhorar a vida de todos na sociedade', isCorrect: true },
-          { id: 'b', text: 'Substituir todas as pessoas do mundo por robôs que nunca descansam nem sorriem', isCorrect: false },
-          { id: 'c', text: 'Fazer robôs que gastam o máximo de energia possível sem se importar com a natureza', isCorrect: false },
-          { id: 'd', text: 'Desligar a tecnologia e viver como na Idade da Pedra', isCorrect: false }
+          { id: 'a', text: 'A tecnologia não substitui o ser humano; ela transforma ferramentas, elimina o trabalho desumano e abre caminhos para criarmos um futuro melhor!', isCorrect: true },
+          { id: 'b', text: 'O ser humano deve ser derrotado pelas máquinas e parar de existir', isCorrect: false },
+          { id: 'c', text: 'O trabalho manual de sofrimento extremo deveria voltar para todas as pessoas', isCorrect: false },
+          { id: 'd', text: 'A tecnologia é um erro e deveríamos viver sem eletricidade nem remédios', isCorrect: false }
         ],
-        explanation: 'Parabéns, Engenheiro(a)! A verdadeira robótica não é sobre substituir humanos, mas sobre construir sistemas inteligentes, seguros e sustentáveis que impulsionem o potencial da humanidade!'
+        didacticExplanation: 'Parabéns, Historiador(a) e Cientista do Futuro! Você completou os 50 desafios sobre A Evolução do Trabalho. Use a tecnologia com sabedoria, ética e empatia para construir um mundo mais justo para todos!'
       }
     ]
   ];
@@ -1132,7 +1149,7 @@ export class AutomationRoboticsEngineService {
               }
             }
           } catch (e) {
-            console.error('Error parsing automation-robotics session state', e);
+            console.error('Error parsing session state', e);
           }
         }
         this.state$.next({ ...this.state });
@@ -1143,7 +1160,7 @@ export class AutomationRoboticsEngineService {
     });
   }
 
-  getCurrentTask(): RoboticsTask | null {
+  getCurrentTask(): WorkEvolutionTask | null {
     if (this.state.module > 4) return null;
     return this.tasks[this.state.module]?.[this.state.phase] || null;
   }
@@ -1154,7 +1171,7 @@ export class AutomationRoboticsEngineService {
   }
 
   submitAnswer(isCorrect: boolean): boolean {
-    const reportLevelId = `automation-robotics-m${this.state.module + 1}-p${this.state.phase + 1}`;
+    const reportLevelId = `work-evolution-m${this.state.module + 1}-p${this.state.phase + 1}`;
     const reportFase = this.state.module * 10 + this.state.phase;
 
     if (isCorrect) {
@@ -1187,14 +1204,12 @@ export class AutomationRoboticsEngineService {
       return true;
     } else {
       this.state.hearts--;
-      let moduleRestarted = false;
 
       if (this.state.hearts <= 0) {
         // 3 hearts lost -> reset current module
         this.state.deathCount++;
         this.state.hearts = 3;
         this.state.phase = 0;
-        moduleRestarted = true;
       }
 
       this.state$.next({ ...this.state });

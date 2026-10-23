@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AutomationRoboticsEngineService, GameState, RoboticsTask } from './engine/automation-robotics-engine.service';
+import { AutomationRoboticsEngineService, GameState, WorkEvolutionTask } from './engine/automation-robotics-engine.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -12,23 +12,22 @@ import { Subscription } from 'rxjs';
 })
 export class AutomationRoboticsComponent implements OnInit, OnDestroy {
   state!: GameState;
-  currentTask: RoboticsTask | null = null;
+  currentTask: WorkEvolutionTask | null = null;
   private sub?: Subscription;
 
-  // Feedback states
   feedbackType: 'success' | 'error' | null = null;
   feedbackExplanation: string = '';
   selectedOptionId: string | null = null;
 
   moduleTitles = [
-    'Linha de Montagem Industrial',
-    'Sensores e Lógica Condicional',
-    'Inspetor de Código & Bugs',
-    'Indústria 4.0 & Ética',
-    'Programação de Rotas com Loops'
+    'A Era do Esforço Manual',
+    'Profissões que Mudaram ou Sumiram',
+    'A Linha do Tempo das Ferramentas',
+    'A Era Digital e os Robôs',
+    'O Futuro e as Novas Profissões'
   ];
 
-  moduleIcons = ['🏭', '🤖', '🐞', '🌐', '🧭'];
+  moduleIcons = ['🪵', '🏮', '⏳', '🤖', '🚀'];
 
   constructor(public engine: AutomationRoboticsEngineService) {}
 
@@ -55,7 +54,7 @@ export class AutomationRoboticsComponent implements OnInit, OnDestroy {
 
     this.selectedOptionId = option.id;
     const isCorrect = option.isCorrect;
-    this.feedbackExplanation = this.currentTask.explanation;
+    this.feedbackExplanation = this.currentTask.didacticExplanation;
 
     if (isCorrect) {
       this.feedbackType = 'success';
@@ -70,7 +69,7 @@ export class AutomationRoboticsComponent implements OnInit, OnDestroy {
         this.feedbackType = null;
         this.selectedOptionId = null;
         this.engine.submitAnswer(false);
-      }, 2200);
+      }, 2400);
     }
   }
 
@@ -81,7 +80,7 @@ export class AutomationRoboticsComponent implements OnInit, OnDestroy {
   }
 
   leaveRoom(): void {
-    if (confirm('Tem certeza que deseja sair da sala? Seu progresso nesta fase será interrompido.')) {
+    if (confirm('Tem certeza que deseja sair da sala? Seu progresso desta fase será interrompido.')) {
       sessionStorage.clear();
       window.location.href = '/';
     }

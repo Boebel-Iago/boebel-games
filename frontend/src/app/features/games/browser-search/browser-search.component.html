@@ -1,6 +1,15 @@
 
 <!-- Sair da Sala -->
-<button (click)="leaveRoom()" class="fixed top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-xl font-bold z-50 shadow-lg hover:bg-red-600 transition-colors border-2 border-red-700">🚪 Sair da Sala</button>
+<button (click)="leaveRoom()" class="fixed top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-xl font-bold z-50 shadow-lg hover:bg-red-600 transition-colors border-2 border-red-700 text-sm">🚪 Sair</button>
+
+<!-- Feedback Overlay -->
+<div *ngIf="feedbackType" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+  <div class="absolute inset-0" [ngClass]="feedbackType === 'success' ? 'bg-green-400/20' : 'bg-red-500/20'"></div>
+  <div class="relative text-9xl" [ngClass]="feedbackType === 'success' ? 'feedback-success' : 'feedback-error'">
+    {{ feedbackType === 'success' ? '✅' : '❌' }}
+  </div>
+</div>
+
 <ng-container *ngIf="gameState as state">
 <div class="game-container w-full h-full min-h-screen bg-blue-50 p-6 flex flex-col items-center font-sans text-gray-800">
   

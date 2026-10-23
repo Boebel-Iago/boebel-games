@@ -13,8 +13,11 @@ import { Subject, takeUntil } from 'rxjs';
 export class BrowserSearchComponent implements OnInit, OnDestroy {
   gameState: GameState | null = null;
   private destroy$ = new Subject<void>();
-  
   draggedItemId: string | null = null;
+
+  // Visual feedback
+  feedbackType: 'success' | 'error' | null = null;
+  private feedbackTimer: any;
 
   constructor(public engine: BrowserSearchEngineService) {}
 
@@ -25,16 +28,26 @@ export class BrowserSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearTimeout(this.feedbackTimer);
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  private showFeedback(type: 'success' | 'error', cb: () => void) {
+    this.feedbackType = type;
+    clearTimeout(this.feedbackTimer);
+    this.feedbackTimer = setTimeout(() => {
+      this.feedbackType = null;
+      cb();
+    }, type === 'success' ? 800 : 900);
+  }
+
   onTapOption(optionId: string) {
-    if (!this.gameState?.currentTask) return;
+    if (this.feedbackType || !this.gameState?.currentTask) return;
     const task = this.gameState.currentTask;
     if (task.type === 'tap') {
       const isCorrect = optionId === task.correctOptionId;
-      this.engine.submitAnswer(isCorrect);
+      this.showFeedback(isCorrect ? 'success' : 'error', () => this.engine.submitAnswer(isCorrect));
     }
   }
 
@@ -47,38 +60,29 @@ export class BrowserSearchComponent implements OnInit, OnDestroy {
   }
 
   onDragOver(event: DragEvent) {
-    event.preventDefault(); // Necessary to allow dropping
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
   }
 
   onDrop(event: DragEvent, dropZoneId: string, acceptsId: string) {
     event.preventDefault();
+    if (this.feedbackType || !this.gameState?.currentTask) return;
     const itemId = event.dataTransfer?.getData('text/plain') || this.draggedItemId;
-    if (!itemId || !this.gameState?.currentTask) return;
-
-    // Check if the drop zone accepts this item
+    if (!itemId) return;
     const isCorrect = acceptsId === itemId;
-    this.engine.submitAnswer(isCorrect);
-    this.draggedItemId = null;
+    this.showFeedback(isCorrect ? 'success' : 'error', () => {
+      this.engine.submitAnswer(isCorrect);
+      this.draggedItemId = null;
+    });
   }
 
-  retry() {
-    this.engine.retryModule();
-  }
-
-  reset() {
-    this.engine.resetGame();
-  }
+  retry() { this.engine.retryModule(); }
+  reset() { this.engine.resetGame(); }
 
   getModuleTitle(moduleIndex: number): string {
     const titles = [
-      '1: Palavras-chave',
-      '2: Menos é Mais',
-      '3: Fontes Confiáveis',
-      '4: Busca Exata',
-      '5: O Investigador'
+      '1: Palavras-chave', '2: Menos é Mais', '3: Fontes Confiáveis',
+      '4: Busca Exata', '5: O Investigador'
     ];
     return titles[moduleIndex] || '';
   }

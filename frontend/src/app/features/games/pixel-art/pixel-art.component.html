@@ -1,117 +1,218 @@
+<!-- 🚪 Sair da Sala -->
+<button (click)="leaveRoom()" class="fixed top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-xl font-bold z-50 shadow-lg hover:bg-red-600 transition-colors border-2 border-red-700 text-sm">🚪 Sair</button>
 
-<!-- Sair da Sala -->
-<button (click)="leaveRoom()" class="fixed top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-xl font-bold z-50 shadow-lg hover:bg-red-600 transition-colors border-2 border-red-700">🚪 Sair da Sala</button>
-<div class="min-h-screen bg-gray-900 text-white flex flex-col p-4 items-center font-sans">
-  
-  <div *ngIf="state.completed" class="text-center mt-20">
-    <h1 class="text-4xl font-bold text-green-400 mb-4">Você venceu todas as fases!</h1>
-    <button (click)="engine.resetGame()" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl text-xl font-bold shadow-lg">Jogar Novamente</button>
+<!-- ✅/❌ Feedback Overlay -->
+<div *ngIf="feedbackType" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+  <div class="absolute inset-0 transition-opacity"
+       [ngClass]="feedbackType === 'success' ? 'bg-green-400/25' : 'bg-red-500/25'"></div>
+  <div class="relative feedback-emoji"
+       [ngClass]="feedbackType === 'success' ? 'feedback-success' : 'feedback-error'">
+    {{ feedbackType === 'success' ? '⭐' : '💔' }}
+  </div>
+</div>
+
+<!-- Jogo concluído -->
+<div *ngIf="state?.completed" class="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center text-center p-8">
+  <div class="text-9xl mb-8 animate-bounce">🏆</div>
+  <h1 class="text-5xl font-extrabold text-yellow-400 mb-4">Parabéns!</h1>
+  <p class="text-2xl text-gray-300 mb-10">Você completou todos os módulos!</p>
+  <button (click)="engine.resetGame()" class="bg-blue-500 hover:bg-blue-600 px-8 py-4 rounded-2xl text-2xl font-bold shadow-xl">🔄 Jogar Novamente</button>
+</div>
+
+<!-- Jogo em andamento -->
+<div *ngIf="state && !state.completed && currentTask" class="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 font-sans">
+
+  <!-- Header -->
+  <div class="w-full max-w-4xl flex justify-between items-center bg-gray-800 p-4 rounded-2xl mb-6 shadow-md border border-gray-700">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl">{{ moduleEmojis[state.module] }}</span>
+      <div>
+        <p class="text-sm text-gray-400">Módulo {{ state.module + 1 }} / 6</p>
+        <p class="text-xs text-gray-500">
+          {{ state.module < 5 ? ('Tarefa ' + (state.taskIndex + 1) + '/10') : ('Desenho ' + (state.taskIndex + 1) + '/15') }}
+        </p>
+      </div>
+    </div>
+    <div class="flex gap-2 text-2xl">
+      <span *ngFor="let full of heartsArray">{{ full ? '❤️' : '🖤' }}</span>
+    </div>
   </div>
 
-  <div *ngIf="!state.completed && currentTask" class="w-full max-w-4xl flex flex-col items-center">
-    
-    <!-- Header -->
-    <div class="w-full flex justify-between items-center bg-gray-800 p-4 rounded-2xl mb-8 shadow-md border border-gray-700">
-      <div>
-        <h2 class="text-xl font-bold text-blue-300">Módulo {{ state.module + 1 }}: {{ moduleNames[state.module] }}</h2>
-        <p class="text-gray-400">Tarefa {{ state.taskIndex + 1 }} / 10</p>
-      </div>
-      <div class="flex space-x-2 text-red-500 text-3xl">
-        <i *ngFor="let _ of [].constructor(state.hearts)" class="fas fa-heart drop-shadow-md"></i>
-        <i *ngFor="let _ of [].constructor(3 - state.hearts)" class="far fa-heart text-gray-600 drop-shadow-md"></i>
-      </div>
-    </div>
+  <div class="w-full max-w-4xl flex flex-col items-center">
 
-    <!-- Question -->
-    <h3 class="text-3xl font-extrabold text-center mb-8 drop-shadow-lg text-white">
-      {{ currentTask.question }}
-    </h3>
-
-    <!-- Módulo 1: Qual é a Cor? -->
-    <div *ngIf="currentTask.type === 'color'" class="grid grid-cols-2 gap-6 w-full max-w-md">
-      <div *ngFor="let opt of currentTask.data.options" 
-           (click)="handleColorTap(opt)"
-           class="h-32 rounded-3xl shadow-xl cursor-pointer border-4 border-gray-700 hover:scale-105 transition-transform"
-           [style.background-color]="opt.code">
-      </div>
-    </div>
-
-    <!-- Módulo 2: Padrão -->
-    <div *ngIf="currentTask.type === 'pattern'" class="w-full flex flex-col items-center">
-      <div class="flex space-x-4 mb-12">
-        <div *ngFor="let c of currentTask.data.pattern" 
-             class="w-20 h-20 rounded-xl shadow-md border-2 border-gray-600 flex items-center justify-center text-4xl"
-             [ngStyle]="{'background-color': c || '#374151'}">
-          <span *ngIf="!c">?</span>
+    <!-- ══════════════════════════════════════
+         MÓDULO 0 — Qual é a Cor?
+         Mostra o emoji gigante; criança toca a cor certa
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'color'">
+      <div class="text-9xl mb-8 animate-pulse select-none">{{ currentTask.emoji }}</div>
+      <div class="grid grid-cols-2 gap-6 w-full max-w-sm">
+        <div *ngFor="let opt of currentTask.data.options"
+             (click)="handleColorTap(opt)"
+             class="h-32 rounded-3xl shadow-xl cursor-pointer border-4 border-gray-700 hover:scale-105 active:scale-95 transition-transform"
+             [style.background-color]="opt.code">
         </div>
       </div>
-      
-      <div class="grid grid-cols-2 gap-6 w-full max-w-md">
-        <div *ngFor="let opt of currentTask.data.options" 
+    </ng-container>
+
+    <!-- ══════════════════════════════════════
+         MÓDULO 1 — Complete o Padrão
+         Sequência de cores com último bloco faltando
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'pattern'">
+      <div class="text-5xl mb-6">🔍</div>
+      <div class="flex gap-3 mb-10 items-center">
+        <div *ngFor="let c of currentTask.data.pattern"
+             class="w-16 h-16 rounded-xl border-4 flex items-center justify-center text-3xl font-bold"
+             [ngClass]="c ? 'border-gray-600' : 'border-dashed border-white animate-pulse'"
+             [style.background-color]="c || 'transparent'">
+          <span *ngIf="!c" class="text-white">❓</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-4">
+        <div *ngFor="let opt of currentTask.data.options"
              (click)="handlePatternTap(opt)"
-             class="h-24 rounded-2xl shadow-lg cursor-pointer border-4 border-gray-700 hover:scale-105 transition-transform"
+             class="w-20 h-20 rounded-2xl cursor-pointer border-4 border-gray-600 hover:scale-110 active:scale-95 transition-transform shadow-lg"
              [style.background-color]="opt">
         </div>
       </div>
-    </div>
+    </ng-container>
 
-    <!-- Módulo 3: Simetria -->
-    <div *ngIf="currentTask.type === 'symmetry'" class="w-full flex flex-col items-center">
-      
-      <div class="mb-8 w-24 h-24 rounded-xl shadow-lg cursor-grab border-4 border-white animate-pulse"
-           draggable="true" 
+    <!-- ══════════════════════════════════════
+         MÓDULO 2 — Simetria (Arrastar)
+         Arraste o bloco para o slot com seta piscando
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'symmetry'">
+      <div class="text-5xl mb-6">🪞</div>
+      <!-- Bloco arrastável -->
+      <div class="mb-8 w-24 h-24 rounded-2xl shadow-xl cursor-grab border-4 border-white animate-pulse select-none"
+           draggable="true"
            (dragstart)="onDragStart($event, {color: currentTask.data.dragColor})"
            [style.background-color]="currentTask.data.dragColor">
       </div>
-
+      <!-- Grade 3x3 -->
       <div class="grid grid-cols-3 gap-2 bg-gray-800 p-4 rounded-2xl">
         <div *ngFor="let cell of currentTask.data.grid; let i = index"
-             class="w-20 h-20 rounded-md border-2"
-             [ngClass]="cell ? 'border-gray-600' : 'border-dashed border-gray-500'"
+             class="w-20 h-20 rounded-xl border-2 flex items-center justify-center text-2xl"
+             [ngClass]="i === currentTask.data.targetIndex
+               ? 'border-dashed border-white animate-pulse'
+               : (cell ? 'border-gray-600' : 'border-gray-700')"
              [style.background-color]="cell || 'transparent'"
              (dragover)="onDragOver($event)"
              (drop)="onDropSymmetry($event, i)">
+          <span *ngIf="i === currentTask.data.targetIndex">⬇️</span>
         </div>
       </div>
-    </div>
+    </ng-container>
 
-    <!-- Módulo 4: Coordenadas -->
-    <div *ngIf="currentTask.type === 'coordinates'" class="w-full flex flex-col items-center">
-      <div class="grid grid-cols-3 gap-2 bg-gray-800 p-6 rounded-3xl shadow-xl relative">
-        <div *ngFor="let _ of [].constructor(currentTask.data.gridSize); let r = index" class="contents">
-          <div *ngFor="let _ of [].constructor(currentTask.data.gridSize); let c = index"
-               (click)="handleCoordinateTap(r, c)"
-               class="w-24 h-24 bg-gray-700 hover:bg-gray-600 rounded-lg cursor-pointer border-2 border-gray-600 flex items-center justify-center text-gray-500 text-sm">
-            {{r+1}},{{c+1}}
-          </div>
+    <!-- ══════════════════════════════════════
+         MÓDULO 3 — Complete a Grade (Visual)
+         Grade 3x3 com uma célula faltando; escolha a cor
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'grid'">
+      <div class="text-5xl mb-6">🎯</div>
+      <div class="grid grid-cols-3 gap-3 mb-10">
+        <div *ngFor="let cell of currentTask.data.grid; let i = index"
+             class="w-24 h-24 rounded-2xl flex items-center justify-center text-4xl border-4"
+             [ngClass]="i === currentTask.data.targetIdx
+               ? 'border-white border-dashed animate-pulse'
+               : 'border-transparent'"
+             [style.background-color]="cell || '#1f2937'">
+          <span *ngIf="i === currentTask.data.targetIdx">❓</span>
         </div>
       </div>
-    </div>
+      <!-- Opções de cor -->
+      <div class="flex gap-6">
+        <div *ngFor="let opt of currentTask.data.options"
+             (click)="handleGridTap(opt)"
+             class="w-20 h-20 rounded-2xl cursor-pointer border-4 border-gray-600 hover:scale-110 active:scale-95 transition-transform shadow-xl"
+             [style.background-color]="opt">
+        </div>
+      </div>
+    </ng-container>
 
-    <!-- Módulo 5: Pintor Digital -->
-    <div *ngIf="currentTask.type === 'painter'" class="w-full flex flex-col items-center">
-      <div class="flex space-x-8 mb-12">
+    <!-- ══════════════════════════════════════
+         MÓDULO 4 — Pintor (Visual Puro)
+         Arraste o blob para a zona de mesma cor
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'painter'">
+      <div class="text-5xl mb-6">🖌️</div>
+      <!-- Blobs arrastáveis -->
+      <div class="flex gap-8 mb-12">
         <div *ngFor="let drag of currentTask.data.draggables"
              draggable="true"
              (dragstart)="onDragStart($event, drag)"
-             class="w-24 h-24 rounded-full shadow-lg cursor-grab border-4 border-white"
+             class="w-24 h-24 rounded-full shadow-xl cursor-grab border-4 border-white hover:scale-110 active:scale-95 transition-transform select-none"
              [style.background-color]="drag.color">
         </div>
       </div>
-
-      <div class="flex space-x-8">
+      <!-- Zonas de destino (borda colorida) -->
+      <div class="flex gap-8">
         <div *ngFor="let zone of currentTask.data.zones"
              (dragover)="onDragOver($event)"
              (drop)="onDropPainter($event, zone.id)"
-             class="w-32 h-40 rounded-2xl border-4 border-dashed border-gray-500 flex flex-col items-center justify-center p-2"
-             [style.background-color]="painterMatches[zone.id] || 'transparent'">
-          <span class="text-xl font-bold bg-black bg-opacity-50 px-2 py-1 rounded" 
-                [ngClass]="painterMatches[zone.id] ? 'text-white' : 'text-gray-400'">
-            {{ zone.name }}
-          </span>
+             class="w-28 h-28 rounded-2xl border-8 border-dashed flex items-center justify-center text-4xl transition-all"
+             [ngClass]="painterMatches[zone.id] ? 'border-solid' : ''"
+             [style.border-color]="zone.color"
+             [style.background-color]="painterMatches[zone.id] || 'rgba(0,0,0,0.2)'">
+          <span *ngIf="!painterMatches[zone.id]">🎯</span>
         </div>
       </div>
-    </div>
+    </ng-container>
+
+    <!-- ══════════════════════════════════════
+         MÓDULO 5 — Pintar o Pixel Art 🎨
+         Grade 10x10 editável + paleta de cores
+    ══════════════════════════════════════ -->
+    <ng-container *ngIf="currentTask.type === 'drawing'">
+      <div class="text-6xl mb-2">{{ currentTask.emoji }}</div>
+      <p class="text-gray-300 text-lg mb-6 font-semibold">{{ currentTask.data.template.name }}</p>
+
+      <div class="flex flex-col md:flex-row gap-8 items-start justify-center w-full">
+
+        <!-- Preview alvo (miniatura) -->
+        <div class="flex flex-col items-center">
+          <p class="text-xs text-gray-500 mb-2 uppercase tracking-widest">Modelo</p>
+          <div class="grid bg-gray-800 border-2 border-gray-600 rounded-lg p-1"
+               style="grid-template-columns: repeat(10, 1fr); gap: 1px;">
+            <div *ngFor="let cell of currentTask.data.template.grid"
+                 class="w-4 h-4 rounded-sm"
+                 [style.background-color]="cell || '#374151'">
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade editável -->
+        <div class="flex flex-col items-center">
+          <p class="text-xs text-gray-500 mb-2 uppercase tracking-widest">✏️ Sua Arte</p>
+          <div class="grid bg-gray-800 border-2 border-blue-500 rounded-lg p-1"
+               style="grid-template-columns: repeat(10, 1fr); gap: 2px;">
+            <div *ngFor="let cell of drawnGrid; let i = index"
+                 (click)="drawCell(i)"
+                 class="w-8 h-8 rounded-sm cursor-pointer hover:opacity-80 border border-gray-700 transition-colors"
+                 [style.background-color]="cell || '#374151'">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Paleta de cores -->
+      <div class="flex gap-5 mt-8">
+        <div *ngFor="let color of currentTask.data.template.palette"
+             (click)="selectColor(color)"
+             class="w-14 h-14 rounded-full cursor-pointer border-4 transition-all hover:scale-110"
+             [ngClass]="selectedColor === color ? 'border-white scale-125 shadow-lg shadow-white/30' : 'border-gray-600'"
+             [style.background-color]="color">
+        </div>
+        <!-- Borracha -->
+        <div (click)="selectColor('transparent-erase')"
+             class="w-14 h-14 rounded-full cursor-pointer border-4 bg-gray-700 flex items-center justify-center text-2xl transition-all hover:scale-110"
+             [ngClass]="selectedColor === 'transparent-erase' ? 'border-white scale-125' : 'border-gray-600'">
+          🧹
+        </div>
+      </div>
+    </ng-container>
 
   </div>
 </div>

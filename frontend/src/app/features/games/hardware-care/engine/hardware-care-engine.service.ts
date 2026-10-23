@@ -91,21 +91,31 @@ export class HardwareCareEngineService {
   currentTaskIndex: number = 0;
 
   constructor(private progress: ProgressReporter) {
-    this.progress.fetchSessionState()?.subscribe(session => {
-      if (session) {
-        try {
-          this.state = JSON.parse(session);
-          // Ensure validity
-          if (this.state.module > 4) {
-            this.resetGame();
+    // Try to restore state from backend session; always initialize the module
+    const sessionObs = this.progress.fetchSessionState();
+    if (sessionObs) {
+      sessionObs.subscribe({
+        next: (session: any) => {
+          if (session?.gameState && session.gameState !== '{}' && session.gameState !== '') {
+            try {
+              const parsed = JSON.parse(session.gameState);
+              if (parsed && typeof parsed.module === 'number') {
+                this.state = parsed;
+                if (this.state.module > 4) this.resetGame();
+              }
+            } catch (e) {
+              console.error('Error parsing hardware-care session state', e);
+            }
           }
-        } catch (e) {
-          console.error('Error parsing session state', e);
-        }
-      }
+          this.initializeModule();
+        },
+        error: () => this.initializeModule()
+      });
+    } else {
       this.initializeModule();
-    });
+    }
   }
+
 
   resetGame() {
     this.state = { module: 0, phase: 0, hearts: 3, deathCount: 0 };

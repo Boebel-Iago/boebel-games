@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
 export interface GameState {
@@ -11,6 +12,7 @@ export interface GameState {
 @Injectable({ providedIn: 'root' })
 export class HardwareCareEngineService {
   state: GameState = { module: 0, phase: 0, hearts: 3, deathCount: 0 };
+  public state$ = new BehaviorSubject<GameState>({ ...this.state });
   
   get score(): number {
     return Math.max(0, (this.state.module * 200) + (this.state.phase * 20) - (this.state.deathCount * 20));
@@ -73,7 +75,6 @@ export class HardwareCareEngineService {
   ];
 
   // Módulo 5: O Grande Inspetor (Drag & Drop - 3 zonas)
-  // Categorias: higiene, energia, transporte
   m5Data = [
     { item: 'Cabo desencapado ⚡', category: 'energia' },
     { item: 'Dedo engordurado 🍕', category: 'higiene' },
@@ -91,7 +92,10 @@ export class HardwareCareEngineService {
   currentTaskIndex: number = 0;
 
   constructor(private progress: ProgressReporter) {
-    // Try to restore state from backend session; always initialize the module
+    // 1. Initialize synchronous tasks immediately so UI has data at instant 0
+    this.initializeModule();
+
+    // 2. Fetch remote session asynchronously and restore if available
     const sessionObs = this.progress.fetchSessionState();
     if (sessionObs) {
       sessionObs.subscribe({
@@ -101,21 +105,21 @@ export class HardwareCareEngineService {
               const parsed = JSON.parse(session.gameState);
               if (parsed && typeof parsed.module === 'number') {
                 this.state = parsed;
-                if (this.state.module > 4) this.resetGame();
+                if (this.state.module > 4) {
+                  this.resetGame();
+                  return;
+                }
+                this.initializeModule();
               }
             } catch (e) {
               console.error('Error parsing hardware-care session state', e);
             }
           }
-          this.initializeModule();
         },
-        error: () => this.initializeModule()
+        error: () => {}
       });
-    } else {
-      this.initializeModule();
     }
   }
-
 
   resetGame() {
     this.state = { module: 0, phase: 0, hearts: 3, deathCount: 0 };
@@ -144,11 +148,12 @@ export class HardwareCareEngineService {
     }
     this.currentModuleTasks = this.shuffle(dataToShuffle);
     this.currentTaskIndex = this.state.phase;
+    this.state$.next({ ...this.state });
   }
 
   getCurrentTask() {
     if (this.state.module > 4) return null;
-    return this.currentModuleTasks[this.state.phase];
+    return this.currentModuleTasks[this.state.phase] || null;
   }
 
   reportMistake() {
@@ -157,11 +162,13 @@ export class HardwareCareEngineService {
 
     this.state.hearts--;
     if (this.state.hearts <= 0) {
-      // Restart current module
+      // 3 hearts lost -> reset module
       this.state.deathCount++;
       this.state.hearts = 3;
       this.state.phase = 0;
       this.initializeModule();
+    } else {
+      this.state$.next({ ...this.state });
     }
 
     this.progress.report({
@@ -185,7 +192,8 @@ export class HardwareCareEngineService {
     const reportFase = this.state.module * 10 + this.state.phase;
 
     if (isLastLevel) {
-      this.state.module++; // will be 5 (game over)
+      this.state.module++; // will be 5 (game completed)
+      this.state$.next({ ...this.state });
     } else if (isLastPhase) {
       this.state.module++;
       this.state.phase = 0;
@@ -193,6 +201,7 @@ export class HardwareCareEngineService {
       this.initializeModule();
     } else {
       this.state.phase++;
+      this.state$.next({ ...this.state });
     }
 
     this.progress.report({

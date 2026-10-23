@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HardwareCareEngineService } from './engine/hardware-care-engine.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-hardware-care',
@@ -10,12 +11,13 @@ import { Router } from '@angular/router';
   templateUrl: './hardware-care.component.html',
   styleUrls: ['./hardware-care.component.scss']
 })
-export class HardwareCareComponent implements OnInit {
+export class HardwareCareComponent implements OnInit, OnDestroy {
   
   shuffledOptions: any[] = [];
   feedbackMessage: string = '';
   feedbackType: 'success' | 'error' | '' = '';
   draggedItem: any = null;
+  private sub?: Subscription;
 
   constructor(
     public engine: HardwareCareEngineService,
@@ -23,7 +25,15 @@ export class HardwareCareComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.prepareCurrentTask();
+    this.sub = this.engine.state$.subscribe(() => {
+      this.prepareCurrentTask();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
   }
 
   get state() {
@@ -49,30 +59,30 @@ export class HardwareCareComponent implements OnInit {
         { text: task.wrong, isCorrect: false }
       ];
       this.engine.shuffle(this.shuffledOptions);
-    }
-
-    if (this.state.module === 3) {
+    } else if (this.state.module === 3) {
       // Module 4 Drag and Drop (2 zones)
       this.shuffledOptions = [
         { action: task.correctAction, isCorrect: true },
         { action: task.wrongAction, isCorrect: false }
       ];
       this.engine.shuffle(this.shuffledOptions);
+    } else {
+      this.shuffledOptions = [];
     }
   }
 
   handleTap(option: any) {
+    if (this.feedbackMessage) return; // Prevent double taps during feedback
+
     if (option.isCorrect) {
-      this.showFeedback('Muito bem!', 'success');
+      this.showFeedback('Muito bem! ✨', 'success');
       setTimeout(() => {
         this.engine.completePhase();
-        this.prepareCurrentTask();
       }, 1000);
     } else {
-      this.showFeedback('Ops! Tente novamente.', 'error');
+      this.showFeedback('Ops! Tente novamente. ❌', 'error');
       setTimeout(() => {
         this.engine.reportMistake();
-        this.prepareCurrentTask();
       }, 1000);
     }
   }
@@ -91,7 +101,7 @@ export class HardwareCareComponent implements OnInit {
 
   onDrop(event: DragEvent, zoneIdentifier: string) {
     event.preventDefault();
-    if (!this.draggedItem) return;
+    if (!this.draggedItem || this.feedbackMessage || !this.currentTask) return;
 
     let isCorrect = false;
 
@@ -107,16 +117,14 @@ export class HardwareCareComponent implements OnInit {
     }
 
     if (isCorrect) {
-      this.showFeedback('Excelente!', 'success');
+      this.showFeedback('Excelente! ✨', 'success');
       setTimeout(() => {
         this.engine.completePhase();
-        this.prepareCurrentTask();
       }, 1000);
     } else {
-      this.showFeedback('Cuidado, isso não está certo!', 'error');
+      this.showFeedback('Cuidado, isso não está certo! ❌', 'error');
       setTimeout(() => {
         this.engine.reportMistake();
-        this.prepareCurrentTask();
       }, 1000);
     }
     this.draggedItem = null;
@@ -133,10 +141,6 @@ export class HardwareCareComponent implements OnInit {
 
   getLostHeartArray() {
     return Array(3 - this.state.hearts).fill(0);
-  }
-
-  goBack() {
-    this.router.navigate(['/']);
   }
 
   leaveRoom() {

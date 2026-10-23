@@ -1,12 +1,9 @@
-
-<!-- Sair da Sala -->
-<button (click)="leaveRoom()" class="fixed top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-xl font-bold z-50 shadow-lg hover:bg-red-600 transition-colors border-2 border-red-700">🚪 Sair da Sala</button>
 <div class="min-h-screen bg-blue-50 flex flex-col p-4 relative font-sans">
   
   <!-- Header -->
   <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6">
-    <button (click)="goBack()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">
-      &larr; Voltar
+    <button (click)="leaveRoom()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl shadow transition-colors text-sm flex items-center gap-1 border border-red-700">
+      🚪 Sair da Sala
     </button>
     <div class="text-center">
       <h1 class="text-2xl font-extrabold text-blue-600 tracking-wide uppercase">

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AutomationRoboticsEngineService } from './engine/automation-robotics-engine.service';
+import { AutomationRoboticsEngineService, GameState, RoboticsTask } from './engine/automation-robotics-engine.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-automation-robotics',
@@ -9,64 +10,78 @@ import { AutomationRoboticsEngineService } from './engine/automation-robotics-en
   templateUrl: './automation-robotics.component.html',
   styleUrls: ['./automation-robotics.component.scss']
 })
-/**
- * AutomationRoboticsComponent
- * Responsável por gerenciar a lógica principal ou estado do jogo educacional.
- * Integrado com a plataforma via ProgressReporter.
- */
-export class AutomationRoboticsComponent implements OnInit {
-  state$ = this.engine.state$;
-  draggedTaskId: string | null = null;
+export class AutomationRoboticsComponent implements OnInit, OnDestroy {
+  state!: GameState;
+  currentTask: RoboticsTask | null = null;
+  private sub?: Subscription;
+
+  // Feedback states
+  feedbackType: 'success' | 'error' | null = null;
+  feedbackExplanation: string = '';
+  selectedOptionId: string | null = null;
+
+  moduleTitles = [
+    'Linha de Montagem Industrial',
+    'Sensores e Lógica Condicional',
+    'Inspetor de Código & Bugs',
+    'Indústria 4.0 & Ética',
+    'Programação de Rotas com Loops'
+  ];
+
+  moduleIcons = ['🏭', '🤖', '🐞', '🌐', '🧭'];
 
   constructor(public engine: AutomationRoboticsEngineService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.sub = this.engine.state$.subscribe(state => {
+      this.state = state;
+      this.currentTask = this.engine.getCurrentTask();
+      this.selectedOptionId = null;
+    });
+  }
 
-  onDragStart(event: DragEvent, taskId: string) {
-    this.draggedTaskId = taskId;
-    if (event.dataTransfer) {
-      event.dataTransfer.setData('text/plain', taskId);
-      event.dataTransfer.effectAllowed = 'move';
+  ngOnDestroy(): void {
+    if (this.sub) {
+      this.sub.unsubscribe();
     }
   }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
+  get heartsArray(): boolean[] {
+    return Array(3).fill(false).map((_, i) => i < this.state.hearts);
+  }
+
+  selectOption(option: { id: string; text: string; isCorrect: boolean }): void {
+    if (this.feedbackType !== null || !this.currentTask) return;
+
+    this.selectedOptionId = option.id;
+    const isCorrect = option.isCorrect;
+    this.feedbackExplanation = this.currentTask.explanation;
+
+    if (isCorrect) {
+      this.feedbackType = 'success';
+      setTimeout(() => {
+        this.feedbackType = null;
+        this.selectedOptionId = null;
+        this.engine.submitAnswer(true);
+      }, 1600);
+    } else {
+      this.feedbackType = 'error';
+      setTimeout(() => {
+        this.feedbackType = null;
+        this.selectedOptionId = null;
+        this.engine.submitAnswer(false);
+      }, 2200);
     }
   }
 
-  onDropPhase0(event: DragEvent) {
-    event.preventDefault();
-    if (this.draggedTaskId) {
-      this.engine.dropPhase0(this.draggedTaskId);
-      this.draggedTaskId = null;
-    }
+  restartGame(): void {
+    this.feedbackType = null;
+    this.selectedOptionId = null;
+    this.engine.resetGame();
   }
 
-  onDropPhase1(event: DragEvent) {
-    event.preventDefault();
-    if (this.draggedTaskId) {
-      this.engine.dropPhase1(this.draggedTaskId);
-      this.draggedTaskId = null;
-    }
-  }
-
-  onDropPhase2(event: DragEvent, targetBox: 'robot' | 'human') {
-    event.preventDefault();
-    if (this.draggedTaskId) {
-      this.engine.dropPhase2(this.draggedTaskId, targetBox);
-      this.draggedTaskId = null;
-    }
-  }
-
-  answerPhase3(type: 'robot' | 'human') {
-    this.engine.answerPhase3(type);
-  }
-
-  leaveRoom() {
-    if (confirm('Tem certeza que deseja sair? Seu progresso desta fase será perdido.')) {
+  leaveRoom(): void {
+    if (confirm('Tem certeza que deseja sair da sala? Seu progresso nesta fase será interrompido.')) {
       sessionStorage.clear();
       window.location.href = '/';
     }

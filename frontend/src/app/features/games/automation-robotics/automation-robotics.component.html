@@ -147,7 +147,7 @@
 
         <!-- Alternativas Interativas -->
         <div *ngIf="currentTask.options" class="grid grid-cols-1 gap-3.5">
-          <button *ngFor="let opt of currentTask.options"
+          <button *ngFor="let opt of currentTask.options; let i = index"
                   (click)="selectOption(opt)"
                   [disabled]="feedbackType !== null"
                   [ngClass]="{
@@ -158,8 +158,10 @@
                   }"
                   class="w-full text-left p-4 md:p-5 rounded-2xl border-2 transition-all font-medium text-sm md:text-base flex items-center justify-between group active:scale-[0.99] disabled:opacity-80 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
             <span class="flex-1 pr-4">{{ opt.text }}</span>
+            
+            <!-- Mudança aqui: transformamos o índice 0, 1, 2, 3 em 'A', 'B', 'C', 'D' com base em onde a alternativa caiu -->
             <span class="w-7 h-7 rounded-full border border-slate-700 flex items-center justify-center text-xs text-slate-400 group-hover:border-amber-400 group-hover:text-amber-300 transition-colors">
-              {{ opt.id.toUpperCase() }}
+              {{ [ 'A', 'B', 'C', 'D' ][i] }}
             </span>
           </button>
         </div>

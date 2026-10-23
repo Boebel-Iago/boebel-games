@@ -2,11 +2,26 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ProgressReporter } from '../../../../core/services/progress-reporter.service';
 
+export interface TimelineCard {
+  id: string;
+  name: string;
+  icon: string;
+  correctSlotIndex: number;
+}
+
+export interface ClassifierItem {
+  id: string;
+  text: string;
+  icon: string;
+  correctCategory: 'machine' | 'human';
+}
+
 export interface WorkEvolutionTask {
   id: number;
   module: number;
   phase: number;
-  era: string;
+  type?: 'quiz' | 'timeline_drag' | 'classifier_drag';
+  era?: string;
   badge: string;
   title: string;
   historicalContext: string;
@@ -20,8 +35,10 @@ export interface WorkEvolutionTask {
   };
   timelineSteps?: { step: string; period: string; tech: string }[];
   question: string;
-  options: { id: string; text: string; isCorrect: boolean }[];
+  options?: { id: string; text: string; isCorrect: boolean }[];
   didacticExplanation: string;
+  timelineCards?: TimelineCard[];
+  classifierItems?: ClassifierItem[];
 }
 
 export interface GameState {
@@ -1132,6 +1149,354 @@ export class AutomationRoboticsEngineService {
         ],
         didacticExplanation: 'Parabéns, Historiador(a) e Cientista do Futuro! Você completou os 50 desafios sobre A Evolução do Trabalho. Use a tecnologia com sabedoria, ética e empatia para construir um mundo mais justo para todos!'
       }
+    ],
+
+    // MÓDULO 6: 🧩 O Construtor da Linha do Tempo (Drag & Drop Cronológico)
+    [
+      {
+        id: 51,
+        module: 5,
+        phase: 0,
+        type: 'timeline_drag',
+        badge: 'Escrita',
+        title: 'Linha do Tempo: A Evolução da Escrita',
+        historicalContext: 'Organize a jornada da escrita humana desde os manuscritos antigos até os processadores de texto modernos.',
+        question: 'Arraste cada uma das 4 invenções para a sua época histórica correta na linha do tempo:',
+        didacticExplanation: 'Da pena animal que dependia da força dos dedos até o processador na nuvem, a escrita se tornou instantânea e universal!',
+        timelineCards: [
+          { id: 't1_1', name: 'Pena de Ganso e Papiro', icon: '🪶', correctSlotIndex: 0 },
+          { id: 't1_2', name: 'Prensa de Tipos Móveis (Gutenberg)', icon: '📰', correctSlotIndex: 1 },
+          { id: 't1_3', name: 'Máquina de Escrever Mecânica', icon: '⌨️', correctSlotIndex: 2 },
+          { id: 't1_4', name: 'Editor de Texto em Nuvem com IA', icon: '💻', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 52,
+        module: 5,
+        phase: 1,
+        type: 'timeline_drag',
+        badge: 'Cálculo',
+        title: 'Linha do Tempo: A Evolução do Cálculo',
+        historicalContext: 'A contagem de pedras até os supercomputadores modernos com transistores microscópicos.',
+        question: 'Encaixe os 4 instrumentos de cálculo nas suas respectivas eras cronológicas:',
+        didacticExplanation: 'O ábaco dependia dos dedos; a régua e as calculadoras dependiam de engrenagens; os chips modernos calculam com elétrons!',
+        timelineCards: [
+          { id: 't2_1', name: 'Ábaco de Madeira e Pedras', icon: '🧮', correctSlotIndex: 0 },
+          { id: 't2_2', name: 'Régua de Cálculo Logarítmica', icon: '📏', correctSlotIndex: 1 },
+          { id: 't2_3', name: 'Calculadora Mecânica de Engrenagens', icon: '⚙️', correctSlotIndex: 2 },
+          { id: 't2_4', name: 'Microprocessador de Silício em Nuvem', icon: '⚡', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 53,
+        module: 5,
+        phase: 2,
+        type: 'timeline_drag',
+        badge: 'Iluminação',
+        title: 'Linha do Tempo: O Domínio da Luz Noturna',
+        historicalContext: 'Como o ser humano venceu a escuridão da noite para trabalhar e viver com segurança.',
+        question: 'Posicione as tecnologias de iluminação na ordem cronológica correta:',
+        didacticExplanation: 'Do fogo instável à lâmpada incandescente que esquentava até os LEDs frios e inteligentes controlados por sensores!',
+        timelineCards: [
+          { id: 't3_1', name: 'Tocha de Fogo e Resina Animal', icon: '🔥', correctSlotIndex: 0 },
+          { id: 't3_2', name: 'Lampião a Gás e Querosene', icon: '🏮', correctSlotIndex: 1 },
+          { id: 't3_3', name: 'Lâmpada Incandescente de Filamento', icon: '💡', correctSlotIndex: 2 },
+          { id: 't3_4', name: 'Lâmpada de LED Inteligente IoT', icon: '✨', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 54,
+        module: 5,
+        phase: 3,
+        type: 'timeline_drag',
+        badge: 'Transporte',
+        title: 'Linha do Tempo: A Velocidade dos Meios de Transporte',
+        historicalContext: 'A evolução da locomoção terrestre: da força dos animais aos motores elétricos inteligentes.',
+        question: 'Ordene a evolução dos veículos de transporte na esteira temporal:',
+        didacticExplanation: 'A tração animal limitava a velocidade a 15 km/h; a locomotiva a vapor uniu cidades; hoje carros elétricos navegam por IA!',
+        timelineCards: [
+          { id: 't4_1', name: 'Carroça de Tração por Cavalos e Bois', icon: '🐎', correctSlotIndex: 0 },
+          { id: 't4_2', name: 'Locomotiva Maria-Fumaça a Vapor', icon: '🚂', correctSlotIndex: 1 },
+          { id: 't4_3', name: 'Automóvel a Gasolina em Linha de Montagem', icon: '🚗', correctSlotIndex: 2 },
+          { id: 't4_4', name: 'Veículo Elétrico Autônomo com Sensores LiDAR', icon: '🔋', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 55,
+        module: 5,
+        phase: 4,
+        type: 'timeline_drag',
+        badge: 'Agricultura',
+        title: 'Linha do Tempo: O Trabalho Rural e a Produção de Alimentos',
+        historicalContext: 'A história da comida: da foice de ferro às colheitadeiras guiadas por satélites.',
+        question: 'Coloque as ferramentas agrícolas nas suas respectivas eras históricas:',
+        didacticExplanation: 'A agricultura era o trabalho mais exaustivo da humanidade; hoje drones e máquinas com GPS monitoram a lavoura com precisão.',
+        timelineCards: [
+          { id: 't5_1', name: 'Foice Manual e Arado de Madeira', icon: '🌾', correctSlotIndex: 0 },
+          { id: 't5_2', name: 'Trator Mecânico Tracionado a Vapor', icon: '⚙️', correctSlotIndex: 1 },
+          { id: 't5_3', name: 'Colheitadeira Industrial a Combustão', icon: '🚜', correctSlotIndex: 2 },
+          { id: 't5_4', name: 'Drone Agrícola com Câmeras Multiespectrais', icon: '🚁', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 56,
+        module: 5,
+        phase: 5,
+        type: 'timeline_drag',
+        badge: 'Comunicação',
+        title: 'Linha do Tempo: A Conexão à Distância',
+        historicalContext: 'Como as notícias e mensagens cruzaram oceanos e montanhas ao longo da história.',
+        question: 'Organize a evolução das telecomunicações na linha do tempo:',
+        didacticExplanation: 'Cartas a cavalo levavam meses; o telégrafo inaugurou a eletricidade na comunicação; hoje o 5G conecta bilhões instantaneamente.',
+        timelineCards: [
+          { id: 't6_1', name: 'Sinal de Fumaça e Carta a Cavalo', icon: '✉️', correctSlotIndex: 0 },
+          { id: 't6_2', name: 'Telégrafo Óptico com Torres de Sinal', icon: '📡', correctSlotIndex: 1 },
+          { id: 't6_3', name: 'Telefone Fixo com Fios de Cobre', icon: '☎️', correctSlotIndex: 2 },
+          { id: 't6_4', name: 'Fibra Óptica Submarina e Redes 5G', icon: '🌐', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 57,
+        module: 5,
+        phase: 6,
+        type: 'timeline_drag',
+        badge: 'Imagem',
+        title: 'Linha do Tempo: O Registro Visual e a Fotografia',
+        historicalContext: 'Do retrato pintado à mão durante meses até as fotos digitais capturadas em milissegundos.',
+        question: 'Encaixe cada técnica de imagem na sua época de surgimento:',
+        didacticExplanation: 'O daguerreótipo exigia que a pessoa ficasse 15 minutos imóvel! Hoje câmeras neurais corrigem a luz em fração de segundo.',
+        timelineCards: [
+          { id: 't7_1', name: 'Pintura a Óleo sobre Tela de Tecido', icon: '🎨', correctSlotIndex: 0 },
+          { id: 't7_2', name: 'Daguerreótipo em Placa Metálica Polida', icon: '📷', correctSlotIndex: 1 },
+          { id: 't7_3', name: 'Câmera Analógica com Rolo de Filme Químico', icon: '🎞️', correctSlotIndex: 2 },
+          { id: 't7_4', name: 'Sensor Digital CMOS com Inteligência Neural', icon: '📱', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 58,
+        module: 5,
+        phase: 7,
+        type: 'timeline_drag',
+        badge: 'Memória',
+        title: 'Linha do Tempo: Onde Guardamos Nossos Dados',
+        historicalContext: 'A preservação do saber humano: das cinzas do papiro aos servidores em nuvem seguros.',
+        question: 'Posicione os suportes de armazenamento na linha do tempo correta:',
+        didacticExplanation: 'Bibliotecas inteiras queimavam em incêndios no passado; hoje réplicas criptografadas em nuvem guardam a memória da humanidade.',
+        timelineCards: [
+          { id: 't8_1', name: 'Rolos de Papiro e Pergaminho de Couro', icon: '📜', correctSlotIndex: 0 },
+          { id: 't8_2', name: 'Enciclopédias e Arquivos Físicos em Papel', icon: '📚', correctSlotIndex: 1 },
+          { id: 't8_3', name: 'Disquetes Magnéticos de 1,44 MB', icon: '💾', correctSlotIndex: 2 },
+          { id: 't8_4', name: 'Servidores em Nuvem com Memória Flash SSD', icon: '☁️', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 59,
+        module: 5,
+        phase: 8,
+        type: 'timeline_drag',
+        badge: 'Construção',
+        title: 'Linha do Tempo: Como Construímos Cidades',
+        historicalContext: 'Das primeiras cabanas de barro às casas impressas em 3D em 24 horas.',
+        question: 'Arraste as tecnologias de construção para a ordem cronológica correta:',
+        didacticExplanation: 'Construir exigia a força muscular de multidões; hoje braços robóticos e impressoras gigantes depositam cimento com segurança.',
+        timelineCards: [
+          { id: 't9_1', name: 'Picareta de Pedra e Corda com Troncos', icon: '🪵', correctSlotIndex: 0 },
+          { id: 't9_2', name: 'Guindaste Mecânico a Vapor com Cabos de Aço', icon: '🏗️', correctSlotIndex: 1 },
+          { id: 't9_3', name: 'Betoneiras e Tratores Diesel de Terraplanagem', icon: '🚚', correctSlotIndex: 2 },
+          { id: 't9_4', name: 'Impressora 3D Robótica de Casas de Concreto', icon: '🏛️', correctSlotIndex: 3 }
+        ]
+      },
+      {
+        id: 60,
+        module: 5,
+        phase: 9,
+        type: 'timeline_drag',
+        badge: 'Medicina',
+        title: 'Linha do Tempo: Os Cuidados de Saúde e Cirurgia',
+        historicalContext: 'A vitória da medicina sobre a dor e as infecções cirúrgicas.',
+        question: 'Ordene a evolução dos procedimentos cirúrgicos na linha do tempo:',
+        didacticExplanation: 'Antes da anestesia e da esterilização, cirurgias eram dolorosas e rústicas; hoje robôs milimétricos operam com incisões microscópicas.',
+        timelineCards: [
+          { id: 't10_1', name: 'Faca Rústica sem Anestesia e Ervas', icon: '🌿', correctSlotIndex: 0 },
+          { id: 't10_2', name: 'Estetoscópio de Madeira e Éter Anestésico', icon: '🩺', correctSlotIndex: 1 },
+          { id: 't10_3', name: 'Aparelho de Raio-X com Tubo a Vácuo', icon: '🩻', correctSlotIndex: 2 },
+          { id: 't10_4', name: 'Braço Robótico Cirúrgico Da Vinci Teleoperado', icon: '🦾', correctSlotIndex: 3 }
+        ]
+      }
+    ],
+
+    // MÓDULO 7: ⚖️ O Grande Classificador: Humano vs Máquina (Drag & Drop Dinâmico)
+    [
+      {
+        id: 61,
+        module: 6,
+        phase: 0,
+        type: 'classifier_drag',
+        badge: 'Força vs Cuidado',
+        title: 'Classificador: Onde Cada Um se Destaca?',
+        historicalContext: 'Cada trabalhador e ferramenta tem seu talento exclusivo. Separe as tarefas entre as habilidades da Máquina e do Ser Humano.',
+        question: 'Arraste cada uma das 4 tarefas para a caixa correta (Máquina ou Humano):',
+        didacticExplanation: 'Máquinas realizam cálculos instantâneos e tarefas exaustivas; humanos oferecem compaixão, escuta ativa e emoção genuína!',
+        classifierItems: [
+          { id: 'c1_1', text: 'Calcular 1 bilhão de equações em 1 segundo', icon: '🧮', correctCategory: 'machine' },
+          { id: 'c1_2', text: 'Abraçar e acalmar uma criança assustada no hospital', icon: '🫂', correctCategory: 'human' },
+          { id: 'c1_3', text: 'Soldar 500 portas de carro sem parar e sem cansaço', icon: '⚡', correctCategory: 'machine' },
+          { id: 'c1_4', text: 'Criar uma melodia tocante inspirada na saudade dos avós', icon: '🎶', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 62,
+        module: 6,
+        phase: 1,
+        type: 'classifier_drag',
+        badge: 'Perigo vs Empatia',
+        title: 'Classificador: Riscos e Convivência',
+        historicalContext: 'Protegendo a vida humana e fortalecendo as relações de amizade.',
+        question: 'Classifique as 4 situações entre a Caixa da Máquina e a Caixa do Humano:',
+        didacticExplanation: 'Colocar um robô em ambiente letal salva vidas humanas; resolver atritos com empatia exige inteligência emocional!',
+        classifierItems: [
+          { id: 'c2_1', text: 'Entrar em local com vazamento de radiação nuclear tóxica', icon: '☢️', correctCategory: 'machine' },
+          { id: 'c2_2', text: 'Mediar uma discussão entre dois amigos para que façam as pazes', icon: '🤝', correctCategory: 'human' },
+          { id: 'c2_3', text: 'Varrer o chão de uma fábrica 24 horas por dia sem parar', icon: '🧹', correctCategory: 'machine' },
+          { id: 'c2_4', text: 'Contar uma história de ninar cheia de carinho para o irmãozinho', icon: '🌙', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 63,
+        module: 6,
+        phase: 2,
+        type: 'classifier_drag',
+        badge: 'Dados vs Sentimento',
+        title: 'Classificador: Organização e Imaginação',
+        historicalContext: 'A separação entre processamento veloz de dados e sensibilidade poética.',
+        question: 'Arraste as tarefas para o destino apropriado:',
+        didacticExplanation: 'Computadores organizam montanhas de dados com rapidez; perceber o sentimento alheio e imaginar novos mundos é puramente humano.',
+        classifierItems: [
+          { id: 'c3_1', text: 'Organizar 1 milhão de prontuários por data de nascimento', icon: '📁', correctCategory: 'machine' },
+          { id: 'c3_2', text: 'Inventar uma fábula inédita com personagens da imaginação', icon: '✨', correctCategory: 'human' },
+          { id: 'c3_3', text: 'Medir espessura de vidro com precisão de 0,001 mm', icon: '🔍', correctCategory: 'machine' },
+          { id: 'c3_4', text: 'Perceber que um colega está em silêncio porque está magoado', icon: '💭', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 64,
+        module: 6,
+        phase: 3,
+        type: 'classifier_drag',
+        badge: 'Pesado vs Justo',
+        title: 'Classificador: Cargas Físicas e Decisões Morais',
+        historicalContext: 'O limite do peso suportado pelo corpo versus a ponderação de regras justas.',
+        question: 'Distribua as ações entre as duas caixas:',
+        didacticExplanation: 'Máquinas suportam toneladas de peso; a flexibilidade da justiça e o respeito aos vulneráveis exigem consciência moral.',
+        classifierItems: [
+          { id: 'c4_1', text: 'Empilhar 1.000 caixas de 50 kg sem lesionar as costas', icon: '📦', correctCategory: 'machine' },
+          { id: 'c4_2', text: 'Decidir com justiça se uma regra precisa de exceção solidária', icon: '⚖️', correctCategory: 'human' },
+          { id: 'c4_3', text: 'Monitorar temperatura de caldeira a 800°C sem desmaiar', icon: '🌡️', correctCategory: 'machine' },
+          { id: 'c4_4', text: 'Ajudar um idoso a atravessar a rua com atenção e respeito', icon: '🚶‍♂️', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 65,
+        module: 6,
+        phase: 4,
+        type: 'classifier_drag',
+        badge: 'Espaço vs Amor',
+        title: 'Classificador: Explorando o Desconhecido',
+        historicalContext: 'Mundos distantes sem ar respirável e o afeto aos seres vivos do nosso planeta.',
+        question: 'Classifique as 4 atividades:',
+        didacticExplanation: 'Robôs espaciais viajam por anos no vácuo congelante; o amor à vida e a expressão de poesias nascem do coração humano.',
+        classifierItems: [
+          { id: 'c5_1', text: 'Explorar a cratera de Marte sob tempestade de poeira cósmica', icon: '🪐', correctCategory: 'machine' },
+          { id: 'c5_2', text: 'Sentir compaixão e alimentar um animalzinho abandonado', icon: '🐶', correctCategory: 'human' },
+          { id: 'c5_3', text: 'Detectar microfissura invisível em turbina de avião por laser', icon: '✈️', correctCategory: 'machine' },
+          { id: 'c5_4', text: 'Compor um poema romântico expressando o primeiro beijo', icon: '💌', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 66,
+        module: 6,
+        phase: 5,
+        type: 'classifier_drag',
+        badge: 'Micrométrico vs Afeto',
+        title: 'Classificador: Precisão e Carinho',
+        historicalContext: 'A manufatura de semicondutores e o acolhimento afetuoso de pessoas queridas.',
+        question: 'Arraste os cartões para a caixa adequada:',
+        didacticExplanation: 'Soldas em nanoescala exigem mãos robóticas firmes; ouvir as memórias de quem amamos exige tempo, paciência e afeto.',
+        classifierItems: [
+          { id: 'c6_1', text: 'Montar circuito com 10.000 micro-soldas invisíveis ao olho', icon: '🔬', correctCategory: 'machine' },
+          { id: 'c6_2', text: 'Olhar nos olhos de um paciente e ouvir com paciência e amor', icon: '❤️', correctCategory: 'human' },
+          { id: 'c6_3', text: 'Verificar a rotação de turbinas de usina a 3.000 RPM sem piscar', icon: '🌀', correctCategory: 'machine' },
+          { id: 'c6_4', text: 'Cozinhar um almoço de domingo colocando o tempero da família', icon: '🍲', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 67,
+        module: 6,
+        phase: 6,
+        type: 'classifier_drag',
+        badge: 'Perigo vs Moral',
+        title: 'Classificador: Proteção e Sabedoria',
+        historicalContext: 'Ações de desativação de explosivos e conselhos para a vida.',
+        question: 'Separe as ações entre Máquina e Humano:',
+        didacticExplanation: 'Robôs operam em zonas de conflito para que vidas sejam poupadas; conselhos éticos requerem sabedoria de vida acumulada.',
+        classifierItems: [
+          { id: 'c7_1', text: 'Desativar mina terrestre enterrada no barro com robô esteira', icon: '💣', correctCategory: 'machine' },
+          { id: 'c7_2', text: 'Avaliar um caso difícil com sabedoria, bom senso e moralidade', icon: '🏛️', correctCategory: 'human' },
+          { id: 'c7_3', text: 'Processar 100.000 transações de pagamento PIX por segundo', icon: '💳', correctCategory: 'machine' },
+          { id: 'c7_4', text: 'Dar um conselho amigo para um jovem que está com medo do futuro', icon: '🌱', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 68,
+        module: 6,
+        phase: 7,
+        type: 'classifier_drag',
+        badge: 'Escuridão vs Liderança',
+        title: 'Classificador: Automação e Inspiração',
+        historicalContext: 'Trabalho contínuo no escuro e a capacidade de encorajar outras pessoas.',
+        question: 'Arraste para as caixas corretas:',
+        didacticExplanation: 'Sensores de AGV não precisam de luz para navegar; a humildade de pedir desculpas e liderar é a essência da liderança humana.',
+        classifierItems: [
+          { id: 'c8_1', text: 'Navegar em armazém totalmente escuro guiado por fita magnética', icon: '🔦', correctCategory: 'machine' },
+          { id: 'c8_2', text: 'Inspirar uma equipe desanimada a ter esperança e continuar', icon: '⭐', correctCategory: 'human' },
+          { id: 'c8_3', text: 'Cortar blocos de granito com jato de areia e água sob pressão', icon: '🪨', correctCategory: 'machine' },
+          { id: 'c8_4', text: 'Reconhecer um erro, pedir desculpas sinceras e mudar de atitude', icon: '🙏', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 69,
+        module: 6,
+        phase: 8,
+        type: 'classifier_drag',
+        badge: 'Velocidade vs Filosofia',
+        title: 'Classificador: Aceleração e Profundidade',
+        historicalContext: 'A velocidade dos processos industriais e o acolhimento do sofrimento humano.',
+        question: 'Distribua as ações entre as duas caixas:',
+        didacticExplanation: 'Máquinas contam e separam frascos em alta velocidade; estar ao lado de alguém que sofre é um ato de puro amor humano.',
+        classifierItems: [
+          { id: 'c9_1', text: 'Separar frascos de remédios defeituosos a 300 frascos por minuto', icon: '💊', correctCategory: 'machine' },
+          { id: 'c9_2', text: 'Refletir sobre o sentido da vida, arte e o que é ser honesto', icon: '📖', correctCategory: 'human' },
+          { id: 'c9_3', text: 'Mapear o fundo do mar a 4.000 metros por meses sem respirar ar', icon: '🌊', correctCategory: 'machine' },
+          { id: 'c9_4', text: 'Segurar a mão de alguém querido em um momento de dor e perda', icon: '🤍', correctCategory: 'human' }
+        ]
+      },
+      {
+        id: 70,
+        module: 6,
+        phase: 9,
+        type: 'classifier_drag',
+        badge: 'A Grande Parceria',
+        title: 'Classificador: A Aliança do Futuro',
+        historicalContext: 'A harmonia perfeita entre a inteligência computacional e o coração humano.',
+        question: 'Finalize a classificação suprema:',
+        didacticExplanation: 'Parabéns! A máquina oferece a potência do cálculo e a precisão do trabalho; o ser humano oferece o propósito, a ética e o amor para transformar o mundo!',
+        classifierItems: [
+          { id: 'c10_1', text: 'Entregar força física incansável, velocidade e precisão de dados', icon: '⚡', correctCategory: 'machine' },
+          { id: 'c10_2', text: 'Entregar propósito ético, empatia, sensibilidade e imaginação', icon: '💡', correctCategory: 'human' },
+          { id: 'c10_3', text: 'Executar tarefas perigosas e repetitivas em escala global', icon: '🏭', correctCategory: 'machine' },
+          { id: 'c10_4', text: 'Sonhar com um mundo melhor e educar as futuras gerações com afeto', icon: '🌍', correctCategory: 'human' }
+        ]
+      }
     ]
   ];
 
@@ -1143,8 +1508,8 @@ export class AutomationRoboticsEngineService {
             const parsed = JSON.parse(session.gameState);
             if (parsed && typeof parsed.module === 'number') {
               this.state = parsed;
-              if (this.state.module > 4) {
-                this.state.module = 4;
+              if (this.state.module > 6) {
+                this.state.module = 6;
                 this.state.phase = 9;
               }
             }
@@ -1161,7 +1526,7 @@ export class AutomationRoboticsEngineService {
   }
 
   getCurrentTask(): WorkEvolutionTask | null {
-    if (this.state.module > 4) return null;
+    if (this.state.module > 6) return null;
     return this.tasks[this.state.module]?.[this.state.phase] || null;
   }
 
@@ -1175,12 +1540,12 @@ export class AutomationRoboticsEngineService {
     const reportFase = this.state.module * 10 + this.state.phase;
 
     if (isCorrect) {
-      const isLastModule = this.state.module === 4;
+      const isLastModule = this.state.module === 6;
       const isLastPhase = this.state.phase === 9;
       const isLastLevel = isLastModule && isLastPhase;
 
       if (isLastLevel) {
-        this.state.module++; // will be 5 (game won)
+        this.state.module++; // will be 7 (game won)
       } else if (isLastPhase) {
         this.state.module++;
         this.state.phase = 0;
@@ -1228,3 +1593,4 @@ export class AutomationRoboticsEngineService {
     }
   }
 }
+

@@ -916,15 +916,15 @@ A partir de Setembro de 2026, todos os jogos curriculares (exceto `emergency-esc
 | **Estado** | 4 fases (plágio, foto whatsapp, proteção de senha) |
 | **Especial** | Estruturado via cenários descritivos interativos (decision-making) |
 
-### 13.16 Automação e Robótica (`automation-robotics`) — 5º/6º/7º Ano
+### 13.16 A Evolução do Trabalho: Do Manual ao Digital (`automation-robotics`) — 5º/6º/7º Ano
 
 | Aspecto | Detalhe |
 |---------|---------|
-| **Tema** | Engenharia de Automação, Robótica Física, Depuração de Bugs, Indústria 4.0 e Algoritmos de Rota |
+| **Tema** | A Evolução do Trabalho: Da força física manual à Era Digital, robôs e inteligência artificial |
 | **Model** | `automation-robotics-engine.service.ts` |
-| **Estado** | 5 módulos com 10 desafios cada (total 50 fases). Sistema de 3 vidas por módulo com penalidade `deathCount`. |
-| **Módulos** | 1. Linha de Montagem Industrial; 2. Sensores & Lógica Condicional; 3. Inspetor de Código & Bugs; 4. Indústria 4.0 & Ética; 5. Programação de Rotas com Loops |
-| **Especial** | Interface de Laboratório Industrial com telemetria sensorial em tempo real, snippets de código/pseudocódigo e feedback animado |
+| **Estado** | 7 módulos com 10 desafios cada (total 70 fases). Sistema de 3 vidas por módulo com penalidade `deathCount`. |
+| **Módulos** | 1. O Trabalho Antigo (Era Manual); 2. Profissões que Mudaram ou Sumiram; 3. A Linha do Tempo das Ferramentas; 4. A Era Digital e os Robôs; 5. O Futuro e as Novas Profissões; 6. 🧩 O Construtor da Linha do Tempo (Drag & Drop Cronológico); 7. ⚖️ O Grande Classificador: Humano vs Máquina (Drag & Drop Dinâmico) |
+| **Especial** | Suporte híbrido a Drag & Drop e clique tátil em slots temporais e caixas seletoras, comparativo visual Passado vs Hoje e feedback pedagógico imediato |
 
 ### 13.17 Feira do Futuro HQ (`future-fair`) — 5º Ano
 

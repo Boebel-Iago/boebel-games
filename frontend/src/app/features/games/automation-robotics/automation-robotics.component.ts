@@ -99,9 +99,9 @@ export class AutomationRoboticsComponent implements OnInit, OnDestroy {
       this.humanZoneItems = [];
       this.availableClassifierItems = this.shuffle(this.currentTask.classifierItems || []);
     } else {
-      // ADICIONE ESTE BLOCO: Embaralha as opções de múltipla escolha se elas existirem
+      // Cria um novo array com o spread [...] antes de embaralhar para o JavaScript não manter a referência estática
       if (this.currentTask?.options) {
-        this.currentTask.options = this.shuffle(this.currentTask.options);
+        this.currentTask.options = this.shuffle([...this.currentTask.options]);
       }
     }
   }

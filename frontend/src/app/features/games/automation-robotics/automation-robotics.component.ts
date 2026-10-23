@@ -98,6 +98,11 @@ export class AutomationRoboticsComponent implements OnInit, OnDestroy {
       this.machineZoneItems = [];
       this.humanZoneItems = [];
       this.availableClassifierItems = this.shuffle(this.currentTask.classifierItems || []);
+    } else {
+      // ADICIONE ESTE BLOCO: Embaralha as opções de múltipla escolha se elas existirem
+      if (this.currentTask?.options) {
+        this.currentTask.options = this.shuffle(this.currentTask.options);
+      }
     }
   }
 
